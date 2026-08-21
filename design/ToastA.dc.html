@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #9A6B12; text-decoration: none; }
+    a:hover { color: #101010; }
+  </style>
+</helmet>
+<div style="width: 620px; height: 540px; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden; background: #F4F2ED; color: #101010; font-family: 'Archivo', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-variant-numeric: tabular-nums;">
+  <div style="padding: 16px 24px 14px; border-bottom: 1px solid #D6D2C8; display: flex; align-items: flex-end; justify-content: space-between;">
+    <div>
+      <div style="font-size: 8.5px; font-weight: 600; letter-spacing: 2.2px; text-transform: uppercase; color: #9A6B12;">Runflow</div>
+      <div style="font-size: 14px; font-weight: 600; letter-spacing: -0.3px; margin-top: 5px;">新员工入职流程</div>
+    </div>
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #9C988F; letter-spacing: 0.4px;">已保存 12:04</div>
+  </div>
+  <div style="height: 340px; position: relative; flex-shrink: 0;">
+      <div style="position: absolute; left: 180px; top: 30px; width: 260px; box-sizing: border-box; background: #FFFFFF; border: 2px solid #101010; padding: 9px 12px; font-size: 11.5px; font-weight: 600; display: flex; align-items: center;">第三方核验<span style="margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.6px; color: #F4F2ED; background: #101010; padding: 1px 5px;">NOW</span></div>
+      <div style="position: absolute; left: 180px; top: 100px; width: 260px; box-sizing: border-box; border: 1px solid #C7C2B6; padding: 10px 12px; font-size: 11.5px;">出具报告</div>
+      <div style="position: absolute; left: 220px; top: 170px; width: 180px; height: 44px; display: flex; align-items: center; justify-content: center;">
+        <svg style="position: absolute; inset: 0; width: 100%; height: 100%;" viewBox="0 0 180 44" preserveAspectRatio="none"><polygon points="90,1.5 178.5,22 90,42.5 1.5,22" fill="#F4F2ED" stroke="#101010" stroke-width="1" stroke-linejoin="miter"></polygon></svg>
+        <span style="position: relative; z-index: 1; font-size: 11px;">核验通过？</span>
+      </div>
+      <div style="position: absolute; left: 180px; top: 245px; width: 260px; box-sizing: border-box; background: #101010; color: #F4F2ED; padding: 10px 12px; font-size: 11.5px; font-weight: 600;">完成入职</div>
+      <svg style="position: absolute; inset: 0; width: 100%; height: 100%;" fill="none">
+        <path d="M310 68 V100" stroke="#101010" stroke-width="1"></path>
+        <path d="M310 138 V170" stroke="#101010" stroke-width="1"></path>
+        <path d="M310 214 V245" stroke="#101010" stroke-width="1"></path>
+      </svg>
+    <div style="position: absolute; left: 16px; right: 16px; top: 282px; background: #101010; color: #F4F2ED; padding: 12px 16px; display: flex; align-items: center; gap: 14px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 500; letter-spacing: 1.4px; color: #E0A62E;">保存失败</span>
+      <span style="font-size: 12px;">改动已存在本机，联网后自动重试</span>
+      <span style="margin-left: auto; font-size: 11.5px; font-weight: 500; color: #E0A62E; border-bottom: 1px solid #E0A62E;">立即重试</span>
+    </div>
+  </div>
+  <div style="padding: 18px 24px 20px; border-top: 2px solid #101010;">
+    <div style="display: flex; align-items: baseline; gap: 10px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500; color: #9A6B12; letter-spacing: 0.5px;">A</span>
+      <span style="font-size: 15px; font-weight: 600; letter-spacing: -0.3px;">底部黑条</span>
+      <span style="font-size: 10.5px; color: #9C988F;">全宽 · 黑底白字</span>
+    </div>
+    <div style="font-size: 11.5px; line-height: 1.7; color: #6B6862; margin-top: 9px; text-wrap: pretty;">像报纸的更正启事，横在底部，看不见都难。错误和需要决定的事用它最合适。<span style="color: #101010; font-weight: 500;">代价：</span>吃掉画布底部一条，会盖住最下面的节点；一次只显示一条，新的直接替换旧的。</div>
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview":{"width":620,"height":540}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

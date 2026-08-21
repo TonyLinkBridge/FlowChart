@@ -1,0 +1,172 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #9A6B12; text-decoration: none; }
+    a:hover { color: #101010; }
+  </style>
+</helmet>
+<div style="width: 1400px; height: 940px; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden; background: #F4F2ED; color: #101010; font-family: 'Archivo', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-variant-numeric: tabular-nums;">
+
+  <div style="padding: 38px 56px 16px; border-bottom: 2px solid #101010; display: flex; align-items: flex-end; justify-content: space-between;">
+    <div style="font-size: 10px; font-weight: 600; letter-spacing: 2.6px; text-transform: uppercase; color: #9A6B12;">四视图 · Four Views</div>
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.6px; color: #9C988F;">ONE JSON / FOUR READINGS</div>
+  </div>
+
+  <div style="padding: 40px 56px 0;">
+    <div style="font-size: 34px; font-weight: 600; letter-spacing: -1.1px; line-height: 1.2;">同一份流程，四种读法</div>
+    <div style="margin-top: 20px; border-top: 1px solid #D6D2C8; padding-top: 18px; display: flex; gap: 40px;">
+      <div style="width: 120px; flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 1px; color: #9C988F; padding-top: 2px;">HOW</div>
+      <p style="margin: 0; max-width: 880px; font-size: 13px; line-height: 1.8; color: #3D3B37; text-wrap: pretty;">不是画四张图，是一份数据换四种渲染。顶上点一下就切，位置、进度、负责人全跟着走。代价只有一个：给每个框多填三个格子——<b style="font-weight: 600; color: #101010;">谁负责 · 要几天 · 做完没</b>。</p>
+    </div>
+  </div>
+
+  <div style="flex-grow: 1; margin: 32px 56px 48px; border-top: 1px solid #101010; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr));">
+
+    <div style="border-right: 1px solid #D6D2C8; border-bottom: 1px solid #D6D2C8; padding: 20px 28px 24px 0;">
+      <div style="display: flex; align-items: baseline; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid #D6D2C8;">
+        <span style="font-size: 14px; font-weight: 600; letter-spacing: -0.2px;">流程图</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.8px; color: #9C988F;">谁接谁 · 分支往哪走</span>
+        <span style="margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 500; letter-spacing: 0.8px; color: #F4F2ED; background: #9A6B12; padding: 2px 6px;">当前</span>
+      </div>
+      <div style="position: relative; height: 220px; margin-top: 18px;">
+        <svg style="position: absolute; inset: 0; width: 100%; height: 100%;" fill="none">
+          <path d="M294 30 V46" stroke="#101010" stroke-width="1"></path>
+          <path d="M294 76 V92" stroke="#101010" stroke-width="1"></path>
+          <path d="M294 124 V142" stroke="#101010" stroke-width="1"></path>
+          <path d="M374 164 H410" stroke="#101010" stroke-width="1"></path>
+          <path d="M214 164 H164" stroke="#9C988F" stroke-width="1" stroke-dasharray="4 4"></path>
+        </svg>
+        <div style="position: absolute; left: 214px; top: 0; width: 160px; box-sizing: border-box; background: #101010; color: #F4F2ED; padding: 7px 11px; font-size: 11px; font-weight: 600;">录用通知发出</div>
+        <div style="position: absolute; left: 214px; top: 46px; width: 160px; box-sizing: border-box; border: 1px solid #C7C2B6; border-left: 3px solid #9A6B12; padding: 7px 11px; font-size: 11px; color: #9C988F; text-decoration: line-through;">收集材料</div>
+        <div style="position: absolute; left: 214px; top: 92px; width: 160px; box-sizing: border-box; background: #FFFFFF; border: 2px solid #101010; border-left: 3px solid #9A6B12; padding: 6px 10px; font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 8px;">第三方核验<span style="margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.6px; color: #F4F2ED; background: #101010; padding: 1px 4px;">NOW</span></div>
+        <div style="position: absolute; left: 214px; top: 142px; width: 160px; height: 44px; display: flex; align-items: center; justify-content: center;">
+          <svg style="position: absolute; inset: 0; width: 100%; height: 100%;" viewBox="0 0 160 44" preserveAspectRatio="none"><polygon points="80,1.5 158.5,22 80,42.5 1.5,22" fill="#F4F2ED" stroke="#101010" stroke-width="1" stroke-linejoin="miter"></polygon></svg>
+          <span style="position: relative; z-index: 1; font-size: 10.5px;">核验通过？</span>
+        </div>
+        <div style="position: absolute; left: 410px; top: 149px; width: 150px; box-sizing: border-box; background: #101010; color: #F4F2ED; padding: 7px 11px; font-size: 11px; font-weight: 600;">完成入职</div>
+        <div style="position: absolute; left: 14px; top: 149px; width: 150px; box-sizing: border-box; border: 1px dashed #C7C2B6; padding: 7px 11px; font-size: 11px; color: #9C988F;">终止流程</div>
+      </div>
+    </div>
+
+    <div style="border-bottom: 1px solid #D6D2C8; padding: 20px 0 24px 28px;">
+      <div style="display: flex; align-items: baseline; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid #D6D2C8;">
+        <span style="font-size: 14px; font-weight: 600; letter-spacing: -0.2px;">泳道</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.8px; color: #9C988F;">按 OWNER 自动分道</span>
+      </div>
+      <div style="position: relative; height: 220px; margin-top: 18px;">
+        <svg style="position: absolute; inset: 0; width: 100%; height: 100%;" fill="none">
+          <path d="M362 28 H382 V84" stroke="#101010" stroke-width="1"></path>
+          <path d="M474 84 H494 V140" stroke="#101010" stroke-width="1"></path>
+        </svg>
+        <div style="position: absolute; left: 0; right: 0; top: 0; height: 56px; border-top: 1px solid #C7C2B6;"></div>
+        <div style="position: absolute; left: 0; right: 0; top: 56px; height: 56px; border-top: 1px solid #E3DFD5;"></div>
+        <div style="position: absolute; left: 0; right: 0; top: 112px; height: 56px; border-top: 1px solid #E3DFD5; border-bottom: 1px solid #C7C2B6;"></div>
+        <div style="position: absolute; left: 0; top: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 1px; color: #9C988F;">HR</div>
+        <div style="position: absolute; left: 0; top: 64px; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 1px; color: #9C988F;">IT</div>
+        <div style="position: absolute; left: 0; top: 120px; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 1px; color: #9C988F;">L&amp;D</div>
+        <div style="position: absolute; left: 48px; top: 14px; width: 140px; box-sizing: border-box; border: 1px solid #C7C2B6; border-left: 3px solid #9A6B12; background: #F4F2ED; padding: 6px 10px; font-size: 10.5px; color: #9C988F; text-decoration: line-through;">收集材料</div>
+        <div style="position: absolute; left: 204px; top: 13px; width: 140px; box-sizing: border-box; background: #FFFFFF; border: 2px solid #101010; padding: 5px 9px; font-size: 10.5px; font-weight: 600;">第三方核验</div>
+        <div style="position: absolute; left: 360px; top: 14px; width: 140px; box-sizing: border-box; border: 1px solid #C7C2B6; background: #F4F2ED; padding: 6px 10px; font-size: 10.5px;">出具报告</div>
+        <div style="position: absolute; left: 334px; top: 70px; width: 156px; box-sizing: border-box; border: 1px solid #C7C2B6; background: #F4F2ED; padding: 6px 10px; font-size: 10.5px;">开通账号 · 领设备</div>
+        <div style="position: absolute; left: 446px; top: 126px; width: 140px; box-sizing: border-box; background: #101010; color: #F4F2ED; padding: 6px 10px; font-size: 10.5px; font-weight: 600;">入职培训</div>
+      </div>
+    </div>
+
+    <div style="border-right: 1px solid #D6D2C8; padding: 24px 28px 0 0;">
+      <div style="display: flex; align-items: baseline; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid #D6D2C8;">
+        <span style="font-size: 14px; font-weight: 600; letter-spacing: -0.2px;">时间条</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.8px; color: #9C988F;">按 DAYS 排 · 一眼看出卡在哪</span>
+      </div>
+      <div style="position: relative; height: 210px; margin-top: 18px;">
+        <div style="position: absolute; left: 96px; right: 0; top: 0; display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #9C988F; letter-spacing: 0.4px; border-bottom: 1px solid #C7C2B6; padding-bottom: 6px;">
+          <span>D1</span><span>D3</span><span>D5</span><span>D7</span><span>D9</span><span>D11</span><span>D13</span>
+        </div>
+        <div style="position: absolute; left: 244px; top: 22px; height: 158px; width: 1px; background: #101010;"></div>
+        <div style="position: absolute; left: 210px; top: 186px; font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 500; letter-spacing: 0.6px;">TODAY · D5</div>
+
+        <div style="position: absolute; left: 0; top: 28px; width: 88px; font-size: 11px; color: #6B6862; text-align: right; padding-right: 12px; box-sizing: border-box;">收集材料</div>
+        <div style="position: absolute; left: 96px; top: 28px; width: 68px; height: 14px; background: #9A6B12;"></div>
+
+        <div style="position: absolute; left: 0; top: 62px; width: 88px; font-size: 11px; font-weight: 600; text-align: right; padding-right: 12px; box-sizing: border-box;">第三方核验</div>
+        <div style="position: absolute; left: 164px; top: 61px; width: 136px; height: 16px; border: 1px solid #101010; box-sizing: border-box;"></div>
+        <div style="position: absolute; left: 165px; top: 62px; width: 79px; height: 14px; background: #101010;"></div>
+
+        <div style="position: absolute; left: 0; top: 96px; width: 88px; font-size: 11px; color: #6B6862; text-align: right; padding-right: 12px; box-sizing: border-box;">出具报告</div>
+        <div style="position: absolute; left: 300px; top: 96px; width: 68px; height: 14px; background: #E3DFD5;"></div>
+
+        <div style="position: absolute; left: 0; top: 130px; width: 88px; font-size: 11px; color: #6B6862; text-align: right; padding-right: 12px; box-sizing: border-box;">开通账号</div>
+        <div style="position: absolute; left: 368px; top: 130px; width: 68px; height: 14px; background: #E3DFD5;"></div>
+
+        <div style="position: absolute; left: 0; top: 164px; width: 88px; font-size: 11px; color: #6B6862; text-align: right; padding-right: 12px; box-sizing: border-box;">入职培训</div>
+        <div style="position: absolute; left: 436px; top: 164px; width: 102px; height: 14px; background: #E3DFD5;"></div>
+      </div>
+    </div>
+
+    <div style="padding: 24px 0 0 28px;">
+      <div style="display: flex; align-items: baseline; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid #D6D2C8;">
+        <span style="font-size: 14px; font-weight: 600; letter-spacing: -0.2px;">清单</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.8px; color: #9C988F;">按 DONE 打勾 · 图变成能用的工具</span>
+      </div>
+
+      <div style="display: flex; align-items: flex-end; gap: 16px; padding: 16px 0 14px; border-bottom: 1px solid #101010;">
+        <div style="display: flex; align-items: baseline; gap: 3px;">
+          <span style="font-size: 30px; font-weight: 600; letter-spacing: -1.6px; line-height: 0.9;">4</span>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #9C988F;">/9</span>
+        </div>
+        <div style="flex-grow: 1; padding-bottom: 2px;">
+          <div style="height: 6px; background: #E3DFD5; display: flex;"><div style="width: 44%; background: #9A6B12;"></div></div>
+        </div>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #9C988F; letter-spacing: 0.4px; padding-bottom: 1px;">还需 8 天</span>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 11px; padding: 9px 0; border-bottom: 1px solid #E3DFD5;">
+        <span style="width: 13px; height: 13px; flex-shrink: 0; background: #9A6B12; display: flex; align-items: center; justify-content: center;"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#F4F2ED" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"></path></svg></span>
+        <span style="flex-grow: 1; font-size: 12px; color: #9C988F; text-decoration: line-through;">收集材料</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #9C988F; letter-spacing: 0.4px;">HR <span style="color: #D6D2C8;">|</span> 1D</span>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 11px; padding: 9px 0; border-bottom: 1px solid #E3DFD5; border-left: 3px solid #101010; padding-left: 9px; margin-left: -12px;">
+        <span style="width: 13px; height: 13px; flex-shrink: 0; border: 1.5px solid #101010; display: flex; align-items: center; justify-content: center;"><span style="width: 5px; height: 5px; background: #101010;"></span></span>
+        <span style="flex-grow: 1; font-size: 12px; font-weight: 600;">第三方核验</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.4px;">HR <span style="color: #D6D2C8;">|</span> 3D</span>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 11px; padding: 9px 0; border-bottom: 1px solid #E3DFD5;">
+        <span style="width: 13px; height: 13px; flex-shrink: 0; border: 1px solid #C7C2B6;"></span>
+        <span style="flex-grow: 1; font-size: 12px;">出具报告</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #9C988F; letter-spacing: 0.4px;">HR <span style="color: #D6D2C8;">|</span> 1D</span>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 11px; padding: 9px 0; border-bottom: 1px solid #E3DFD5;">
+        <span style="width: 13px; height: 13px; flex-shrink: 0; border: 1px solid #C7C2B6;"></span>
+        <span style="flex-grow: 1; font-size: 12px;">开通账号 · 领设备</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #9C988F; letter-spacing: 0.4px;">IT <span style="color: #D6D2C8;">|</span> 2D</span>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 11px; padding: 9px 0;">
+        <span style="width: 13px; height: 13px; flex-shrink: 0; border: 1px solid #C7C2B6;"></span>
+        <span style="flex-grow: 1; font-size: 12px;">入职培训</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #9C988F; letter-spacing: 0.4px;">L&amp;D <span style="color: #D6D2C8;">|</span> 3D</span>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview":{"width":1400,"height":940}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

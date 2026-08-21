@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #A9761A; text-decoration: none; }
+    a:hover { color: #8A5F13; }
+  </style>
+</helmet>
+<div style="width: 620px; height: 820px; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden; background: #FBFAF7; color: #1A1917; font-family: 'IBM Plex Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-variant-numeric: tabular-nums;">
+
+  <div style="padding: 22px 26px 18px; border-bottom: 1px solid #E6E3DC; display: flex; align-items: flex-start; gap: 16px;">
+    <div style="flex-grow: 1;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="width: 16px; height: 16px; border-radius: 5px; background: #A9761A; display: flex; align-items: center; justify-content: center;"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#FBFAF7" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4v7a4 4 0 004 4h8M18 11l3 4-3 4"></path></svg></span>
+        <span style="font-size: 17px; font-weight: 600; letter-spacing: -0.2px;">新员工入职流程</span>
+      </div>
+      <div style="font-size: 11.5px; color: #8B8780; margin-top: 7px; margin-left: 26px; letter-spacing: 0.1px;">Runflow · 9 步 · 3 个部门 · 预计 14 天</div>
+    </div>
+    <div style="display: flex; gap: 8px; flex-shrink: 0;">
+      <button style="font-family: inherit; font-size: 12px; font-weight: 500; color: #3D3A34; background: #FFFFFF; border: 1px solid #E0DCD3; padding: 7px 13px; border-radius: 8px; box-shadow: 0 1px 2px rgba(26,25,23,0.04);">导出</button>
+      <button style="font-family: inherit; font-size: 12px; font-weight: 500; color: #FBFAF7; background: #1A1917; border: 1px solid #1A1917; padding: 7px 13px; border-radius: 8px; display: inline-flex; align-items: center; gap: 5px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>节点</button>
+    </div>
+  </div>
+
+  <div style="padding: 14px 26px; border-bottom: 1px solid #E6E3DC; display: flex; align-items: center; gap: 14px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; color: #1A1917; letter-spacing: -0.3px;">4<span style="color: #B8B4AC;"> / 9</span></span>
+    <div style="flex-grow: 1; height: 4px; border-radius: 999px; background: #EAE7E0; overflow: hidden;"><div style="width: 44%; height: 100%; background: #A9761A; border-radius: 999px;"></div></div>
+    <span style="font-size: 11px; color: #8B8780;">还需 8 天</span>
+  </div>
+
+  <div style="padding: 14px 26px; border-bottom: 1px solid #E6E3DC;">
+    <div style="display: inline-flex; background: #F1EEE7; border-radius: 8px; padding: 3px; gap: 2px;">
+      <span style="font-size: 11.5px; font-weight: 600; color: #1A1917; background: #FFFFFF; border-radius: 6px; padding: 5px 13px; box-shadow: 0 1px 2px rgba(26,25,23,0.06);">流程图</span>
+      <span style="font-size: 11.5px; font-weight: 500; color: #8B8780; padding: 5px 13px;">泳道</span>
+      <span style="font-size: 11.5px; font-weight: 500; color: #8B8780; padding: 5px 13px;">时间条</span>
+      <span style="font-size: 11.5px; font-weight: 500; color: #8B8780; padding: 5px 13px;">清单</span>
+    </div>
+  </div>
+
+  <div style="flex-grow: 1; position: relative; background-image: radial-gradient(#E2DED5 1px, transparent 1px); background-size: 22px 22px;">
+    <svg style="position: absolute; inset: 0; width: 100%; height: 100%;" fill="none">
+      <path d="M310 122 V152" stroke="#C9C4B9" stroke-width="1.5" stroke-linecap="round"></path>
+      <path d="M310 254 V284" stroke="#C9C4B9" stroke-width="1.5" stroke-linecap="round"></path>
+    </svg>
+
+    <div style="position: absolute; left: 210px; top: 40px; width: 200px; box-sizing: border-box; background: #FFFFFF; border: 1px solid #E0DCD3; border-radius: 10px; padding: 13px 15px; box-shadow: 0 1px 2px rgba(26,25,23,0.05);">
+      <div style="display: flex; align-items: center; gap: 9px;">
+        <span style="width: 15px; height: 15px; flex-shrink: 0; border-radius: 4px; background: #A9761A; display: flex; align-items: center; justify-content: center;"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"></path></svg></span>
+        <span style="font-size: 13.5px; font-weight: 600; color: #8B8780; text-decoration: line-through;">收集材料</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; margin-top: 10px; padding-left: 24px;">
+        <span style="font-size: 10.5px; font-weight: 500; color: #6E6A63; background: #F1EEE7; border-radius: 5px; padding: 2px 7px;">HR</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #A5A199;">1d</span>
+      </div>
+    </div>
+
+    <div style="position: absolute; left: 210px; top: 152px; width: 200px; box-sizing: border-box; background: #FFFFFF; border: 1px solid #C3D2E8; border-radius: 10px; padding: 13px 15px; box-shadow: 0 0 0 3px #EBF1F9, 0 1px 2px rgba(26,25,23,0.05);">
+      <div style="display: flex; align-items: center; gap: 9px;">
+        <span style="width: 15px; height: 15px; flex-shrink: 0; border-radius: 4px; border: 1.5px solid #3562A6; display: flex; align-items: center; justify-content: center;"><span style="width: 5px; height: 5px; border-radius: 1.5px; background: #3562A6;"></span></span>
+        <span style="font-size: 13.5px; font-weight: 600; letter-spacing: -0.1px;">第三方核验</span>
+        <span style="margin-left: auto; font-size: 9.5px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: #3562A6;">进行中</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; margin-top: 10px; padding-left: 24px;">
+        <span style="font-size: 10.5px; font-weight: 500; color: #6E6A63; background: #F1EEE7; border-radius: 5px; padding: 2px 7px;">HR</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #A5A199;">3d</span>
+        <span style="margin-left: auto; font-size: 10.5px; color: #3562A6; font-weight: 500;">详情</span>
+      </div>
+    </div>
+
+    <div style="position: absolute; left: 226px; top: 284px; width: 168px; height: 64px; display: flex; align-items: center; justify-content: center;">
+      <svg style="position: absolute; inset: 0; width: 100%; height: 100%;" viewBox="0 0 168 64" preserveAspectRatio="none"><polygon points="84,2 166,32 84,62 2,32" fill="#FFFFFF" stroke="#E0DCD3" stroke-width="1.2" stroke-linejoin="round"></polygon></svg>
+      <span style="position: relative; z-index: 1; font-size: 12px; font-weight: 500; color: #6E6A63;">核验通过？</span>
+    </div>
+  </div>
+
+  <div style="padding: 20px 26px 22px; border-top: 1px solid #E6E3DC; background: #FFFFFF;">
+    <div style="display: flex; align-items: baseline; gap: 10px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500; color: #A9761A; letter-spacing: 0.5px;">A</span>
+      <span style="font-size: 15px; font-weight: 600; letter-spacing: -0.1px;">精工浅色</span>
+      <span style="font-size: 11px; color: #A5A199;">IBM Plex · 暖中性纸 · 单一琥珀</span>
+    </div>
+    <div style="font-size: 12px; line-height: 1.65; color: #6E6A63; margin-top: 9px; text-wrap: pretty;">去掉毛玻璃和叠色，改成真实的分隔线、克制的阴影、等宽数字。像 Linear 那类工具，但偏暖。<span style="color: #1A1917; font-weight: 500;">代价：</span>好看但不抢眼，容易和市面上的工具撞脸。</div>
+  </div>
+
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview":{"width":620,"height":820}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

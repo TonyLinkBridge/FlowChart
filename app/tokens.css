@@ -1,0 +1,43 @@
+/* Runflow 设计变量 · 编辑部瑞士
+ * 数值全部来自设计稿，改这里等于改全站。
+ * 两条铁律：border-radius 恒为 0，box-shadow 恒为 none。 */
+:root {
+  /* 纸与墨 */
+  --rf-paper:       #F4F2ED;
+  --rf-surface:     #FFFFFF;
+  --rf-ink:         #101010;
+  --rf-ink-2:       #3D3B37;
+  --rf-ink-3:       #6B6862;
+  --rf-ink-4:       #9C988F;
+
+  /* 线（粗细本身就是层级） */
+  --rf-rule:        #101010;   /* 2px 主分区 */
+  --rf-rule-mid:    #C7C2B6;   /* 1px 卡片边 */
+  --rf-rule-light:  #D6D2C8;   /* 1px 次分区 */
+  --rf-rule-faint:  #E3DFD5;   /* 1px 行分隔 */
+  --rf-fill:        #E3DFD5;   /* 空槽填充 */
+
+  /* 唯一强调色 —— 全站只有黑和金 */
+  --rf-gold:        #9A6B12;
+  --rf-on-gold:     #F4F2ED;
+
+  --rf-font: var(--rf-font-archivo), 'Archivo', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', system-ui, sans-serif;
+  --rf-mono: var(--rf-font-mono), 'IBM Plex Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+
+  /* 字号 */
+  --rf-t-display: 32px;
+  --rf-t-title:   22px;
+  --rf-t-node:    13.5px;
+  --rf-t-body:    12.5px;
+  --rf-t-small:   11.5px;
+  --rf-t-meta:    10px;    /* mono */
+  --rf-t-label:   9px;     /* mono, 大字距 */
+
+  --rf-track-label: 1.6px; /* 小标签字距 */
+  --rf-track-brand: 2.4px;
+
+  /* 节点尺寸 */
+  --rf-node-w:     260px;
+  --rf-node-pad:   13px 15px;
+  --rf-check:      14px;
+}

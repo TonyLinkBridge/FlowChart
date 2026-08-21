@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #E0A62E; text-decoration: none; }
+    a:hover { color: #F0BC52; }
+  </style>
+</helmet>
+<div style="width: 620px; height: 820px; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden; background: #0C0D10; color: #E8E9EC; font-family: 'Space Grotesk', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-variant-numeric: tabular-nums;">
+
+  <div style="padding: 22px 26px 18px; border-bottom: 1px solid #23262C; display: flex; align-items: flex-start; gap: 16px; background: #101216;">
+    <div style="flex-grow: 1;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="width: 16px; height: 16px; border-radius: 5px; background: linear-gradient(160deg, #E0A62E, #B87F16); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 14px rgba(224,166,46,0.35);"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#0C0D10" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4v7a4 4 0 004 4h8M18 11l3 4-3 4"></path></svg></span>
+        <span style="font-size: 17px; font-weight: 600; letter-spacing: -0.2px;">新员工入职流程</span>
+      </div>
+      <div style="font-size: 11.5px; color: #6A6F79; margin-top: 7px; margin-left: 26px;">Runflow · 9 步 · 3 个部门 · 预计 14 天</div>
+    </div>
+    <div style="display: flex; gap: 8px; flex-shrink: 0;">
+      <button style="font-family: inherit; font-size: 12px; font-weight: 500; color: #C6C9D0; background: #1A1D23; border: 1px solid #2B2F37; padding: 7px 13px; border-radius: 8px;">导出</button>
+      <button style="font-family: inherit; font-size: 12px; font-weight: 600; color: #0C0D10; background: #E0A62E; border: 1px solid #E0A62E; padding: 7px 13px; border-radius: 8px; display: inline-flex; align-items: center; gap: 5px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>节点</button>
+    </div>
+  </div>
+
+  <div style="padding: 14px 26px; border-bottom: 1px solid #23262C; display: flex; align-items: center; gap: 14px; background: #101216;">
+    <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 500; color: #E8E9EC;">4<span style="color: #4E535C;"> / 9</span></span>
+    <div style="flex-grow: 1; height: 4px; border-radius: 999px; background: #23262C; overflow: hidden;"><div style="width: 44%; height: 100%; background: linear-gradient(90deg, #B87F16, #E0A62E); border-radius: 999px; box-shadow: 0 0 10px rgba(224,166,46,0.5);"></div></div>
+    <span style="font-size: 11px; color: #6A6F79;">还需 8 天</span>
+  </div>
+
+  <div style="padding: 14px 26px; border-bottom: 1px solid #23262C; background: #101216;">
+    <div style="display: inline-flex; background: #1A1D23; border: 1px solid #23262C; border-radius: 8px; padding: 3px; gap: 2px;">
+      <span style="font-size: 11.5px; font-weight: 600; color: #0C0D10; background: #E8E9EC; border-radius: 6px; padding: 5px 13px;">流程图</span>
+      <span style="font-size: 11.5px; font-weight: 500; color: #6A6F79; padding: 5px 13px;">泳道</span>
+      <span style="font-size: 11.5px; font-weight: 500; color: #6A6F79; padding: 5px 13px;">时间条</span>
+      <span style="font-size: 11.5px; font-weight: 500; color: #6A6F79; padding: 5px 13px;">清单</span>
+    </div>
+  </div>
+
+  <div style="flex-grow: 1; position: relative; background-color: #0C0D10; background-image: radial-gradient(#1D2026 1px, transparent 1px); background-size: 22px 22px;">
+    <svg style="position: absolute; inset: 0; width: 100%; height: 100%;" fill="none">
+      <path d="M310 122 V152" stroke="#33383F" stroke-width="1.5" stroke-linecap="round"></path>
+      <path d="M310 254 V284" stroke="#33383F" stroke-width="1.5" stroke-linecap="round"></path>
+    </svg>
+
+    <div style="position: absolute; left: 210px; top: 40px; width: 200px; box-sizing: border-box; background: #16191E; border: 1px solid #2B2F37; border-radius: 10px; padding: 13px 15px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);">
+      <div style="display: flex; align-items: center; gap: 9px;">
+        <span style="width: 15px; height: 15px; flex-shrink: 0; border-radius: 4px; background: #E0A62E; display: flex; align-items: center; justify-content: center;"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#0C0D10" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"></path></svg></span>
+        <span style="font-size: 13.5px; font-weight: 600; color: #6A6F79; text-decoration: line-through;">收集材料</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; margin-top: 10px; padding-left: 24px;">
+        <span style="font-size: 10.5px; font-weight: 500; color: #9A9EA8; background: #22262D; border-radius: 5px; padding: 2px 7px;">HR</span>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: #565B65;">1d</span>
+      </div>
+    </div>
+
+    <div style="position: absolute; left: 210px; top: 152px; width: 200px; box-sizing: border-box; background: #16191E; border: 1px solid #3A557F; border-radius: 10px; padding: 13px 15px; box-shadow: 0 0 0 3px rgba(91,141,232,0.12), inset 0 1px 0 rgba(255,255,255,0.05);">
+      <div style="display: flex; align-items: center; gap: 9px;">
+        <span style="width: 15px; height: 15px; flex-shrink: 0; border-radius: 4px; border: 1.5px solid #5B8DE8; display: flex; align-items: center; justify-content: center;"><span style="width: 5px; height: 5px; border-radius: 1.5px; background: #5B8DE8;"></span></span>
+        <span style="font-size: 13.5px; font-weight: 600; letter-spacing: -0.1px;">第三方核验</span>
+        <span style="margin-left: auto; font-size: 9.5px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: #5B8DE8;">进行中</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; margin-top: 10px; padding-left: 24px;">
+        <span style="font-size: 10.5px; font-weight: 500; color: #9A9EA8; background: #22262D; border-radius: 5px; padding: 2px 7px;">HR</span>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: #565B65;">3d</span>
+        <span style="margin-left: auto; font-size: 10.5px; color: #5B8DE8; font-weight: 500;">详情</span>
+      </div>
+    </div>
+
+    <div style="position: absolute; left: 226px; top: 284px; width: 168px; height: 64px; display: flex; align-items: center; justify-content: center;">
+      <svg style="position: absolute; inset: 0; width: 100%; height: 100%;" viewBox="0 0 168 64" preserveAspectRatio="none"><polygon points="84,2 166,32 84,62 2,32" fill="#16191E" stroke="#2B2F37" stroke-width="1.2" stroke-linejoin="round"></polygon></svg>
+      <span style="position: relative; z-index: 1; font-size: 12px; font-weight: 500; color: #9A9EA8;">核验通过？</span>
+    </div>
+  </div>
+
+  <div style="padding: 20px 26px 22px; border-top: 1px solid #23262C; background: #101216;">
+    <div style="display: flex; align-items: baseline; gap: 10px;">
+      <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500; color: #E0A62E; letter-spacing: 0.5px;">B</span>
+      <span style="font-size: 15px; font-weight: 600; letter-spacing: -0.1px;">深色控制台</span>
+      <span style="font-size: 11px; color: #565B65;">Space Grotesk · 墨黑 · 发光琥珀</span>
+    </div>
+    <div style="font-size: 12px; line-height: 1.65; color: #9A9EA8; margin-top: 9px; text-wrap: pretty;">深底高对比，连线和节点浮起来，金色一点就亮。内部工具里最"贵"的一种长相。<span style="color: #E8E9EC; font-weight: 500;">代价：</span>导出 PNG 贴进 PPT 或打印时深色不好用，得单独做浅色导出。</div>
+  </div>
+
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview":{"width":620,"height":820}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

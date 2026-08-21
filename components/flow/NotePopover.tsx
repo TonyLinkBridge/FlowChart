@@ -1,0 +1,102 @@
+'use client';
+
+import { Fragment } from 'react';
+import { NoteSections } from '@/components/views/NoteSections';
+import type { FlowNode, Note } from '@/lib/types';
+import s from './NotePopover.module.css';
+
+const POP_W = 320, GAP = 14;
+
+function inline(text: string) {
+  return text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g).map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**'))
+      return <b key={i} style={{ fontWeight: 600, color: 'var(--rf-ink)' }}>{part.slice(2, -2)}</b>;
+    if (part.startsWith('`') && part.endsWith('`')) return <code key={i}>{part.slice(1, -1)}</code>;
+    return <Fragment key={i}>{part}</Fragment>;
+  });
+}
+
+/** 折起来那几样压成一行灰字：「4 步 · 2/5 · 2 个填空 · 1 个链接」 */
+function summarize(note: Note) {
+  const out: React.ReactNode[] = [];
+  const steps = note.steps ?? [];
+  if (steps.length) {
+    const done = steps.filter(x => x.done).length;
+    out.push(<span key="s">{steps.length} 步 · <b>{done}/{steps.length}</b></span>);
+  }
+  if (note.fields?.length) out.push(<span key="f">{note.fields.length} 个填空</span>);
+  if (note.links?.length) out.push(<span key="l">{note.links.length} 个链接</span>);
+  if (note.contact?.trim()) out.push(<span key="c">有联系人</span>);
+  return out;
+}
+
+export function NotePopover({
+  node, index, x, y, canvasW, pinned, expanded,
+  onEnter, onLeave, onClose, onToggleExpand, onChange,
+}: {
+  node: FlowNode;
+  index: number;
+  x: number; y: number;          // 节点左上角在画布里的位置
+  canvasW: number;
+  pinned: boolean;
+  expanded: boolean;
+  onEnter: () => void;
+  onLeave: () => void;
+  onClose: () => void;
+  onToggleExpand: () => void;
+  onChange: (n: Note | undefined) => void;
+}) {
+  const note = node.note;
+  if (!note) return null;
+
+  // 默认贴右边；右边放不下就翻到左边
+  const right = x + 260 + GAP;
+  const flip = canvasW > 0 && right + POP_W > canvasW - 8;
+  const left = flip ? Math.max(8, x - POP_W - GAP) : right;
+
+  const bits = summarize(note);
+  const hasText = !!note.text?.trim();
+  const firstTodo = note.steps?.find(st => !st.done)?.text;
+
+  return (
+    <div className={`${s.pop} ${pinned ? s.pinned : ''}`} style={{ left, top: y }}
+         onMouseEnter={onEnter} onMouseLeave={onLeave}>
+      <div className={s.head}>
+        <span className={s.idx}>{String(index).padStart(2, '0')}</span>
+        <span className={s.who}>{node.title}</span>
+        {pinned ? (
+          <button className={s.close} onClick={onClose} aria-label="关闭">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 strokeWidth="1.8" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+          </button>
+        ) : (
+          <span className={s.pinHint}>点一下钉住</span>
+        )}
+      </div>
+
+      {!expanded && (
+        <div className={s.body}>
+          {hasText ? inline(note.text!)
+            : firstTodo ? (
+              <span className={s.fallback}>
+                <span className={s.fallbackLabel}>下一步要做</span>{firstTodo}
+              </span>
+            ) : <span className={s.fallback}>这条附注还没写说明。</span>}
+        </div>
+      )}
+
+      {bits.length > 0 && (
+        <div className={s.summary}>
+          {bits.map((b, i) => <Fragment key={i}>{i > 0 && <span>·</span>}{b}</Fragment>)}
+          <button className={s.more} onClick={onToggleExpand}>{expanded ? '收起' : '展开'}</button>
+        </div>
+      )}
+
+      {expanded && (
+        <div className={s.detail}>
+          <NoteSections note={note} onChange={onChange} onRemoveNote={() => onChange(undefined)} />
+        </div>
+      )}
+    </div>
+  );
+}

@@ -1,0 +1,16 @@
+.wrap { height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--rf-paper); }
+.box { width: 420px; max-width: 90%; }
+.brand { font-size: 10px; font-weight: 600; letter-spacing: 2.6px; text-transform: uppercase; color: var(--rf-gold); }
+.title { font-size: 30px; font-weight: 600; letter-spacing: -1px; line-height: 1.2; margin-top: 14px; }
+.sub { font-size: 13px; line-height: 1.8; color: var(--rf-ink-3); margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--rf-rule-light); }
+.form { display: flex; margin-top: 24px; border: 1px solid var(--rf-ink); }
+.input { flex-grow: 1; border: none; outline: none; background: transparent; padding: 12px 14px; font-family: var(--rf-font); font-size: 13px; color: var(--rf-ink); }
+.input::placeholder { color: var(--rf-rule-mid); }
+.submit { background: var(--rf-ink); color: var(--rf-on-gold); font-size: 12px; font-weight: 500; padding: 0 18px; white-space: nowrap; }
+.submit:disabled { background: var(--rf-rule-mid); }
+.note { font-family: var(--rf-mono); font-size: 10px; line-height: 1.9; color: var(--rf-ink-4); margin-top: 14px; letter-spacing: 0.3px; }
+.err { color: var(--rf-gold); }
+.sent { margin-top: 24px; border: 1px solid var(--rf-gold); padding: 16px 18px; font-size: 13px; line-height: 1.8; }
+.sent b { color: var(--rf-gold); font-weight: 600; }
+.link { font-size: 11.5px; color: var(--rf-ink-4); border-bottom: 1px solid var(--rf-rule-mid); margin-top: 14px; display: inline-block; }
+.link:hover { color: var(--rf-ink); }

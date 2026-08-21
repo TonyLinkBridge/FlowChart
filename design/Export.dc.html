@@ -1,0 +1,123 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #9A6B12; text-decoration: none; }
+    a:hover { color: #101010; }
+  </style>
+</helmet>
+<div style="width: 800px; height: 900px; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden; background: #F4F2ED; color: #101010; font-family: 'Archivo', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-variant-numeric: tabular-nums;">
+
+  <div style="padding: 38px 48px 16px; border-bottom: 2px solid #101010; display: flex; align-items: flex-end; justify-content: space-between;">
+    <div style="font-size: 10px; font-weight: 600; letter-spacing: 2.6px; text-transform: uppercase; color: #9A6B12;">自动保存与导出</div>
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.6px; color: #9C988F;">新员工入职流程 / 9 STEPS</div>
+  </div>
+
+  <div style="padding: 32px 48px 0;">
+    <div style="font-size: 27px; font-weight: 600; letter-spacing: -0.9px; line-height: 1.2;">自动保存要三层，不是一层</div>
+  </div>
+
+  <div style="margin: 26px 48px 0; border-top: 1px solid #101010; padding-top: 16px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 500; letter-spacing: 1.6px; color: #9C988F;">01 · 自动保存</div>
+
+    <div style="display: flex; align-items: center; gap: 18px; padding: 14px 0; border-bottom: 1px solid #E3DFD5;">
+      <span style="width: 52px; flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 500; letter-spacing: 0.8px; color: #9A6B12;">本机</span>
+      <div style="flex-grow: 1;">
+        <div style="font-size: 13px; font-weight: 600; letter-spacing: -0.2px;">停手 0.5 秒 → 写进浏览器</div>
+        <div style="font-size: 11.5px; color: #6B6862; margin-top: 4px; line-height: 1.6;">断网、崩溃、手滑关掉都不丢。这一层永远开着。</div>
+      </div>
+      <div style="width: 34px; height: 18px; border: 1px solid #101010; flex-shrink: 0; display: flex; justify-content: flex-end; align-items: center; padding: 1px;"><span style="width: 14px; height: 14px; background: #101010;"></span></div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 18px; padding: 14px 0; border-bottom: 1px solid #E3DFD5;">
+      <span style="width: 52px; flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 500; letter-spacing: 0.8px; color: #9A6B12;">云端</span>
+      <div style="flex-grow: 1;">
+        <div style="font-size: 13px; font-weight: 600; letter-spacing: -0.2px;">停手 2 秒 → 存到你的账号下</div>
+        <div style="font-size: 11.5px; color: #6B6862; margin-top: 4px; line-height: 1.6;">另加一条硬规矩：连续操作最多 10 秒也强制存一次，别一直拖节点就一直不存。</div>
+      </div>
+      <div style="width: 34px; height: 18px; border: 1px solid #101010; flex-shrink: 0; display: flex; justify-content: flex-end; align-items: center; padding: 1px;"><span style="width: 14px; height: 14px; background: #101010;"></span></div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 18px; padding: 14px 0; border-bottom: 1px solid #101010;">
+      <span style="width: 52px; flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 500; letter-spacing: 0.8px; color: #9A6B12;">版本</span>
+      <div style="flex-grow: 1;">
+        <div style="font-size: 13px; font-weight: 600; letter-spacing: -0.2px;">5 分钟内的连续改动，合并成一版</div>
+        <div style="font-size: 11.5px; color: #6B6862; margin-top: 4px; line-height: 1.6;">不然一天几百版没法看。也能手动打标记：「这版发给老板了」。</div>
+      </div>
+      <div style="width: 34px; height: 18px; border: 1px solid #101010; flex-shrink: 0; display: flex; justify-content: flex-end; align-items: center; padding: 1px;"><span style="width: 14px; height: 14px; background: #101010;"></span></div>
+    </div>
+
+    <div style="padding: 16px 0 0;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 1.2px; color: #9C988F; margin-bottom: 11px;">状态必须看得见 · 原版一个都没有，所以没人敢信它</div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.4px; color: #F4F2ED; background: #101010; padding: 5px 10px;">已保存 12:04</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.4px; color: #6B6862; border: 1px solid #C7C2B6; padding: 4px 9px;">保存中…</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.4px; color: #6B6862; border: 1px dashed #C7C2B6; padding: 4px 9px;">离线 · 改动存在本机</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.4px; color: #9A6B12; border: 1px solid #9A6B12; padding: 4px 9px;">保存失败 · 重试</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.4px; color: #9A6B12; border: 1px solid #9A6B12; padding: 4px 9px;">这张图在别处改过了</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin: 24px 48px 0; border-top: 1px solid #101010; padding-top: 16px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 500; letter-spacing: 1.6px; color: #9C988F;">02 · 带走一份</div>
+
+    <div style="display: flex; align-items: center; gap: 18px; padding: 14px 0; border-bottom: 1px solid #E3DFD5;">
+      <div style="flex-grow: 1;">
+        <div style="font-size: 13px; font-weight: 600; letter-spacing: -0.2px;">另存为单个 HTML</div>
+        <div style="font-size: 11.5px; color: #6B6862; margin-top: 4px; line-height: 1.6; text-wrap: pretty;">含位置、进度、附注，双击即开。给没有账号的人看 —— 这是跟别家工具拉开距离的地方，别砍。</div>
+      </div>
+      <button style="font-family: inherit; font-size: 11.5px; font-weight: 500; color: #101010; background: transparent; border: 1px solid #101010; padding: 7px 14px; flex-shrink: 0;">另存为</button>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 16px; padding: 10px 0; border-bottom: 1px solid #E3DFD5;">
+      <span style="width: 52px; flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.8px; color: #9C988F;">PNG</span>
+      <span style="flex-grow: 1; font-size: 12px; color: #3D3B37;">图 + 附注表，发群里最快</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 16px; padding: 10px 0; border-bottom: 1px solid #E3DFD5;">
+      <span style="width: 52px; flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.8px; color: #9A6B12;">SVG</span>
+      <span style="flex-grow: 1; font-size: 12px; color: #3D3B37;">矢量，进 PPT 投大屏不糊</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 16px; padding: 10px 0; border-bottom: 1px solid #E3DFD5;">
+      <span style="width: 52px; flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.8px; color: #9A6B12;">JSON</span>
+      <span style="flex-grow: 1; font-size: 12px; color: #3D3B37;">丢回给 AI 接着改</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 16px; padding: 10px 0;">
+      <span style="width: 52px; flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.8px; color: #9A6B12;">MMD</span>
+      <span style="flex-grow: 1; font-size: 12px; color: #3D3B37;">Mermaid，贴进 GitHub / 飞书 / Notion</span>
+    </div>
+  </div>
+
+  <div style="flex-grow: 1;"></div>
+
+  <div style="margin: 0 48px 36px; border-top: 2px solid #101010; padding-top: 16px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 500; letter-spacing: 1.6px; color: #9A6B12;">03 · 导出前必须问一句</div>
+    <div style="display: flex; align-items: center; gap: 18px; padding: 14px 0 0;">
+      <div style="flex-grow: 1;">
+        <div style="font-size: 13px; font-weight: 600; letter-spacing: -0.2px;">这份文件含 2 项填写内容，一起带走？</div>
+        <div style="font-size: 11.5px; color: #6B6862; margin-top: 4px; line-height: 1.6; text-wrap: pretty;">附注里的「要填的」可能有单号、金额、工号。随手转发就是数据外泄 —— 必须给一个「清空后再导出」的选项。</div>
+      </div>
+      <div style="display: flex; flex-shrink: 0; border: 1px solid #101010;">
+        <button style="font-family: inherit; font-size: 11px; color: #101010; background: transparent; border: none; border-right: 1px solid #101010; padding: 7px 12px;">清空后导出</button>
+        <button style="font-family: inherit; font-size: 11px; color: #F4F2ED; background: #101010; border: none; padding: 7px 12px;">一起带走</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview":{"width":800,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

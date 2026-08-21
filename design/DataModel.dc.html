@@ -1,0 +1,113 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #9A6B12; text-decoration: none; }
+    a:hover { color: #101010; }
+  </style>
+</helmet>
+<div style="width: 1120px; height: 760px; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden; background: #F4F2ED; color: #101010; font-family: 'Archivo', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-variant-numeric: tabular-nums;">
+
+  <div style="padding: 38px 56px 16px; border-bottom: 2px solid #101010; display: flex; align-items: flex-end; justify-content: space-between;">
+    <div style="font-size: 10px; font-weight: 600; letter-spacing: 2.6px; text-transform: uppercase; color: #9A6B12;">数据模型 · Data Model</div>
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.6px; color: #9C988F;">3 OPTIONAL FIELDS</div>
+  </div>
+
+  <div style="padding: 36px 56px 0;">
+    <div style="font-size: 30px; font-weight: 600; letter-spacing: -1px; line-height: 1.2;">三个字段，解锁四个视图</div>
+    <div style="margin-top: 18px; border-top: 1px solid #D6D2C8; padding-top: 16px; display: flex; gap: 40px;">
+      <div style="width: 100px; flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 1px; color: #9C988F; padding-top: 2px;">SCHEMA</div>
+      <p style="margin: 0; max-width: 800px; font-size: 13px; line-height: 1.8; color: #3D3B37; text-wrap: pretty;">节点结构不重做，只在 flowmaker 原有字段后面加三个可选项。加了就多三个视图，不加就还是原来那张流程图。</p>
+    </div>
+  </div>
+
+  <div style="flex-grow: 1; margin: 32px 56px 0; display: grid; grid-template-columns: 480px minmax(0, 1fr); gap: 40px;">
+
+    <div style="border: 1px solid #101010; background: #FFFFFF; padding: 20px 22px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; line-height: 1.8; color: #6B6862; display: flex; flex-direction: column;">
+      <div style="font-family: 'Archivo', sans-serif; font-size: 9.5px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #9C988F; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid #E3DFD5;">nodes[ ] · 单个节点</div>
+      <div>{</div>
+      <div style="padding-left: 18px;">"id": <span style="color: #101010;">"verify"</span>,</div>
+      <div style="padding-left: 18px;">"title": <span style="color: #101010;">"第三方核验"</span>,</div>
+      <div style="padding-left: 18px;">"shape": <span style="color: #101010;">"process"</span>,</div>
+      <div style="height: 10px;"></div>
+      <div style="padding-left: 18px; border-left: 3px solid #9A6B12; margin-left: -3px; color: #9A6B12;">"owner": <span style="font-weight: 500;">"HR"</span>,<span style="float: right; font-family: 'Archivo', 'PingFang SC', sans-serif; font-size: 11px; color: #9C988F;">谁负责</span></div>
+      <div style="padding-left: 18px; border-left: 3px solid #9A6B12; margin-left: -3px; color: #9A6B12;">"days": <span style="font-weight: 500;">3</span>,<span style="float: right; font-family: 'Archivo', 'PingFang SC', sans-serif; font-size: 11px; color: #9C988F;">要几天</span></div>
+      <div style="padding-left: 18px; border-left: 3px solid #9A6B12; margin-left: -3px; color: #9A6B12;">"done": <span style="font-weight: 500;">false</span>,<span style="float: right; font-family: 'Archivo', 'PingFang SC', sans-serif; font-size: 11px; color: #9C988F;">做完没</span></div>
+      <div style="height: 10px;"></div>
+      <div style="padding-left: 18px; border-left: 3px solid #9A6B12; margin-left: -3px; color: #9A6B12;">"note": {<span style="float: right; font-family: 'Archivo', 'PingFang SC', sans-serif; font-size: 11px; color: #9C988F;">脚注 02</span></div>
+      <div style="padding-left: 18px; border-left: 3px solid #9A6B12; margin-left: -3px; color: #9A6B12; padding-left: 36px;">"steps": [ … ],<span style="float: right; font-family: 'Archivo', 'PingFang SC', sans-serif; font-size: 11px; color: #9C988F;">可逐条打勾</span></div>
+      <div style="padding-left: 18px; border-left: 3px solid #9A6B12; margin-left: -3px; color: #9A6B12; padding-left: 36px;">"fields": [ … ],<span style="float: right; font-family: 'Archivo', 'PingFang SC', sans-serif; font-size: 11px; color: #9C988F;">要填的</span></div>
+      <div style="padding-left: 18px; border-left: 3px solid #9A6B12; margin-left: -3px; color: #9A6B12; padding-left: 36px;">"links": [ … ],</div>
+      <div style="padding-left: 18px; border-left: 3px solid #9A6B12; margin-left: -3px; color: #9A6B12; padding-left: 36px;">"contact": <span style="font-weight: 500;">"…"</span>,</div>
+      <div style="padding-left: 18px; border-left: 3px solid #9A6B12; margin-left: -3px; color: #9A6B12; padding-left: 36px;">"text": <span style="font-weight: 500;">"markdown"</span><span style="float: right; font-family: 'Archivo', 'PingFang SC', sans-serif; font-size: 11px; color: #9C988F;">自由说明</span></div>
+      <div style="padding-left: 18px; border-left: 3px solid #9A6B12; margin-left: -3px; color: #9A6B12;">}</div>
+      <div style="height: 10px;"></div>
+      <div>}</div>
+      <div style="flex-grow: 1;"></div>
+      <div style="font-family: 'Archivo', 'PingFang SC', sans-serif; font-size: 11.5px; line-height: 1.75; color: #9C988F; border-top: 1px solid #E3DFD5; padding-top: 14px; margin-top: 14px;">原版的 <b style="font-weight:600; color:#101010;">detail</b>（一坨 HTML 字符串）已被 <b style="font-weight:600; color:#101010;">note</b> 取代：分成四块结构化数据 + 一段 markdown 自由说明。<b style="font-weight:600; color:#101010;">不再收 HTML</b> —— 结构化的东西才导得出附注表、转得了 Mermaid、AI 也才改得动。</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column;">
+      <div style="display: grid; grid-template-columns: 100px minmax(0, 1fr) 96px; gap: 16px; padding-bottom: 11px; border-bottom: 1px solid #101010; font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 500; letter-spacing: 1.4px; color: #9C988F;">
+        <span>视图</span><span>多吃的字段</span><span style="text-align: right;">解锁什么</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 100px minmax(0, 1fr) 96px; gap: 16px; align-items: center; padding: 16px 0; border-bottom: 1px solid #E3DFD5;">
+        <span style="font-size: 13px; font-weight: 600;">流程图</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6B6862; letter-spacing: 0.2px;">id · title · shape · edges</span>
+        <span style="font-size: 11px; color: #9C988F; text-align: right;">原样能跑</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 100px minmax(0, 1fr) 96px; gap: 16px; align-items: center; padding: 16px 0; border-bottom: 1px solid #E3DFD5;">
+        <span style="font-size: 13px; font-weight: 600;">泳道</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #9C988F; letter-spacing: 0.2px;">以上全部 + <span style="color: #9A6B12; font-weight: 500; border-bottom: 2px solid #9A6B12;">owner</span></span>
+        <span style="font-size: 11px; color: #9C988F; text-align: right;">按人分道</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 100px minmax(0, 1fr) 96px; gap: 16px; align-items: center; padding: 16px 0; border-bottom: 1px solid #E3DFD5;">
+        <span style="font-size: 13px; font-weight: 600;">时间条</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #9C988F; letter-spacing: 0.2px;">以上全部 + <span style="color: #9A6B12; font-weight: 500; border-bottom: 2px solid #9A6B12;">days</span></span>
+        <span style="font-size: 11px; color: #9C988F; text-align: right;">算关键路径</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 100px minmax(0, 1fr) 96px; gap: 16px; align-items: center; padding: 16px 0; border-bottom: 1px solid #E3DFD5;">
+        <span style="font-size: 13px; font-weight: 600;">清单</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #9C988F; letter-spacing: 0.2px;">以上全部 + <span style="color: #9A6B12; font-weight: 500; border-bottom: 2px solid #9A6B12;">done</span></span>
+        <span style="font-size: 11px; color: #9C988F; text-align: right;">跑进度条</span>
+      </div>
+
+      <div style="flex-grow: 1;"></div>
+
+      <div style="border-top: 2px solid #101010; padding-top: 20px; display: flex; flex-direction: column; gap: 18px;">
+        <div style="display: flex; gap: 20px;">
+          <span style="width: 100px; flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 1.2px; color: #9A6B12; padding-top: 3px;">兼容</span>
+          <span style="font-size: 12px; line-height: 1.75; color: #3D3B37; text-wrap: pretty;">老 flowmaker 文件直接能开，只是切到泳道时会提示「这几步还没填负责人」，点一下就能补。</span>
+        </div>
+        <div style="display: flex; gap: 20px;">
+          <span style="width: 100px; flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 1.2px; color: #9A6B12; padding-top: 3px;">自动保存</span>
+          <span style="font-size: 12px; line-height: 1.75; color: #3D3B37; text-wrap: pretty;">三层：本机立刻存、云端停手 2 秒存、版本 5 分钟合一版。打勾属于执行数据，立刻存但不产生新版本。</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="height: 48px; flex-shrink: 0;"></div>
+
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview":{"width":1120,"height":760}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

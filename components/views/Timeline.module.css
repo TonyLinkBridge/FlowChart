@@ -1,0 +1,33 @@
+.wrap { height: 100%; overflow-y: auto; padding: 28px 40px 96px; }
+
+.head { display: flex; align-items: flex-end; gap: 20px; padding-bottom: 16px; border-bottom: 2px solid var(--rf-rule); }
+.bigNum { font-size: 34px; font-weight: 600; letter-spacing: -1.8px; line-height: 0.9; }
+.unit { font-family: var(--rf-mono); font-size: 12px; color: var(--rf-ink-4); }
+.headMeta { margin-left: auto; font-family: var(--rf-mono); font-size: 9.5px; color: var(--rf-ink-4); letter-spacing: 0.4px; text-align: right; line-height: 1.8; }
+
+.grid { position: relative; margin-top: 22px; }
+.ruler { display: flex; margin-left: var(--label-w); border-bottom: 1px solid var(--rf-rule-mid); padding-bottom: 6px; }
+.tick { font-family: var(--rf-mono); font-size: 9px; color: var(--rf-ink-4); letter-spacing: 0.4px; flex-shrink: 0; }
+
+/* 今天 —— 一条黑竖线贯穿所有行 */
+.todayLine { position: absolute; top: 22px; bottom: 26px; width: 1px; background: var(--rf-ink); }
+.todayTag { position: absolute; bottom: 0; transform: translateX(-50%); font-family: var(--rf-mono); font-size: 9px; font-weight: 500; letter-spacing: 0.6px; background: var(--rf-paper); padding: 0 6px; white-space: nowrap; }
+
+.row { display: flex; align-items: center; height: 34px; }
+.label { width: var(--label-w); flex-shrink: 0; font-size: 11.5px; color: var(--rf-ink-3); text-align: right; padding-right: 14px; box-sizing: border-box; }
+.labelCurrent { font-weight: 600; color: var(--rf-ink); }
+.labelDone { color: var(--rf-ink-4); text-decoration: line-through; }
+.lane { flex-grow: 1; position: relative; height: 100%; }
+
+/* 条：干完=实心金；干了一半=黑框内填黑；没开工=浅灰 */
+.bar { position: absolute; top: 50%; transform: translateY(-50%); height: 16px; box-sizing: border-box; }
+.barDone { background: var(--rf-gold); }
+.barTodo { background: var(--rf-fill); }
+.barPart { border: 1px solid var(--rf-ink); }
+.barFill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--rf-ink); }
+.barLate { border: 1px solid var(--rf-gold); background: transparent; }
+.barLate .barFill { background: var(--rf-gold); }
+
+.range { position: absolute; top: 50%; transform: translateY(-50%); font-family: var(--rf-mono); font-size: 9px; color: var(--rf-ink-4); letter-spacing: 0.3px; white-space: nowrap; }
+.lateTag { font-family: var(--rf-mono); font-size: 8.5px; font-weight: 500; letter-spacing: 0.8px; color: var(--rf-on-gold); background: var(--rf-gold); padding: 1px 5px; }
+.foot { margin-top: 26px; padding-top: 14px; border-top: 1px solid var(--rf-rule-light); font-size: 11.5px; color: var(--rf-ink-4); line-height: 1.8; }

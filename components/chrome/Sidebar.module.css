@@ -1,0 +1,40 @@
+.rail { width: 236px; flex-shrink: 0; border-right: 1px solid var(--rf-ink); display: flex; flex-direction: column; background: var(--rf-paper); overflow: hidden; }
+.railHidden { width: 0; border-right: none; }
+
+.head { padding: 16px 14px 12px; border-bottom: 1px solid var(--rf-ink); display: flex; align-items: center; gap: 8px; }
+.brand { font-size: 9.5px; font-weight: 600; letter-spacing: 2.4px; text-transform: uppercase; color: var(--rf-gold); }
+.headBtn { margin-left: auto; font-size: 15px; line-height: 1; color: var(--rf-ink-3); padding: 0 3px; }
+.headBtn:hover { color: var(--rf-ink); }
+
+.list { flex-grow: 1; overflow-y: auto; padding-bottom: 20px; }
+
+.group { padding: 14px 14px 4px; display: flex; align-items: baseline; gap: 6px; }
+.groupName {
+  font-family: var(--rf-mono); font-size: 9px; letter-spacing: 1.4px; text-transform: uppercase;
+  color: var(--rf-ink-4); border: none; background: transparent; outline: none; padding: 0; min-width: 0; flex-grow: 1;
+  font-weight: 500;
+}
+.groupName:focus { color: var(--rf-ink); }
+.groupDrop { font-size: 11px; color: var(--rf-rule-mid); }
+.group:hover .groupDrop { color: var(--rf-ink-3); }
+
+.row { display: flex; align-items: center; gap: 8px; padding: 7px 14px; cursor: pointer; }
+.row:hover { background: rgba(16,16,16,0.04); }
+.rowOn { background: var(--rf-surface); border-left: 3px solid var(--rf-gold); padding-left: 11px; }
+.dot { width: 5px; height: 5px; flex-shrink: 0; border: 1px solid var(--rf-rule-mid); }
+.rowOn .dot { background: var(--rf-gold); border-color: var(--rf-gold); }
+.name {
+  flex-grow: 1; min-width: 0; font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  border: none; background: transparent; outline: none; padding: 0; color: inherit; font-family: inherit;
+}
+.rowOn .name { font-weight: 600; }
+.name:focus { border-bottom: 1px solid var(--rf-ink); }
+.meta { font-family: var(--rf-mono); font-size: 8.5px; color: var(--rf-rule-mid); flex-shrink: 0; }
+.row:hover .meta { display: none; }
+.tools { display: none; gap: 6px; flex-shrink: 0; align-items: center; }
+.row:hover .tools { display: flex; }
+.tool { font-size: 11px; color: var(--rf-ink-4); line-height: 1; }
+.tool:hover { color: var(--rf-ink); }
+.move { font-family: var(--rf-font); font-size: 9.5px; border: 1px solid var(--rf-rule-mid); background: transparent; color: var(--rf-ink-4); padding: 1px 2px; outline: none; max-width: 62px; }
+
+.empty { padding: 10px 14px; font-size: 11px; color: var(--rf-rule-mid); line-height: 1.6; }

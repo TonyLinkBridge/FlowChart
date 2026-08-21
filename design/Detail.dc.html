@@ -1,0 +1,212 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #9A6B12; text-decoration: none; }
+    a:hover { color: #101010; }
+  </style>
+</helmet>
+<div style="width: 1240px; height: 1120px; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden; background: #F4F2ED; color: #101010; font-family: 'Archivo', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-variant-numeric: tabular-nums;">
+
+  <div style="padding: 38px 56px 16px; border-bottom: 2px solid #101010; display: flex; align-items: flex-end; justify-content: space-between;">
+    <div style="font-size: 10px; font-weight: 600; letter-spacing: 2.6px; text-transform: uppercase; color: #9A6B12;">附注 · Footnotes</div>
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.6px; color: #9C988F;">原「详情 ▾」的升级版</div>
+  </div>
+
+  <div style="padding: 36px 56px 0;">
+    <div style="font-size: 30px; font-weight: 600; letter-spacing: -1px; line-height: 1.2;">别做弹窗，做脚注</div>
+    <div style="margin-top: 18px; border-top: 1px solid #D6D2C8; padding-top: 16px; display: flex; gap: 40px;">
+      <div style="width: 100px; flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 1px; color: #9C988F; padding-top: 2px;">WHY</div>
+      <p style="margin: 0; max-width: 900px; font-size: 13px; line-height: 1.8; color: #3D3B37; text-wrap: pretty;">原版是「详情 ▾」按钮 + 全屏弹窗：点开就盖住整张图，读第 4 步时看不见它接第 5 步；一次只能开一个；<b style="font-weight: 600; color: #101010;">而且导出 PNG 时按钮被隐藏，内容一个字都带不出去</b>。改成脚注：节点上留一个小号金色编号，内容进右侧栏，导出时自动生成附注表跟图一起走。</p>
+    </div>
+  </div>
+
+  <div style="margin: 32px 56px 0; display: flex; gap: 40px;">
+
+    <div style="width: 400px; flex-shrink: 0;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 500; letter-spacing: 1.6px; color: #9C988F; padding-bottom: 12px; border-bottom: 1px solid #101010;">图上 · 只留一个编号</div>
+
+      <div style="position: relative; height: 220px; margin-top: 22px;">
+        <svg style="position: absolute; inset: 0; width: 100%; height: 100%;" fill="none">
+          <path d="M180 46 V70" stroke="#101010" stroke-width="1"></path>
+          <path d="M180 118 V142" stroke="#101010" stroke-width="1"></path>
+        </svg>
+        <div style="position: absolute; left: 40px; top: 0; width: 280px; box-sizing: border-box; border: 1px solid #C7C2B6; padding: 13px 15px; display: flex; align-items: center; gap: 10px;">
+          <span style="width: 14px; height: 14px; flex-shrink: 0; background: #9A6B12; display: flex; align-items: center; justify-content: center;"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#F4F2ED" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"></path></svg></span>
+          <span style="font-size: 13.5px; font-weight: 500; color: #9C988F; text-decoration: line-through;">收集材料<sup style="font-family: 'IBM Plex Mono', monospace; font-size: 8.5px; font-weight: 500; color: #9A6B12; margin-left: 3px; vertical-align: super; text-decoration: none; display: inline-block;">01</sup></span>
+          <span style="margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #9C988F;">HR <span style="color: #D6D2C8;">|</span> 1D</span>
+        </div>
+        <div style="position: absolute; left: 40px; top: 70px; width: 280px; box-sizing: border-box; background: #FFFFFF; border: 2px solid #101010; padding: 13px 15px; display: flex; align-items: center; gap: 10px;">
+          <span style="width: 14px; height: 14px; flex-shrink: 0; border: 1.5px solid #101010; display: flex; align-items: center; justify-content: center;"><span style="width: 6px; height: 6px; background: #101010;"></span></span>
+          <span style="font-size: 13.5px; font-weight: 600; letter-spacing: -0.2px;">第三方核验<sup style="font-family: 'IBM Plex Mono', monospace; font-size: 8.5px; font-weight: 500; color: #F4F2ED; background: #9A6B12; margin-left: 4px; vertical-align: super; padding: 1px 3px; display: inline-block;">02</sup></span>
+          <span style="margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 500; letter-spacing: 0.8px; color: #F4F2ED; background: #101010; padding: 2px 6px;">NOW</span>
+        </div>
+        <div style="position: absolute; left: 40px; top: 142px; width: 280px; box-sizing: border-box; border: 1px solid #C7C2B6; padding: 13px 15px; display: flex; align-items: center; gap: 10px;">
+          <span style="width: 14px; height: 14px; flex-shrink: 0; border: 1px solid #C7C2B6;"></span>
+          <span style="font-size: 13.5px; font-weight: 500;">出具报告<sup style="font-family: 'IBM Plex Mono', monospace; font-size: 8.5px; font-weight: 500; color: #9A6B12; margin-left: 3px; vertical-align: super; display: inline-block;">03</sup></span>
+          <span style="margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #9C988F;">HR <span style="color: #D6D2C8;">|</span> 1D</span>
+        </div>
+      </div>
+
+      <div style="border-top: 1px solid #D6D2C8; padding-top: 18px; display: flex; flex-direction: column; gap: 16px;">
+        <div style="display: flex; gap: 16px;">
+          <span style="width: 64px; flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 1.2px; color: #9A6B12; padding-top: 2px;">编号</span>
+          <span style="font-size: 12px; line-height: 1.7; color: #3D3B37; text-wrap: pretty;">按流程顺序自动排，插一步或删一步会重排。节点上只占一个上标的宽度，不撑版。</span>
+        </div>
+        <div style="display: flex; gap: 16px;">
+          <span style="width: 64px; flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 1.2px; color: #9A6B12; padding-top: 2px;">反白</span>
+          <span style="font-size: 12px; line-height: 1.7; color: #3D3B37; text-wrap: pretty;">正在读的那一条编号反白（见 02），图和侧栏永远对得上，不会读着读着忘了在看哪一步。</span>
+        </div>
+        <div style="display: flex; gap: 16px;">
+          <span style="width: 64px; flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 1.2px; color: #9A6B12; padding-top: 2px;">无编号</span>
+          <span style="font-size: 12px; line-height: 1.7; color: #3D3B37; text-wrap: pretty;">没写附注的节点就没有编号——不用点开才知道里面是空的。</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex-grow: 1; border: 1px solid #101010; background: #FFFFFF; display: flex; flex-direction: column;">
+
+      <div style="padding: 14px 20px; border-bottom: 1px solid #101010; display: flex; align-items: center; gap: 12px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 500; letter-spacing: 1.2px; color: #9A6B12;">附注 02 / 共 06</span>
+        <span style="margin-left: auto; display: flex; gap: 14px; color: #9C988F;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3l6 6-3.5 1.2L14 18l-8-8 7.8-3.5z"></path><path d="M9.5 14.5L4 20"></path></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+        </span>
+      </div>
+
+      <div style="padding: 18px 20px; border-bottom: 1px solid #D6D2C8;">
+        <div style="font-size: 18px; font-weight: 600; letter-spacing: -0.4px;">第三方核验</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #9C988F; margin-top: 8px; letter-spacing: 0.4px;">HR <span style="color: #D6D2C8;">|</span> 3D <span style="color: #D6D2C8;">|</span> <span style="color: #101010; font-weight: 500;">进行中</span></div>
+      </div>
+
+      <div style="padding: 16px 20px; border-bottom: 1px solid #D6D2C8;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 500; letter-spacing: 1.6px; color: #9C988F;">怎么做</span>
+          <div style="flex-grow: 1; height: 4px; background: #E3DFD5; display: flex;"><div style="width: 60%; background: #9A6B12;"></div></div>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #9C988F;">3 / 5</span>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 11px; padding: 6px 0;">
+          <span style="width: 13px; height: 13px; flex-shrink: 0; background: #9A6B12; display: flex; align-items: center; justify-content: center;"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"></path></svg></span>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #C7C2B6;">1</span>
+          <span style="font-size: 12.5px; color: #9C988F; text-decoration: line-through;">在 HRIS 提交核验申请</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 11px; padding: 6px 0;">
+          <span style="width: 13px; height: 13px; flex-shrink: 0; background: #9A6B12; display: flex; align-items: center; justify-content: center;"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"></path></svg></span>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #C7C2B6;">2</span>
+          <span style="font-size: 12.5px; color: #9C988F; text-decoration: line-through;">上传候选人授权书</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 11px; padding: 6px 0;">
+          <span style="width: 13px; height: 13px; flex-shrink: 0; background: #9A6B12; display: flex; align-items: center; justify-content: center;"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"></path></svg></span>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #C7C2B6;">3</span>
+          <span style="font-size: 12.5px; color: #9C988F; text-decoration: line-through;">勾选核验项：学历 / 履历 / 背调</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 11px; padding: 6px 0;">
+          <span style="width: 13px; height: 13px; flex-shrink: 0; border: 1px solid #101010;"></span>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #9C988F;">4</span>
+          <span style="font-size: 12.5px; font-weight: 500;">等第三方回执，一般 2 个工作日</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 11px; padding: 6px 0;">
+          <span style="width: 13px; height: 13px; flex-shrink: 0; border: 1px solid #101010;"></span>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #9C988F;">5</span>
+          <span style="font-size: 12.5px; font-weight: 500;">回执 PDF 存档到候选人档案</span>
+        </div>
+
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #9A6B12; letter-spacing: 0.6px; margin-top: 12px; padding-top: 10px; border-top: 1px dashed #E3DFD5;">节点进度由这 5 条自动汇总 → 60%</div>
+      </div>
+
+      <div style="padding: 16px 20px; border-bottom: 1px solid #D6D2C8;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 500; letter-spacing: 1.6px; color: #9C988F; margin-bottom: 12px;">要填的</div>
+        <div style="display: flex; align-items: center; gap: 16px; padding: 5px 0;">
+          <span style="width: 76px; flex-shrink: 0; font-size: 12px; color: #6B6862;">申请单号</span>
+          <span style="flex-grow: 1; border: 1px solid #C7C2B6; padding: 6px 10px; font-family: 'IBM Plex Mono', monospace; font-size: 11px;">HRV-2026-0418</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px; padding: 5px 0;">
+          <span style="width: 76px; flex-shrink: 0; font-size: 12px; color: #6B6862;">核验机构</span>
+          <span style="flex-grow: 1; border: 1px dashed #C7C2B6; padding: 6px 10px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #C7C2B6;">待填</span>
+        </div>
+      </div>
+
+      <div style="padding: 16px 20px; border-bottom: 1px solid #D6D2C8;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 500; letter-spacing: 1.6px; color: #9C988F; margin-bottom: 10px;">相关</div>
+        <div style="display: flex; align-items: center; gap: 9px; padding: 4px 0;">
+          <svg width="11" height="11" style="flex-shrink: 0;" viewBox="0 0 24 24" fill="none" stroke="#9A6B12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+          <span style="font-size: 12.5px; color: #9A6B12;">HRIS 核验申请入口</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 9px; padding: 4px 0;">
+          <svg width="11" height="11" style="flex-shrink: 0;" viewBox="0 0 24 24" fill="none" stroke="#9A6B12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+          <span style="font-size: 12.5px; color: #9A6B12;">背调授权书模板 v3</span>
+        </div>
+      </div>
+
+      <div style="padding: 16px 20px; border-bottom: 1px solid #101010; display: flex; align-items: center; gap: 16px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 500; letter-spacing: 1.6px; color: #9C988F;">问谁</span>
+        <span style="font-size: 12.5px;">人力运营组 <span style="color: #C7C2B6;">|</span> 群「入职流程答疑」</span>
+      </div>
+
+      <div style="padding: 14px 20px; display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 11.5px; font-weight: 500; border: 1px solid #101010; padding: 7px 13px;">让 AI 改这条附注</span>
+        <span style="font-size: 11.5px; border: 1px solid #C7C2B6; color: #6B6862; padding: 7px 13px;">存成片段</span>
+        <span style="margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #9C988F; display: flex; gap: 10px;"><span>← 01</span><span>03 →</span></span>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div style="margin: 34px 56px 0; border-top: 2px solid #101010; padding-top: 20px;">
+    <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 18px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 500; letter-spacing: 1.6px; color: #9A6B12;">导出的时候</span>
+      <span style="font-size: 12px; color: #6B6862;">原版导 PNG 会把详情按钮整个隐藏，内容全丢。改成脚注之后，图下面自动接一张附注表。</span>
+    </div>
+
+    <div style="border: 1px solid #C7C2B6; background: #FFFFFF; padding: 20px 24px; display: flex; gap: 32px;">
+      <div style="width: 240px; flex-shrink: 0; position: relative; height: 168px;">
+        <svg style="position: absolute; inset: 0; width: 100%; height: 100%;" fill="none">
+          <path d="M120 26 V44" stroke="#101010" stroke-width="1"></path>
+          <path d="M120 70 V88" stroke="#101010" stroke-width="1"></path>
+          <path d="M120 114 V132" stroke="#101010" stroke-width="1"></path>
+        </svg>
+        <div style="position: absolute; left: 20px; top: 0; width: 200px; box-sizing: border-box; background: #101010; color: #F4F2ED; padding: 5px 10px; font-size: 10.5px; font-weight: 600;">录用通知发出</div>
+        <div style="position: absolute; left: 20px; top: 44px; width: 200px; box-sizing: border-box; border: 1px solid #C7C2B6; padding: 5px 10px; font-size: 10.5px;">收集材料<sup style="font-family: 'IBM Plex Mono', monospace; font-size: 8px; color: #9A6B12; margin-left: 3px; vertical-align: super;">01</sup></div>
+        <div style="position: absolute; left: 20px; top: 88px; width: 200px; box-sizing: border-box; border: 1px solid #C7C2B6; padding: 5px 10px; font-size: 10.5px;">第三方核验<sup style="font-family: 'IBM Plex Mono', monospace; font-size: 8px; color: #9A6B12; margin-left: 3px; vertical-align: super;">02</sup></div>
+        <div style="position: absolute; left: 20px; top: 132px; width: 200px; box-sizing: border-box; border: 1px solid #C7C2B6; padding: 5px 10px; font-size: 10.5px;">出具报告<sup style="font-family: 'IBM Plex Mono', monospace; font-size: 8px; color: #9A6B12; margin-left: 3px; vertical-align: super;">03</sup></div>
+      </div>
+
+      <div style="flex-grow: 1;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 500; letter-spacing: 1.6px; color: #9C988F; padding-bottom: 10px; border-bottom: 1px solid #101010;">附注 · NOTES</div>
+        <div style="display: flex; gap: 14px; padding: 10px 0; border-bottom: 1px solid #E3DFD5;">
+          <span style="width: 22px; flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #9A6B12; font-weight: 500;">01</span>
+          <span style="font-size: 11.5px; line-height: 1.65; color: #3D3B37;"><b style="font-weight: 600;">收集材料</b> — 身份证、学历证书、离职证明各一份；扫描件命名规则见模板。</span>
+        </div>
+        <div style="display: flex; gap: 14px; padding: 10px 0; border-bottom: 1px solid #E3DFD5;">
+          <span style="width: 22px; flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #9A6B12; font-weight: 500;">02</span>
+          <span style="font-size: 11.5px; line-height: 1.65; color: #3D3B37;"><b style="font-weight: 600;">第三方核验</b> — 5 步：HRIS 提交申请 / 上传授权书 / 勾选核验项 / 等回执约 2 个工作日 / 回执存档。</span>
+        </div>
+        <div style="display: flex; gap: 14px; padding: 10px 0;">
+          <span style="width: 22px; flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #9A6B12; font-weight: 500;">03</span>
+          <span style="font-size: 11.5px; line-height: 1.65; color: #3D3B37;"><b style="font-weight: 600;">出具报告</b> — 模板见「背调报告 v3」；结论栏只能填通过 / 存疑 / 不通过。</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height: 48px; flex-shrink: 0;"></div>
+
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview":{"width":1240,"height":1120}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

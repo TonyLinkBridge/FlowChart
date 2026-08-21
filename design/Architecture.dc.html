@@ -1,0 +1,136 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #9A6B12; text-decoration: none; }
+    a:hover { color: #101010; }
+  </style>
+</helmet>
+<div style="width: 1400px; height: 1060px; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden; background: #F4F2ED; color: #101010; font-family: 'Archivo', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-variant-numeric: tabular-nums;">
+
+  <div style="padding: 38px 56px 16px; border-bottom: 2px solid #101010; display: flex; align-items: flex-end; justify-content: space-between;">
+    <div style="font-size: 10px; font-weight: 600; letter-spacing: 2.6px; text-transform: uppercase; color: #9A6B12;">架构 · Architecture</div>
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.6px; color: #9C988F;">NEXT.JS + SUPABASE / NO CLERK</div>
+  </div>
+
+  <div style="padding: 36px 56px 0;">
+    <div style="font-size: 32px; font-weight: 600; letter-spacing: -1.1px; line-height: 1.2;">一个网站 + 一个文件，各干各的</div>
+    <div style="margin-top: 18px; border-top: 1px solid #D6D2C8; padding-top: 16px; display: flex; gap: 40px;">
+      <div style="width: 100px; flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 1px; color: #9C988F; padding-top: 2px;">分工</div>
+      <p style="margin: 0; max-width: 900px; font-size: 13px; line-height: 1.8; color: #3D3B37; text-wrap: pretty;">加了登录之后最容易犯的错，是把单文件导出当成多余的东西砍掉。<b style='font-weight: 600; color: #101010;'>别砍</b>。网站是<b style="font-weight: 600; color: #101010;">做图的地方</b>，单文件是<b style="font-weight: 600; color: #101010;">发出去的东西</b>。你的同事、老板、外部合作方不一定有账号。</p>
+    </div>
+  </div>
+
+  <div style="margin: 30px 56px 0; border-top: 1px solid #101010;">
+    <div style="display: grid; grid-template-columns: 110px minmax(0, 1fr) minmax(0, 1fr); gap: 24px; padding: 12px 0; border-bottom: 1px solid #101010; font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 500; letter-spacing: 1.4px; color: #9C988F;">
+      <span></span><span>网站 · 登录后</span><span>单个 HTML · 导出的</span>
+    </div>
+    <div style="display: grid; grid-template-columns: 110px minmax(0, 1fr) minmax(0, 1fr); gap: 24px; padding: 12px 0; border-bottom: 1px solid #E3DFD5; font-size: 12.5px;">
+      <span style="color: #9C988F; font-size: 11.5px;">干什么</span><span>做图、管图、翻历史版本</span><span style="color: #3D3B37;">发给没账号的人看</span>
+    </div>
+    <div style="display: grid; grid-template-columns: 110px minmax(0, 1fr) minmax(0, 1fr); gap: 24px; padding: 12px 0; border-bottom: 1px solid #E3DFD5; font-size: 12.5px;">
+      <span style="color: #9C988F; font-size: 11.5px;">谁能进</span><span>公司邮箱域名内的人</span><span style="color: #3D3B37;">拿到文件的任何人 —— 想清楚再发</span>
+    </div>
+    <div style="display: grid; grid-template-columns: 110px minmax(0, 1fr) minmax(0, 1fr); gap: 24px; padding: 12px 0; border-bottom: 1px solid #E3DFD5; font-size: 12.5px;">
+      <span style="color: #9C988F; font-size: 11.5px;">存在哪</span><span>Supabase，三层自动保存</span><span style="color: #3D3B37;">文件自己，改动只留在他本机</span>
+    </div>
+    <div style="display: grid; grid-template-columns: 110px minmax(0, 1fr) minmax(0, 1fr); gap: 24px; padding: 12px 0; border-bottom: 1px solid #E3DFD5; font-size: 12.5px;">
+      <span style="color: #9C988F; font-size: 11.5px;">AI 在吗</span><span>在，常驻侧栏</span><span style="color: #9C988F;">不在 —— 文件里没有 key，也不该有</span>
+    </div>
+    <div style="display: grid; grid-template-columns: 110px minmax(0, 1fr) minmax(0, 1fr); gap: 24px; padding: 12px 0; font-size: 12.5px;">
+      <span style="color: #9C988F; font-size: 11.5px;">改完怎么办</span><span>自动存回你的账号</span><span style="color: #9A6B12;">顶栏留一个「回网站编辑」的链接</span>
+    </div>
+  </div>
+
+  <div style="margin: 30px 56px 0; border-top: 1px solid #101010; padding-top: 18px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 500; letter-spacing: 1.6px; color: #9C988F; margin-bottom: 20px;">登录 · 一条直线，别绕</div>
+    <div style="position: relative; height: 108px;">
+      <svg style="position: absolute; inset: 0; width: 100%; height: 100%;" fill="none">
+        <path d="M186 26 H222" stroke="#101010" stroke-width="1"></path>
+        <path d="M408 26 H444" stroke="#101010" stroke-width="1"></path>
+        <path d="M630 26 H666" stroke="#101010" stroke-width="1"></path>
+        <path d="M846 26 H882" stroke="#101010" stroke-width="1"></path>
+        <path d="M780 52 V84 H520" stroke="#9C988F" stroke-width="1" stroke-dasharray="4 4"></path>
+      </svg>
+      <div style="position: absolute; left: 0; top: 8px; width: 186px; box-sizing: border-box; background: #101010; color: #F4F2ED; padding: 10px 14px; font-size: 12px; font-weight: 600;">打开 runflow</div>
+      <div style="position: absolute; left: 222px; top: 8px; width: 186px; box-sizing: border-box; border: 1px solid #C7C2B6; padding: 10px 14px; font-size: 12px;">用公司 Google 账号</div>
+      <div style="position: absolute; left: 444px; top: 8px; width: 186px; box-sizing: border-box; border: 1px solid #C7C2B6; padding: 10px 14px; font-size: 12px;">Supabase Auth</div>
+      <div style="position: absolute; left: 666px; top: 4px; width: 180px; height: 44px; display: flex; align-items: center; justify-content: center;">
+        <svg style="position: absolute; inset: 0; width: 100%; height: 100%;" viewBox="0 0 180 44" preserveAspectRatio="none"><polygon points="90,1.5 178.5,22 90,42.5 1.5,22" fill="#F4F2ED" stroke="#101010" stroke-width="1" stroke-linejoin="miter"></polygon></svg>
+        <span style="position: relative; z-index: 1; font-size: 11px; font-weight: 500;">是公司邮箱？</span>
+      </div>
+      <div style="position: absolute; left: 882px; top: 8px; width: 210px; box-sizing: border-box; background: #101010; color: #F4F2ED; padding: 10px 14px; font-size: 12px; font-weight: 600;">我的流程图列表</div>
+      <div style="position: absolute; left: 380px; top: 68px; width: 200px; box-sizing: border-box; border: 1px dashed #C7C2B6; padding: 9px 14px; font-size: 11.5px; color: #9C988F;">不是 → 拒绝并说清楚原因</div>
+      <div style="position: absolute; left: 852px; top: 0; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; background: #F4F2ED; padding: 0 4px;">是</div>
+    </div>
+    <div style="font-size: 11.5px; line-height: 1.75; color: #6B6862; border-top: 1px dashed #E3DFD5; padding-top: 12px; text-wrap: pretty;">Supabase 自带登录，配一个 Google OAuth 就完事。<b style="font-weight: 600; color: #101010;">不需要 Clerk</b> —— 上 Clerk 等于同时养两套账号系统，还得把它的身份接进数据库，是出 bug 的常客。等真需要「邀请同事 / 分配角色」这种现成界面时再换不迟。</div>
+  </div>
+
+  <div style="flex-grow: 1; margin: 26px 56px 0; border-top: 1px solid #101010; padding-top: 18px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 500; letter-spacing: 1.6px; color: #9C988F; margin-bottom: 16px;">四张表 · 够了</div>
+    <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; line-height: 1.9;">
+
+      <div>
+        <div style="font-family: 'Archivo', sans-serif; font-size: 12.5px; font-weight: 600; padding-bottom: 8px; border-bottom: 1px solid #101010; margin-bottom: 8px;">profiles</div>
+        <div style="color: #6B6862;">id <span style="color: #C7C2B6;">uuid</span></div>
+        <div style="color: #6B6862;">email <span style="color: #C7C2B6;">text</span></div>
+        <div style="color: #6B6862;">display_name <span style="color: #C7C2B6;">text</span></div>
+        <div style="color: #6B6862;">created_at</div>
+        <div style="font-family: 'Archivo', 'PingFang SC', sans-serif; font-size: 11px; color: #9C988F; line-height: 1.6; margin-top: 8px;">Supabase 自带 auth.users，这张只放额外信息</div>
+      </div>
+
+      <div>
+        <div style="font-family: 'Archivo', sans-serif; font-size: 12.5px; font-weight: 600; padding-bottom: 8px; border-bottom: 1px solid #101010; margin-bottom: 8px;">flows</div>
+        <div style="color: #6B6862;">id <span style="color: #C7C2B6;">uuid</span></div>
+        <div style="color: #6B6862;">owner_id <span style="color: #C7C2B6;">→ profiles</span></div>
+        <div style="color: #6B6862;">title <span style="color: #C7C2B6;">text</span></div>
+        <div style="color: #9A6B12; font-weight: 500;">doc <span style="color: #C7C2B6;">jsonb</span></div>
+        <div style="color: #9A6B12; font-weight: 500;">version <span style="color: #C7C2B6;">int</span></div>
+        <div style="color: #6B6862;">updated_at</div>
+        <div style="font-family: 'Archivo', 'PingFang SC', sans-serif; font-size: 11px; color: #9C988F; line-height: 1.6; margin-top: 8px;">doc 就是我们设计的那套 JSON。version 是乐观锁，防两个标签页互相覆盖</div>
+      </div>
+
+      <div>
+        <div style="font-family: 'Archivo', sans-serif; font-size: 12.5px; font-weight: 600; padding-bottom: 8px; border-bottom: 1px solid #101010; margin-bottom: 8px;">flow_versions</div>
+        <div style="color: #6B6862;">id <span style="color: #C7C2B6;">uuid</span></div>
+        <div style="color: #6B6862;">flow_id <span style="color: #C7C2B6;">→ flows</span></div>
+        <div style="color: #6B6862;">doc <span style="color: #C7C2B6;">jsonb</span></div>
+        <div style="color: #6B6862;">label <span style="color: #C7C2B6;">text</span></div>
+        <div style="color: #6B6862;">author_id</div>
+        <div style="color: #6B6862;">created_at</div>
+        <div style="font-family: 'Archivo', 'PingFang SC', sans-serif; font-size: 11px; color: #9C988F; line-height: 1.6; margin-top: 8px;">存整份快照，<b style="font-weight:600; color:#101010;">别搞 diff</b> —— 流程图才几 KB，省那点空间不值得</div>
+      </div>
+
+      <div>
+        <div style="font-family: 'Archivo', sans-serif; font-size: 12.5px; font-weight: 600; padding-bottom: 8px; border-bottom: 1px solid #101010; margin-bottom: 8px;">flow_shares</div>
+        <div style="color: #6B6862;">flow_id <span style="color: #C7C2B6;">→ flows</span></div>
+        <div style="color: #6B6862;">user_id <span style="color: #C7C2B6;">→ profiles</span></div>
+        <div style="color: #6B6862;">role <span style="color: #C7C2B6;">viewer | editor</span></div>
+        <div style="font-family: 'Archivo', 'PingFang SC', sans-serif; font-size: 11px; color: #9C988F; line-height: 1.6; margin-top: 8px;">第一版可以先不做，全公司可读也行。要限权限时再加</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="margin: 24px 56px 36px; border-top: 2px solid #101010; padding-top: 16px; display: flex; gap: 24px;">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 500; letter-spacing: 1.6px; color: #9A6B12; padding-top: 3px; flex-shrink: 0;">一条铁律</span>
+    <span style="font-size: 12.5px; line-height: 1.75; color: #3D3B37; text-wrap: pretty;">Supabase 会给你一把万能钥匙（service role key）。<b style="font-weight: 600; color: #101010;">它只能待在服务器上</b> —— 放进浏览器等于把数据库大门敞开。前端只用 anon key，并且把 RLS 从第一天就打开：每个人只看得见自己的和分享给自己的。这两条是 Supabase 事故排行榜的前两名。</span>
+  </div>
+
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview":{"width":1400,"height":1060}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

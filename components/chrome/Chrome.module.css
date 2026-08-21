@@ -1,0 +1,127 @@
+/* 最外层：左侧栏 + 右边整个编辑器 */
+.app { height: 100vh; display: flex; overflow: hidden; }
+.shell { flex-grow: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
+/* 收起/展开左侧栏 */
+.sideToggle { font-size: 13px; color: var(--rf-ink-4); padding: 0 6px; line-height: 1; }
+.sideToggle:hover { color: var(--rf-ink); }
+/* 顶栏右侧的账号 */
+.who { font-family: var(--rf-mono); font-size: 9px; letter-spacing: 0.4px; color: var(--rf-ink-4); margin-right: 4px; }
+
+/* 顶栏 —— C 提示就住在这里：规线转金，meta 行被消息顶掉 */
+.masthead {
+  padding: 24px 32px 18px;
+  border-bottom: 2px solid var(--rf-rule);
+  display: flex; align-items: flex-end; gap: 20px;
+  transition: border-color 0.2s ease;
+}
+.mastheadToast { border-bottom-color: var(--rf-gold); }
+.brand { font-size: 9.5px; font-weight: 600; letter-spacing: var(--rf-track-brand); text-transform: uppercase; color: var(--rf-gold); }
+.docTitle { font-size: var(--rf-t-title); font-weight: 600; letter-spacing: -0.6px; margin-top: 8px; line-height: 1.1; }
+.meta { font-family: var(--rf-mono); font-size: var(--rf-t-meta); color: var(--rf-ink-3); margin-top: 8px; letter-spacing: 0.4px; }
+.toastLine { display: flex; align-items: center; gap: 9px; margin-top: 8px; }
+.toastText { font-family: var(--rf-mono); font-size: var(--rf-t-meta); color: var(--rf-gold); letter-spacing: 0.4px; font-weight: 500; }
+
+.btnGroup { display: flex; flex-shrink: 0; border: 1px solid var(--rf-ink); }
+.btn { font-size: var(--rf-t-small); font-weight: 500; padding: 8px 14px; border-right: 1px solid var(--rf-ink); }
+.btn:last-child { border-right: none; }
+.btnPrimary { background: var(--rf-ink); color: var(--rf-on-gold); }
+
+/* 进度条 —— 大数字撑场面 */
+.progress { padding: 16px 32px; border-bottom: 1px solid var(--rf-rule-light); display: flex; align-items: flex-end; gap: 20px; }
+.bigNum { font-size: 38px; font-weight: 600; letter-spacing: -2px; line-height: 0.9; }
+.ofNum { font-family: var(--rf-mono); font-size: 13px; color: var(--rf-ink-4); }
+.track { height: 8px; background: var(--rf-fill); display: flex; }
+.fill { background: var(--rf-gold); transition: width 0.3s ease; }
+.progCaption { display: flex; justify-content: space-between; margin-top: 7px; font-family: var(--rf-mono); font-size: 9.5px; color: var(--rf-ink-4); letter-spacing: 0.4px; }
+
+/* 视图标签 —— 2px 下划线标当前 */
+.tabs { padding: 0 32px; border-bottom: 1px solid var(--rf-rule-light); display: flex; gap: 26px; }
+.tab { font-size: var(--rf-t-small); font-weight: 400; letter-spacing: 0.3px; padding: 13px 0; color: var(--rf-ink-4); }
+.tabOn { font-weight: 600; color: var(--rf-ink); border-bottom: 2px solid var(--rf-ink); margin-bottom: -1px; }
+
+.body { flex-grow: 1; display: flex; overflow: hidden; }
+.canvas { flex-grow: 1; position: relative; overflow: hidden; }
+.placeholder { height: 100%; display: flex; align-items: center; justify-content: center; font-size: var(--rf-t-body); color: var(--rf-ink-4); }
+
+/* D 日志条 —— 画布底部常驻，默认收起一行 */
+.log { position: absolute; left: 0; right: 0; bottom: 0; border-top: 1px solid var(--rf-ink); background: var(--rf-paper); }
+.logRowTop { padding: 11px 24px; display: flex; align-items: center; gap: 12px; }
+.logLabel { font-family: var(--rf-mono); font-size: 8.5px; font-weight: 500; letter-spacing: var(--rf-track-label); color: var(--rf-gold); }
+.logTime { font-family: var(--rf-mono); font-size: 9px; color: var(--rf-rule-mid); }
+.logText { font-size: var(--rf-t-small); }
+.logAction { font-size: 10.5px; font-weight: 500; border-bottom: 1px solid var(--rf-ink); }
+.logRight { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.logCount { font-family: var(--rf-mono); font-size: 8.5px; color: var(--rf-ink-4); letter-spacing: 0.6px; }
+.logToggle { font-size: 10.5px; color: var(--rf-ink-3); border-bottom: 1px solid var(--rf-rule-mid); }
+.logList { padding: 0 24px 12px; }
+.logItem { display: flex; align-items: baseline; gap: 12px; padding: 6px 0; border-top: 1px solid var(--rf-rule-faint); }
+.logIdx { font-family: var(--rf-mono); font-size: 9px; color: var(--rf-gold); font-weight: 500; }
+
+
+/* 右栏检查器 */
+.rail { width: 380px; flex-shrink: 0; border-left: 1px solid var(--rf-ink); display: flex; flex-direction: column; background: var(--rf-paper); overflow: hidden; }
+
+/* 导出菜单 */
+.exportWrap { position: relative; }
+.menu { position: absolute; top: calc(100% + 9px); right: 0; width: 320px; background: var(--rf-surface); border: 1px solid var(--rf-ink); z-index: 20; }
+.menuRow { display: flex; align-items: center; gap: 14px; padding: 11px 14px; width: 100%; border-bottom: 1px solid var(--rf-rule-faint); text-align: left; }
+.menuRow:last-child { border-bottom: none; }
+.menuRow:hover { background: var(--rf-paper); }
+.menuKey { width: 42px; flex-shrink: 0; font-family: var(--rf-mono); font-size: 10px; font-weight: 500; letter-spacing: 0.8px; color: var(--rf-gold); }
+.menuKeyMuted { color: var(--rf-ink-4); }
+.menuDesc { font-size: 11.5px; color: var(--rf-ink-3); }
+.guard { padding: 14px; border-bottom: 1px solid var(--rf-ink); }
+.guardLabel { font-family: var(--rf-mono); font-size: var(--rf-t-label); font-weight: 500; letter-spacing: var(--rf-track-label); color: var(--rf-gold); }
+.guardText { font-size: 11.5px; line-height: 1.7; color: var(--rf-ink-2); margin-top: 8px; }
+.guardBtns { display: flex; margin-top: 12px; border: 1px solid var(--rf-ink); }
+.guardBtn { flex: 1; font-size: 11px; padding: 7px 0; border-right: 1px solid var(--rf-ink); }
+.guardBtn:last-child { border-right: none; background: var(--rf-ink); color: var(--rf-on-gold); }
+
+/* 图的标题：平时看不出是输入框，聚焦才显形 */
+.docTitleInput {
+  font-family: var(--rf-font); font-size: var(--rf-t-title); font-weight: 600;
+  letter-spacing: -0.6px; margin-top: 8px; line-height: 1.1;
+  border: none; border-bottom: 1px solid transparent; background: transparent;
+  color: var(--rf-ink); outline: none; padding: 0 0 2px; width: 100%; max-width: 460px;
+}
+.docTitleInput:hover { border-bottom-color: var(--rf-rule-light); }
+.docTitleInput:focus { border-bottom-color: var(--rf-ink); }
+.docTitleInput::placeholder { color: var(--rf-rule-mid); }
+
+/* 拖 json 文件进画布时的提示 */
+.canvasDrop { outline: 2px dashed var(--rf-gold); outline-offset: -8px; }
+
+/* 粘贴生成 */
+.pasteWrap { position: absolute; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; background: rgba(16,16,16,0.28); }
+.pasteBox { width: 560px; max-width: 90%; background: var(--rf-surface); border: 2px solid var(--rf-ink); display: flex; flex-direction: column; }
+.pasteHead { padding: 16px 20px; border-bottom: 1px solid var(--rf-ink); display: flex; align-items: baseline; gap: 12px; }
+.pasteTitle { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
+.pasteHint { font-family: var(--rf-mono); font-size: 9px; letter-spacing: 0.8px; color: var(--rf-ink-4); margin-left: auto; }
+.pasteArea {
+  border: none; outline: none; resize: vertical; min-height: 190px; padding: 16px 20px;
+  font-family: var(--rf-font); font-size: 13px; line-height: 1.8; color: var(--rf-ink); background: transparent;
+}
+.pasteArea::placeholder { color: var(--rf-rule-mid); }
+.pasteRules { padding: 12px 20px; border-top: 1px solid var(--rf-rule-light); font-family: var(--rf-mono); font-size: 9.5px; line-height: 1.9; color: var(--rf-ink-4); letter-spacing: 0.2px; }
+.pasteRules b { color: var(--rf-gold); font-weight: 500; }
+.pasteFoot { padding: 14px 20px; border-top: 1px solid var(--rf-ink); display: flex; align-items: center; gap: 12px; }
+.pasteStat { font-family: var(--rf-mono); font-size: 10px; color: var(--rf-ink-3); letter-spacing: 0.4px; }
+.pasteStat b { color: var(--rf-gold); font-weight: 500; }
+.pasteBtns { margin-left: auto; display: flex; border: 1px solid var(--rf-ink); }
+.pasteBtn { font-size: 11.5px; padding: 8px 15px; border-right: 1px solid var(--rf-ink); }
+.pasteBtn:last-child { border-right: none; background: var(--rf-ink); color: var(--rf-on-gold); font-weight: 500; }
+.pasteBtn:disabled { color: var(--rf-rule-mid); background: transparent; cursor: default; }
+
+/* 缩放控件 */
+.zoomGroup { display: flex; border: 1px solid var(--rf-ink); }
+.zoomBtn {
+  font-family: var(--rf-mono); font-size: 11px; padding: 8px 0; min-width: 34px;
+  border-right: 1px solid var(--rf-ink); color: var(--rf-ink);
+}
+.zoomBtn:nth-child(2) { min-width: 52px; }
+.zoomBtn:last-child { border-right: none; }
+.zoomBtn:hover { background: var(--rf-paper); }
+
+/* 按住空格 = 可以拖画布，光标要变，不然没人知道空格有用 */
+.canvasPan { cursor: grab; }
+.canvasPan * { cursor: grab !important; }

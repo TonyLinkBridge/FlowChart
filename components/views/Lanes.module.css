@@ -1,0 +1,42 @@
+.wrap { height: 100%; overflow: auto; padding: 28px 40px 96px; }
+
+.head { display: flex; align-items: flex-end; gap: 20px; padding-bottom: 16px; border-bottom: 2px solid var(--rf-rule); }
+.bigNum { font-size: 34px; font-weight: 600; letter-spacing: -1.8px; line-height: 0.9; }
+.unit { font-family: var(--rf-mono); font-size: 12px; color: var(--rf-ink-4); }
+.headMeta { margin-left: auto; font-family: var(--rf-mono); font-size: 9.5px; color: var(--rf-ink-4); letter-spacing: 0.4px; text-align: right; line-height: 1.8; }
+
+.board { position: relative; margin-top: 22px; }
+.lane { position: absolute; left: 0; right: 0; border-top: 1px solid var(--rf-rule-faint); }
+.laneFirst { border-top: 1px solid var(--rf-rule-mid); }
+.laneLast  { border-bottom: 1px solid var(--rf-rule-mid); }
+.laneName {
+  position: absolute; left: 0; top: 10px;
+  font-family: var(--rf-mono); font-size: 9.5px; letter-spacing: 1.2px; color: var(--rf-ink-4);
+}
+.laneCount { font-family: var(--rf-mono); font-size: 8.5px; color: var(--rf-rule-mid); letter-spacing: 0.4px; }
+
+.chip {
+  position: absolute; box-sizing: border-box;
+  background: var(--rf-paper); border: 1px solid var(--rf-rule-mid);
+  padding: 0 10px; display: flex; align-items: center; gap: 7px;
+  font-size: 10.5px; cursor: pointer; overflow: hidden;
+}
+.chipCurrent { background: var(--rf-surface); border: 2px solid var(--rf-ink); font-weight: 600; }
+.chipDone    { color: var(--rf-ink-4); }
+.chipDone .label { text-decoration: line-through; }
+.chipTerm    { background: var(--rf-ink); color: var(--rf-on-gold); border: none; font-weight: 600; }
+.chipMuted   { background: transparent; border: 1px dashed var(--rf-rule-mid); color: var(--rf-ink-4); }
+.label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.days { margin-left: auto; font-family: var(--rf-mono); font-size: 9px; color: var(--rf-ink-4); flex-shrink: 0; }
+.chipTerm .days { color: var(--rf-ink-4); }
+
+.dot { width: 9px; height: 9px; flex-shrink: 0; }
+.dotDone { background: var(--rf-gold); }
+.dotCurrent { border: 1.5px solid var(--rf-ink); }
+.dotTodo { border: 1px solid var(--rf-rule-mid); }
+
+.edgeLabel {
+  position: absolute; font-family: var(--rf-mono); font-size: 9px;
+  background: var(--rf-paper); padding: 0 4px; transform: translate(-50%, -50%);
+}
+.foot { margin-top: 26px; padding-top: 14px; border-top: 1px solid var(--rf-rule-light); font-size: 11.5px; color: var(--rf-ink-4); line-height: 1.8; }

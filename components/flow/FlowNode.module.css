@@ -1,0 +1,73 @@
+/* 三种形状共用的单行排版：勾选框 · 标题(脚注号) · 右端元信息 */
+.node {
+  cursor: grab;
+  user-select: none;      /* 不然一拖就变成选中文字 */
+  touch-action: none;     /* 触屏上不然会变成滚页面 */
+  position: absolute;
+  width: var(--rf-node-w);
+  padding: var(--rf-node-pad);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--rf-paper);
+  border: 1px solid var(--rf-rule-mid);
+  cursor: default;
+}
+.current  { background: var(--rf-surface); border: 2px solid var(--rf-ink); }
+.muted    { background: transparent; border: 1px dashed var(--rf-rule-mid); }
+
+/* 起止节点：黑色实心条 */
+.terminator {
+  background: var(--rf-ink);
+  border: none;
+  color: var(--rf-on-gold);
+}
+
+.title {
+  font-size: var(--rf-t-node); font-weight: 500; line-height: 1.35;
+  white-space: pre-line;              /* 认标题里的换行 */
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+  overflow: hidden;                   /* 超过两行就截断，别把节点撑爆 */
+}
+.current .title     { font-weight: 600; letter-spacing: -0.2px; }
+.terminator .title  { font-weight: 600; letter-spacing: -0.2px; }
+.done .title { color: var(--rf-ink-4); text-decoration: line-through; }
+.muted .title { color: var(--rf-ink-4); font-weight: 400; }
+
+/* 脚注号 —— 期刊上标，正在读的那条反白 */
+.fn {
+  font-family: var(--rf-mono); font-size: 8.5px; font-weight: 500;
+  color: var(--rf-gold); margin-left: 3px; vertical-align: super;
+  text-decoration: none; display: inline-block; letter-spacing: 0.3px;
+}
+.fn { cursor: pointer; padding: 6px 7px; margin: -6px 0 -6px -3px; }
+.fnActive { color: var(--rf-on-gold); background: var(--rf-gold); padding: 1px 3px; margin-left: 4px; }
+
+.meta {
+  margin-left: auto; font-family: var(--rf-mono);
+  font-size: var(--rf-t-meta); color: var(--rf-ink-4); letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+.pipe { color: var(--rf-rule-light); }
+.endLabel { margin-left: auto; font-family: var(--rf-mono); font-size: var(--rf-t-label); letter-spacing: 1.2px; color: var(--rf-ink-4); }
+.nowTag {
+  margin-left: auto; font-family: var(--rf-mono); font-size: var(--rf-t-label); font-weight: 500;
+  letter-spacing: 0.8px; color: var(--rf-on-gold); background: var(--rf-ink); padding: 2px 6px;
+}
+
+/* 勾选框：方的，14px */
+.box { width: var(--rf-check); height: var(--rf-check); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.boxDone    { background: var(--rf-gold); }
+.boxCurrent { border: 1.5px solid var(--rf-ink); }
+.boxCurrent i { width: 6px; height: 6px; background: var(--rf-ink); display: block; }
+.boxTodo    { border: 1px solid var(--rf-rule-mid); }
+
+/* 判断菱形：SVG 描边多边形，锐角不糊 */
+.diamond { cursor: grab; user-select: none; touch-action: none; position: absolute; display: flex; align-items: center; justify-content: center; }
+.diamond svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.diamondText { position: relative; z-index: 1; font-size: 12px; font-weight: 500; white-space: pre-line; text-align: center; line-height: 1.35; }
+
+.node:active, .diamond:active { cursor: grabbing; }
+
+/* 黑色起止条上的脚注号：金色在黑底上偏暗，提亮一档 */
+.terminator .fn { color: #D2A648; }

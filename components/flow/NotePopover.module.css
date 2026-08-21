@@ -1,0 +1,30 @@
+.pop {
+  position: absolute; z-index: 40; width: 320px;
+  background: var(--rf-surface); border: 1px solid var(--rf-ink);
+  display: flex; flex-direction: column; max-height: 460px;
+}
+.pinned { border-width: 2px; }
+
+.head { padding: 11px 14px; border-bottom: 1px solid var(--rf-rule-light); display: flex; align-items: center; gap: 10px; }
+.idx { font-family: var(--rf-mono); font-size: 9px; font-weight: 500; letter-spacing: 1.2px; color: var(--rf-gold); }
+.who { font-size: 12.5px; font-weight: 600; letter-spacing: -0.2px; }
+.close { margin-left: auto; color: var(--rf-ink-4); line-height: 1; }
+.close:hover { color: var(--rf-ink); }
+.pinHint { margin-left: auto; font-family: var(--rf-mono); font-size: 8.5px; letter-spacing: 0.6px; color: var(--rf-rule-mid); }
+
+/* 主体：那段话。没写就退而显示第一步该干嘛，别弹个空卡片 */
+.body { padding: 13px 14px; font-size: 12.5px; line-height: 1.75; color: var(--rf-ink-2); overflow-y: auto; }
+.body code { font-family: var(--rf-mono); font-size: 11px; background: var(--rf-fill); padding: 1px 5px; }
+.fallback { color: var(--rf-ink-3); }
+.fallbackLabel { font-family: var(--rf-mono); font-size: 8.5px; letter-spacing: 1.2px; color: var(--rf-ink-4); display: block; margin-bottom: 6px; }
+
+/* 折起来的那四样，平时只占一行灰字 */
+.summary {
+  padding: 9px 14px; border-top: 1px solid var(--rf-rule-light);
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--rf-mono); font-size: 9.5px; letter-spacing: 0.4px; color: var(--rf-ink-4);
+}
+.summary b { color: var(--rf-gold); font-weight: 500; }
+.more { margin-left: auto; color: var(--rf-ink-3); border-bottom: 1px solid var(--rf-rule-mid); }
+.more:hover { color: var(--rf-ink); border-bottom-color: var(--rf-ink); }
+.detail { border-top: 1px solid var(--rf-rule-light); overflow-y: auto; }

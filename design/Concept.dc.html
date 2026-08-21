@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #9A6B12; text-decoration: none; }
+    a:hover { color: #101010; }
+  </style>
+</helmet>
+<div style="width: 1200px; height: 860px; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden; background: #F4F2ED; color: #101010; font-family: 'Archivo', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-variant-numeric: tabular-nums;">
+
+  <div style="padding: 38px 56px 16px; border-bottom: 2px solid #101010; display: flex; align-items: flex-end; justify-content: space-between;">
+    <div style="font-size: 10px; font-weight: 600; letter-spacing: 2.6px; text-transform: uppercase; color: #9A6B12;">Runflow · 跑流程</div>
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.6px; color: #9C988F;">PRODUCT CONCEPT / 基于 FLOWMAKER (MIT)</div>
+  </div>
+
+  <div style="padding: 46px 56px 0;">
+    <div style="font-size: 46px; font-weight: 600; letter-spacing: -1.6px; line-height: 1.24; max-width: 880px;">
+      别人的流程图，画出来给人看。<br><span style="color: #9A6B12;">这一张，可以跑一遍。</span>
+    </div>
+  </div>
+
+  <div style="margin: 40px 56px 0; border-top: 1px solid #D6D2C8; padding-top: 22px; display: flex; gap: 40px;">
+    <div style="width: 120px; flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 1px; color: #9C988F; padding-top: 3px;">WHY</div>
+    <p style="margin: 0; max-width: 760px; font-size: 14px; line-height: 1.8; color: #3D3B37; text-wrap: pretty;">保留 flowmaker 最聪明的地方——一个 HTML 文件、双击就开、拖着就能改。补上它缺的保存和离线。然后往前推一步：给每个框多填三个格子，<b style="font-weight: 600; color: #101010;">谁负责、要几天、做完没</b>。一份数据切出四种读法，流程图不再只是一张图。</p>
+  </div>
+
+  <div style="margin: 40px 56px 0; border-top: 1px solid #101010; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));">
+
+    <div style="padding: 24px 32px 24px 0; border-right: 1px solid #D6D2C8;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 500; color: #9A6B12; letter-spacing: -1px; line-height: 1;">01</div>
+      <div style="font-size: 17px; font-weight: 600; letter-spacing: -0.3px; margin-top: 14px;">一份数据，四种视图</div>
+      <div style="font-size: 12.5px; line-height: 1.75; color: #6B6862; margin-top: 10px; text-wrap: pretty;">流程图、泳道、时间条、清单，顶上点一下就换。别人给你一张图，这里给你四种看法。</div>
+    </div>
+
+    <div style="padding: 24px 32px; border-right: 1px solid #D6D2C8;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 500; color: #9A6B12; letter-spacing: -1px; line-height: 1;">02</div>
+      <div style="font-size: 17px; font-weight: 600; letter-spacing: -0.3px; margin-top: 14px;">图能打勾，带进度</div>
+      <div style="font-size: 12.5px; line-height: 1.75; color: #6B6862; margin-top: 10px; text-wrap: pretty;">做完一步打个勾，顶上进度条走一格。入职、上线这种流程，画完不是终点，是起点。</div>
+    </div>
+
+    <div style="padding: 24px 0 24px 32px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 500; color: #9A6B12; letter-spacing: -1px; line-height: 1;">03</div>
+      <div style="font-size: 17px; font-weight: 600; letter-spacing: -0.3px; margin-top: 14px;">AI 不下班</div>
+      <div style="font-size: 12.5px; line-height: 1.75; color: #6B6862; margin-top: 10px; text-wrap: pretty;">点住一个框说「拆成三步」「加条驳回的路」，图当场就变。画完之后，AI 还在图里待着。</div>
+    </div>
+
+  </div>
+
+  <div style="flex-grow: 1; margin: 32px 56px 0; border-top: 2px solid #101010; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));">
+
+    <div style="padding: 20px 32px 32px 0; border-right: 1px solid #D6D2C8;">
+      <div style="display: flex; align-items: baseline; gap: 10px; padding-bottom: 12px; border-bottom: 1px solid #D6D2C8;">
+        <span style="font-size: 15px; font-weight: 600; letter-spacing: -0.2px;">一抄</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 1px; color: #9C988F;">KEEP</span>
+      </div>
+      <div style="display: flex; flex-direction: column; font-size: 12.5px; line-height: 1.5; color: #6B6862;">
+        <div style="padding: 10px 0; border-bottom: 1px solid #E3DFD5;">单文件产物，双击即开，微信能发</div>
+        <div style="padding: 10px 0; border-bottom: 1px solid #E3DFD5;">AI 只写数据，画图交给固定引擎</div>
+        <div style="padding: 10px 0; border-bottom: 1px solid #E3DFD5;">长内容收进「详情」，框不撑胖</div>
+        <div style="padding: 10px 0;">三形状 + dagre 自动布局</div>
+      </div>
+    </div>
+
+    <div style="padding: 20px 32px 32px; border-right: 1px solid #D6D2C8;">
+      <div style="display: flex; align-items: baseline; gap: 10px; padding-bottom: 12px; border-bottom: 1px solid #D6D2C8;">
+        <span style="font-size: 15px; font-weight: 600; letter-spacing: -0.2px;">二改</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 1px; color: #9C988F;">FIX</span>
+      </div>
+      <div style="display: flex; flex-direction: column; font-size: 12.5px; line-height: 1.5; color: #6B6862;">
+        <div style="padding: 10px 0; border-bottom: 1px solid #E3DFD5;">自动存本地 + 撤销，刷新不白干</div>
+        <div style="padding: 10px 0; border-bottom: 1px solid #E3DFD5;">依赖内联，断网也打得开</div>
+        <div style="padding: 10px 0; border-bottom: 1px solid #E3DFD5;">导出加 SVG / JSON / Mermaid</div>
+        <div style="padding: 10px 0;">另存为新文件，改过的样子能传下去</div>
+      </div>
+    </div>
+
+    <div style="padding: 20px 0 32px 32px;">
+      <div style="display: flex; align-items: baseline; gap: 10px; padding-bottom: 12px; border-bottom: 1px solid #101010;">
+        <span style="font-size: 15px; font-weight: 600; letter-spacing: -0.2px; color: #9A6B12;">三超越</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 1px; color: #9A6B12;">BEYOND</span>
+      </div>
+      <div style="display: flex; flex-direction: column; font-size: 12.5px; line-height: 1.5; color: #101010;">
+        <div style="padding: 10px 0; border-bottom: 1px solid #E3DFD5;">四视图：流程图 / 泳道 / 时间条 / 清单</div>
+        <div style="padding: 10px 0; border-bottom: 1px solid #E3DFD5;">节点可打勾，顶栏跑进度</div>
+        <div style="padding: 10px 0; border-bottom: 1px solid #E3DFD5;">AI 常驻画布，选中就能改</div>
+        <div style="padding: 10px 0; color: #9C988F; font-size: 11.5px;">代价：每个节点多填三个格子</div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview":{"width":1200,"height":860}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

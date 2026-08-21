@@ -1,0 +1,38 @@
+.wrap { height: 100%; overflow-y: auto; padding: 28px 40px 96px; }
+
+/* 顶部小结 —— 大数字 + 扁条，跟顶栏同一套语言 */
+.summary { display: flex; align-items: flex-end; gap: 20px; padding-bottom: 16px; border-bottom: 2px solid var(--rf-rule); }
+.bigNum { font-size: 34px; font-weight: 600; letter-spacing: -1.8px; line-height: 0.9; }
+.ofNum { font-family: var(--rf-mono); font-size: 12px; color: var(--rf-ink-4); }
+.track { height: 6px; background: var(--rf-fill); display: flex; }
+.fill { background: var(--rf-gold); transition: width 0.3s ease; }
+.caption { display: flex; justify-content: space-between; margin-top: 7px; font-family: var(--rf-mono); font-size: 9.5px; color: var(--rf-ink-4); letter-spacing: 0.4px; }
+
+/* 主行 —— 一步一行，像一张排好的表 */
+.row { display: flex; align-items: center; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--rf-rule-faint); }
+.rowCurrent { border-left: 3px solid var(--rf-ink); padding-left: 11px; margin-left: -14px; }
+.fn { font-family: var(--rf-mono); font-size: 9.5px; color: var(--rf-gold); font-weight: 500; width: 18px; flex-shrink: 0; }
+.title { font-size: 13.5px; font-weight: 500; }
+.rowCurrent .title { font-weight: 600; letter-spacing: -0.2px; }
+.rowDone .title { color: var(--rf-ink-4); text-decoration: line-through; }
+.meta { margin-left: auto; font-family: var(--rf-mono); font-size: var(--rf-t-meta); color: var(--rf-ink-4); letter-spacing: 0.4px; white-space: nowrap; }
+.pipe { color: var(--rf-rule-light); }
+.stepCount { font-family: var(--rf-mono); font-size: 9.5px; color: var(--rf-gold); letter-spacing: 0.4px; }
+
+/* 子步骤 —— 附注里的「怎么做」直接铺出来，能单条打勾 */
+.steps { padding: 4px 0 10px 46px; border-bottom: 1px solid var(--rf-rule-faint); }
+.step { display: flex; align-items: center; gap: 11px; padding: 5px 0; }
+.stepIdx { font-family: var(--rf-mono); font-size: 9px; color: var(--rf-rule-mid); width: 10px; flex-shrink: 0; }
+.stepText { font-size: 12px; color: var(--rf-ink-2); }
+.stepDone .stepText { color: var(--rf-ink-4); text-decoration: line-through; }
+
+/* 勾选框：方的 */
+.box { flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.boxLg { width: 14px; height: 14px; }
+.boxSm { width: 11px; height: 11px; }
+.boxDone { background: var(--rf-gold); }
+.boxCurrent { border: 1.5px solid var(--rf-ink); }
+.boxCurrent i { width: 6px; height: 6px; background: var(--rf-ink); display: block; }
+.boxTodo { border: 1px solid var(--rf-rule-mid); }
+
+.empty { padding: 24px 0; font-size: var(--rf-t-body); color: var(--rf-ink-4); }

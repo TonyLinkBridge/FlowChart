@@ -1,0 +1,210 @@
+{
+  "pages": [
+    {
+      "id": "page-arch",
+      "name": "1 · 架构"
+    },
+    {
+      "id": "page-toast",
+      "name": "2 · 提示方案 · 已定 C+D"
+    },
+    {
+      "id": "page-concept",
+      "name": "3 · 概念稿 · 主界面在最左"
+    },
+    {
+      "id": "page-dir",
+      "name": "4 · 方向存档"
+    }
+  ],
+  "artboards": [
+    {
+      "file": "Concept.dc.html",
+      "x": 1400,
+      "y": 0,
+      "w": 1200,
+      "h": 860,
+      "title": "定位",
+      "page": "page-concept"
+    },
+    {
+      "file": "Main.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1320,
+      "h": 860,
+      "title": "主界面 · 含 C+D",
+      "page": "page-concept"
+    },
+    {
+      "file": "Export.dc.html",
+      "x": 2680,
+      "y": 0,
+      "w": 800,
+      "h": 900,
+      "title": "自动保存与导出",
+      "page": "page-concept"
+    },
+    {
+      "file": "Views.dc.html",
+      "x": 0,
+      "y": 1000,
+      "w": 1400,
+      "h": 940,
+      "title": "四视图",
+      "page": "page-concept"
+    },
+    {
+      "file": "DataModel.dc.html",
+      "x": 1480,
+      "y": 1000,
+      "w": 1120,
+      "h": 760,
+      "title": "数据模型",
+      "page": "page-concept"
+    },
+    {
+      "file": "Detail.dc.html",
+      "x": 2680,
+      "y": 1000,
+      "w": 1240,
+      "h": 1120,
+      "title": "附注 · 脚注系统",
+      "page": "page-concept"
+    },
+    {
+      "file": "Architecture.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1400,
+      "h": 1060,
+      "title": "架构 · 登录与数据",
+      "page": "page-arch"
+    },
+    {
+      "file": "ToastA.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 620,
+      "h": 540,
+      "title": "A · 备用 · 真错误",
+      "page": "page-toast"
+    },
+    {
+      "file": "ToastB.dc.html",
+      "x": 660,
+      "y": 0,
+      "w": 620,
+      "h": 540,
+      "title": "B · 已排除",
+      "page": "page-toast"
+    },
+    {
+      "file": "ToastC.dc.html",
+      "x": 0,
+      "y": 580,
+      "w": 620,
+      "h": 540,
+      "title": "C · 已采用 · 成功类",
+      "page": "page-toast"
+    },
+    {
+      "file": "ToastD.dc.html",
+      "x": 660,
+      "y": 580,
+      "w": 620,
+      "h": 540,
+      "title": "D · 已采用 · 改动类",
+      "page": "page-toast"
+    },
+    {
+      "file": "DirC.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 620,
+      "h": 820,
+      "title": "C · 已采用",
+      "page": "page-dir"
+    },
+    {
+      "file": "DirA.dc.html",
+      "x": 660,
+      "y": 0,
+      "w": 620,
+      "h": 820,
+      "title": "A · 精工浅色",
+      "page": "page-dir"
+    },
+    {
+      "file": "DirB.dc.html",
+      "x": 1320,
+      "y": 0,
+      "w": 620,
+      "h": 820,
+      "title": "B · 深色控制台",
+      "page": "page-dir"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "note-concept",
+      "x": 1400,
+      "y": -190,
+      "w": 320,
+      "text": "定位页。\n\n瑞士版做法：卡片全部拆掉，改用 2px 黑线分区、1px 灰线分行。三个「超越」用竖线隔开，不再是三个卡片。",
+      "page": "page-concept"
+    },
+    {
+      "id": "note-main",
+      "x": 0,
+      "y": -190,
+      "w": 380,
+      "text": "主界面。C + D 都已接进来：\n\n顶栏那条分隔线转金、meta 行被「已导出 PNG」顶掉 —— 这是 C，两秒后自己退回去，画布一寸没挡。\n\n画布底部那条常驻细带是 D（收起态，只占一行）。有后果、能撤销的改动落在这儿，点「展开」看全部三条。\n\n分工规矩：没东西可撤销的走 C，能撤销的走 D，两边不重复报同一件事。",
+      "page": "page-concept"
+    },
+    {
+      "id": "note-views",
+      "x": 0,
+      "y": 900,
+      "w": 320,
+      "text": "四个视图共用一份 JSON。\n\n2×2 不是四张卡片，是被十字线分开的四个区 —— 这是瑞士版和第一版最直观的区别。",
+      "page": "page-concept"
+    },
+    {
+      "id": "note-detail",
+      "x": 3560,
+      "y": 0,
+      "w": 340,
+      "text": "「详情」的升级版。\n\n原版是按钮 + 全屏弹窗，导出 PNG 时按钮被隐藏、内容全丢。改成期刊脚注：节点上留编号，内容进右侧栏，导出时自动接一张附注表。\n\n数据上 detail（HTML 字符串）已废弃，换成 note（四块结构化数据 + 一段 markdown）。",
+      "page": "page-concept"
+    },
+    {
+      "id": "note-arch",
+      "x": 1480,
+      "y": 0,
+      "w": 340,
+      "text": "架构板。\n\n三件事：网站和单文件怎么分工、登录走哪条线、四张表长什么样。\n\n两个结论写在板上：不用 Clerk（Supabase 自带登录够了），单文件导出不能砍（那是发给没账号的人的唯一途径）。",
+      "page": "page-arch"
+    },
+    {
+      "id": "note-toast",
+      "x": 1320,
+      "y": 0,
+      "w": 380,
+      "text": "已定：C + D 组合。\n\nC 管「成功了」—— 导出完成、复制成功，瞄一眼就够，不留痕。\nD 管「发生了改动」—— AI 改图、删节点，这类不该三秒就消失，得能回头撤销。\nA 留给真错误（保存失败），黑条横在底下想无视都难。\nB 已排除 —— 唯一优点是常规，而常规正是做瑞士版要躲开的。\n\n落地：sonner 只借它的队列和动画，样式全部自己套；D 不是 toast 库能干的活，挂在编辑器的撤销历史上。",
+      "page": "page-toast"
+    },
+    {
+      "id": "note-dir",
+      "x": 0,
+      "y": -130,
+      "w": 620,
+      "text": "方向存档。已采用 C（编辑部瑞士），A 和 B 留作记录。",
+      "page": "page-dir"
+    }
+  ],
+  "launch": {
+    "view": "canvas",
+    "page": "page-concept"
+  }
+}

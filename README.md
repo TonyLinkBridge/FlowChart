@@ -1,36 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Runflow · 跑流程
 
-## Getting Started
+别人的流程图是画出来给人看的，这一张可以跑一遍。
 
-First, run the development server:
+## 能干什么
+
+- **四种视图共用一份数据** — 流程图 / 泳道 / 时间条 / 清单，在任何一个里打勾，另外三个跟着变
+- **附注** — 鼠标移到节点上就看到；操作步骤能逐条打勾，自动汇总成节点进度
+- **粘贴生成** — 把有条理的文字或一段 Mermaid 粘进来，直接成图
+- **导出** — PNG / SVG / JSON / Mermaid，**附注跟着一起走**（图下面自动接一张附注表）
+- **多张图 + 分组** — 左侧栏管理，存在你自己的账号下
+
+## 跑起来
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
+cp .env.example .env.local   # 填上 Supabase 的两个值
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`.env.local` 需要：
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+NEXT_PUBLIC_SUPABASE_URL=https://你的项目.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=你的 anon key
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+数据库建表脚本在 `supabase/schema.sql` —— 到 Supabase 后台的 SQL Editor 整段粘贴运行。
 
-## Learn More
+## 技术
 
-To learn more about Next.js, take a look at the following resources:
+Next.js 16 · React 19 · Supabase（登录 + 数据）· 原生 CSS（无 Tailwind）
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+排版、连线、排期都是自己实现的，没有引流程图库。
