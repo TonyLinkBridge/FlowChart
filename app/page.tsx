@@ -27,19 +27,18 @@ export default async function Home() {
 
       <section className={s.hero}>
         <div>
-          <div className={`${s.kicker} ${s.rise} ${s.d1}`}>内部流程工具 · 一份数据 · 四种读法</div>
+          <div className={`${s.kicker} ${s.rise} ${s.d1}`}>团队流程管理与协作工具</div>
           <h1 className={`${s.head} ${s.rise} ${s.d2}`}>
-            别人的流程图，画出来给人看。<br />
-            <span>这一张，可以跑一遍。</span>
+            把流程画清楚，<br />
+            <span>也真正执行起来。</span>
           </h1>
           <p className={`${s.deck} ${s.rise} ${s.d3}`}>
-            给每一步填上<b>谁负责、要几天、做完没</b>，图就不再只是图：
-            操作细节收在附注里，逐条勾完，节点自己变成「已完成」，
-            顶上的进度跟着走。
+            在同一张流程里安排负责人、处理时间和操作说明。
+            团队一起查看、共同编辑、跟进进度，<b>每次修改都有记录</b>。
           </p>
           <div className={`${s.ctaRow} ${s.rise} ${s.d4}`}>
-            <Link href={enter} className={s.ctaBig}>{userId ? '进入工作台' : '开始使用'}</Link>
-            <span className={s.ctaNote}>登录即用 · 各人数据各归各人</span>
+            <Link href={enter} className={s.ctaBig}>{userId ? '进入工作台' : '创建流程'}</Link>
+            <span className={s.ctaNote}>团队共编 · 自动保存 · 历史版本可恢复</span>
           </div>
         </div>
 
@@ -84,60 +83,60 @@ export default async function Home() {
 
       <section className={s.bandHead}>
         <div className={s.bandRule}>
-          <span className={s.bandTitle}>一份数据，四种读法</span>
-          <span className={s.bandNote}>在任何一个里打勾，另外三个跟着变 —— 本来就只有一份数据</span>
+          <span className={s.bandTitle}>一套流程，四个工作视角</span>
+          <span className={s.bandNote}>内容只维护一次，流程图、泳道、排期和执行清单同步更新</span>
         </div>
       </section>
       <div className={s.tiles}>
         <div className={s.tile}>
           <div className={s.tileGlyph}><span className={s.gFlow}><i /><span className={s.gDia} /><i /></span></div>
           <div className={s.tileName}>流程图</div>
-          <div className={s.tileText}>谁接谁、分支往哪走。判断菱形、是/否两条路。</div>
+          <div className={s.tileText}>看清每个步骤、判断条件和分支。</div>
         </div>
         <div className={s.tile}>
           <div className={s.tileGlyph}><span className={s.gLanes}><i /><i /><i /></span></div>
           <div className={s.tileName}>泳道</div>
-          <div className={s.tileText}>按负责人分道，跨部门交接几次一眼看清。</div>
+          <div className={s.tileText}>看清谁负责，以及工作交给谁。</div>
         </div>
         <div className={s.tile}>
           <div className={s.tileGlyph}><span className={s.gGantt}><i /><i /><i /></span></div>
-          <div className={s.tileName}>时间条</div>
-          <div className={s.tileText}>沿流程算排期，今天在第几天、卡在哪一步。</div>
+          <div className={s.tileName}>排期</div>
+          <div className={s.tileText}>看清需要多久、目前做到哪里、卡在哪一步。</div>
         </div>
         <div className={s.tile}>
           <div className={s.tileGlyph}><span className={s.gChecks}><i /><i /><i /></span></div>
-          <div className={s.tileName}>清单</div>
-          <div className={s.tileText}>逐条打勾，连附注里的子步骤一起铺出来。</div>
+          <div className={s.tileName}>执行清单</div>
+          <div className={s.tileText}>按照流程逐项完成，整体进度自动更新。</div>
         </div>
       </div>
 
       <div className={s.rows}>
         <div className={s.row}>
           <div className={s.idx}>01</div>
-          <div className={s.rowHead}>附注跟着图一起走</div>
-          <div className={s.rowText}>鼠标移到节点上就看到操作细节，点一下直接改。导出 PNG 时图下面自动接一张附注表 —— 发出去的是完整的。</div>
+          <div className={s.rowHead}>操作细节放在流程里面</div>
+          <div className={s.rowText}>每个节点都可以加入负责人、说明、子步骤和相关链接，不用再到聊天记录里寻找。</div>
         </div>
         <div className={s.row}>
           <div className={s.idx}>02</div>
-          <div className={s.rowHead}>粘进来就成图</div>
-          <div className={s.rowText}>有条理的步骤文字，或一段 Mermaid，贴上去直接画出来。缩进变子步骤，问号变判断，是/否变分支。</div>
+          <div className={s.rowHead}>粘贴文字就能生成流程</div>
+          <div className={s.rowText}>把现有步骤或 Mermaid 贴进来，系统自动识别层级、判断条件和是／否分支。</div>
         </div>
         <div className={s.row}>
           <div className={s.idx}>03</div>
-          <div className={s.rowHead}>各人数据各归各人</div>
-          <div className={s.rowText}>登录即用。你的流程图存在你自己的账号下，服务端逐条校验身份 —— 别人登进来看到的是他们自己的。</div>
+          <div className={s.rowHead}>团队一起维护，修改都有记录</div>
+          <div className={s.rowText}>Team 成员可以查看和编辑同一张流程。系统记录修改人、修改时间和历史版本，需要时可以恢复。</div>
         </div>
       </div>
 
       <div className={s.bottom}>
         <div className={s.bottomBand}>
-          <div className={s.bottomLine}>下一个要梳理的流程，<span>直接画成能跑的</span>。</div>
-          <Link href={enter} className={s.ctaBig}>{userId ? '进入工作台' : '开始使用'}</Link>
+          <div className={s.bottomLine}>把下一个流程，变成<span>团队真正能执行的工作</span>。</div>
+          <Link href={enter} className={s.ctaBig}>{userId ? '进入工作台' : '创建第一张流程'}</Link>
         </div>
       </div>
 
       <footer className={s.foot}>
-        <span>Runflow</span><span>·</span><span>Next.js · Clerk · Supabase</span><span>·</span><span>内部工具</span>
+        <span>Runflow</span><span>·</span><span>流程梳理 · 团队协作 · 版本留痕</span>
       </footer>
     </div>
   );
