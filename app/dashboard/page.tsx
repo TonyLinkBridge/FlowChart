@@ -25,11 +25,12 @@ import { ChecklistView } from '@/components/views/ChecklistView';
 import { TimelineView } from '@/components/views/TimelineView';
 import { LanesView } from '@/components/views/LanesView';
 import { Sidebar } from '@/components/chrome/Sidebar';
+import { VersionsPanel } from '@/components/chrome/VersionsPanel';
 import {
-  loadWorkspace, rememberCurrent, createFlow, saveFlow, deleteFlow, moveFlow, fetchFlow,
+  loadWorkspace, rememberCurrent, createFlow, saveFlow, deleteFlow, moveFlow, fetchFlow, restoreVersion,
   createFolder, renameFolderDb, deleteFolderDb, currentDoc, SaveConflict, type Workspace,
 } from '@/lib/store';
-import { UserButton, useClerk, useUser } from '@clerk/nextjs';
+import { OrganizationSwitcher, UserButton, useClerk, useOrganization, useUser } from '@clerk/nextjs';
 import s from '@/components/chrome/Chrome.module.css';
 
 
@@ -198,6 +199,42 @@ export default function Editor() {
       .catch(e => { setLoadErr(e instanceof Error ? e.message : '网络不通'); setLoadState('error'); });
   }, []);
   useEffect(() => { bootstrap(); }, [bootstrap]);
+
+  /** 切换空间（个人 ↔ Team）：先把手上没存完的发出去，再整个工作区重拉。
+   *  orgId 来自 Clerk 会话，服务端按它过滤 —— 前端只负责触发重载。 */
+  const { organization } = useOrganization();
+  const orgId = organization?.id ?? null;
+  const orgRef = useRef<string | null | undefined>(undefined);
+  useEffect(() => {
+    if (orgRef.current === undefined) { orgRef.current = orgId; return; }   // 首次挂载不算切换
+    if (orgRef.current === orgId) return;
+    orgRef.current = orgId;
+    flushSave();
+    syncRef.current = { id: null, doc: null, version: 1 };
+    lastLoadedRef.current = null;
+    setHistory([]); setFuture([]); setSelected(null); setEdgeIndex(null); setPinnedNote(null);
+    setWs(null);
+    bootstrap();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orgId]);
+
+  const [histOpen, setHistOpen] = useState(false);
+
+  /** 恢复历史版本：结果是一个新版本，历史不毁，恢复错了再恢复回去。 */
+  const doRestore = useCallback((v: number) => {
+    const id = wsRef.current?.currentId;
+    if (!id) return;
+    restoreVersion(id, v).then(r => {
+      syncRef.current = { id, doc: r.doc, version: r.version };
+      lastLoadedRef.current = r.doc;
+      setDoc(r.doc);
+      setHistory([]); setFuture([]); setSelected(null); setPinnedNote(null);
+      setWs(w => w && { ...w, docs: w.docs.map(d => d.id === id ? { ...d, doc: r.doc, version: r.version, updatedAt: Date.now() } : d) });
+      refit(r.doc.nodes);
+      announceRef.current?.(r.version);
+      setToast(`已恢复到 V${v}，生成新版本 V${r.version}`);
+    }).catch(e => setToast(e instanceof Error ? e.message : '恢复失败'));
+  }, [refit]);
 
   /** 首次进来适应一次。
    *  之前只在新建/切换/导入/粘贴/重排时适应，唯独一进来那次漏了 ——
@@ -828,6 +865,7 @@ export default function Editor() {
             {mates.length > 4 && <span className={s.mateMore}>+{mates.length - 4}</span>}
           </span>
         )}
+        <button className={s.histBtn} onClick={() => setHistOpen(o => !o)}>历史</button>
       </div>
 
       {/* 顶部中央：四视图切换 */}
@@ -848,6 +886,8 @@ export default function Editor() {
 
       {/* 右上：账号 —— 头像（点开是 Clerk 菜单）+ 明确的登出 */}
       <div className={`${s.pill} ${s.acctPill}`}>
+        {/* 个人空间 ↔ Team 的切换；邀请/移除成员也在这个菜单里（Clerk 自带） */}
+        <span className={s.orgSwitch}><OrganizationSwitcher /></span>
         <UserButton />
         <span className={s.acctName}>{user?.firstName ?? user?.username ?? user?.primaryEmailAddress?.emailAddress?.split('@')[0] ?? ''}</span>
         <button className={s.acctOut} onClick={() => signOut({ redirectUrl: '/' })}>登出</button>
@@ -898,13 +938,22 @@ export default function Editor() {
       )}
 
       {/* 检查器：选中了才浮出来 */}
-      {view === '流程图' && edgeIndex !== null && (
+      {histOpen && ws?.currentId && (
+        <VersionsPanel
+          flowId={ws.currentId}
+          currentVersion={ws.docs.find(d => d.id === ws.currentId)?.version ?? 1}
+          onClose={() => setHistOpen(false)}
+          onRestore={doRestore}
+        />
+      )}
+
+      {view === '流程图' && !histOpen && edgeIndex !== null && (
         <div className={s.inspectorFloat}>
           <EdgePanel doc={doc} index={edgeIndex} onPatch={changeEdge}
                      onDelete={deleteEdge} onClose={() => setEdgeIndex(null)} />
         </div>
       )}
-      {view === '流程图' && edgeIndex === null && selected && (
+      {view === '流程图' && !histOpen && edgeIndex === null && selected && (
         <div className={s.inspectorFloat}>
           <NotePanel
             doc={doc}

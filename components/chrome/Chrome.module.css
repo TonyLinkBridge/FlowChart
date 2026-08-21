@@ -211,3 +211,32 @@ button.saveErr:hover { text-decoration: underline; }
 .mateRow { display: flex; align-items: center; gap: 3px; margin-left: 10px; padding-left: 10px; border-left: 1px solid var(--rf-rule-faint); }
 .mateChip { width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--rf-on-gold); }
 .mateMore { font-size: 10px; color: var(--rf-ink-3); font-family: var(--rf-mono); }
+
+/* ── 版本历史面板 ── */
+.histFloat { position: absolute; z-index: 33; top: 72px; right: 20px; width: 320px; max-height: calc(100% - 160px); display: flex; flex-direction: column; background: var(--rf-paper); border: 1px solid var(--rf-ink); }
+.histHead { display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; border-bottom: 1px solid var(--rf-ink); }
+.histTitle { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; }
+.histClose { font-size: 15px; color: var(--rf-ink-3); padding: 0 3px; }
+.histClose:hover { color: var(--rf-ink); }
+.histSnapRow { display: flex; gap: 6px; padding: 10px 14px; border-bottom: 1px solid var(--rf-rule-faint); }
+.histNote { flex: 1; min-width: 0; padding: 6px 9px; font-size: 11.5px; border: 1px solid var(--rf-rule-mid); background: var(--rf-surface); }
+.histNote:focus { outline: none; border-color: var(--rf-ink); }
+.histSnapBtn { padding: 6px 13px; font-size: 11.5px; font-weight: 600; background: var(--rf-ink); color: var(--rf-on-gold); }
+.histSnapBtn:hover { background: var(--rf-gold); }
+.histSnapBtn:disabled { opacity: 0.4; }
+.histBody { overflow-y: auto; padding: 6px 0 12px; }
+.histEmpty { padding: 18px 14px; font-size: 11.5px; color: var(--rf-ink-3); }
+.histRow { display: flex; align-items: baseline; gap: 8px; padding: 7px 14px; border-bottom: 1px solid var(--rf-rule-faint); }
+.histVer { font-family: var(--rf-mono); font-size: 11px; font-weight: 700; color: var(--rf-gold); min-width: 30px; }
+.histMeta { flex: 1; font-size: 11px; color: var(--rf-ink-3); }
+.histNoteText { color: var(--rf-ink); }
+.histNow { font-family: var(--rf-mono); font-size: 9.5px; color: var(--rf-ink-4); }
+.histRestore { font-size: 11px; color: var(--rf-ink); text-decoration: underline; text-underline-offset: 2px; }
+.histRestore:hover { color: var(--rf-gold); }
+.histSection { padding: 12px 14px 5px; font-family: var(--rf-mono); font-size: 9.5px; letter-spacing: 0.14em; color: var(--rf-ink-4); }
+.histAct { display: flex; gap: 6px; align-items: baseline; padding: 4px 14px; font-size: 11px; color: var(--rf-ink-3); }
+.histActDetail { color: var(--rf-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 110px; }
+.histActTime { margin-left: auto; font-family: var(--rf-mono); font-size: 9.5px; color: var(--rf-ink-4); }
+.histBtn { margin-left: 8px; font-size: 11px; color: var(--rf-ink-3); text-decoration: underline; text-underline-offset: 2px; white-space: nowrap; }
+.histBtn:hover { color: var(--rf-ink); }
+.orgSwitch { display: flex; align-items: center; margin-right: 4px; }

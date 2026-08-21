@@ -101,3 +101,40 @@ export async function deleteFolderDb(id: string) {
 }
 
 export const currentDoc = (w: Workspace) => w.docs.find(d => d.id === w.currentId) ?? w.docs[0];
+
+/* ── 版本历史 ── */
+
+export interface FlowVersion {
+  version: number; savedBy: string; savedName: string | null; note: string | null; createdAt: number;
+}
+export interface ActivityEntry {
+  action: string; actorName: string | null; detail: string | null; createdAt: number;
+}
+
+type VersionRow = { version: number; saved_by: string; saved_name: string | null; note: string | null; created_at: string };
+type ActivityRow = { action: string; actor_name: string | null; detail: string | null; created_at: string };
+
+/** 一张图的版本列表 + 最近动态。 */
+export async function fetchHistory(id: string): Promise<{ versions: FlowVersion[]; activity: ActivityEntry[] }> {
+  const r = await call<{ versions: VersionRow[]; activity: ActivityRow[] }>(`/api/flows/${id}/versions`);
+  return {
+    versions: r.versions.map(v => ({
+      version: v.version, savedBy: v.saved_by, savedName: v.saved_name,
+      note: v.note, createdAt: new Date(v.created_at).getTime(),
+    })),
+    activity: r.activity.map(a => ({
+      action: a.action, actorName: a.actor_name, detail: a.detail,
+      createdAt: new Date(a.created_at).getTime(),
+    })),
+  };
+}
+
+/** 手动存一版（可带备注）。 */
+export async function snapshotVersion(id: string, note?: string) {
+  await call(`/api/flows/${id}/versions`, { method: 'POST', body: JSON.stringify({ note }) });
+}
+
+/** 恢复到某个历史版本 —— 结果本身成为一个新版本，历史永不覆盖。 */
+export async function restoreVersion(id: string, version: number): Promise<{ doc: FlowDoc; version: number }> {
+  return call(`/api/flows/${id}/restore`, { method: 'POST', body: JSON.stringify({ version }) });
+}
