@@ -16,7 +16,7 @@ const ROWS: { fmt: Fmt; key: string; desc: string }[] = [
   { fmt: 'mmd',  key: 'MMD',  desc: 'Mermaid，贴进 GitHub / 飞书' },
 ];
 
-export function ExportMenu({ doc, onDone }: { doc: FlowDoc; onDone: (msg: string) => void }) {
+export function ExportMenu({ doc, onDone, up }: { doc: FlowDoc; onDone: (msg: string) => void; up?: boolean }) {
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState<Fmt | null>(null);
 
@@ -48,10 +48,10 @@ export function ExportMenu({ doc, onDone }: { doc: FlowDoc; onDone: (msg: string
 
   return (
     <span className={s.exportWrap}>
-      <button className={s.btn} onClick={() => { setOpen(o => !o); setPending(null); }}>导出</button>
+      <button className={up ? s.tbBtn : s.btn} onClick={() => { setOpen(o => !o); setPending(null); }}>导出</button>
 
       {open && (
-        <div className={s.menu}>
+        <div className={`${s.menu} ${up ? s.menuUp : ''}`}>
           {pending ? (
             <div className={s.guard}>
               <div className={s.guardLabel}>带走之前</div>

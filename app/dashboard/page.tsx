@@ -9,11 +9,12 @@ import { terminalRole } from '@/lib/graph';
 import { nodeH, nodeW } from '@/lib/edges';
 import { useElementSize } from '@/hooks/useElementSize';
 import { fitView, zoomAt, clampZ, type View } from '@/lib/viewport';
-import { docProgress, footnoteIndex, nodeProgress, toggleStep, totalDays, type FlowDoc, type FlowEdge, type FlowNode as FlowNodeData, type Note } from '@/lib/types';
+import { docProgress, footnoteIndex, nodeProgress, toggleStep, type FlowDoc, type FlowEdge, type FlowNode as FlowNodeData, type Note } from '@/lib/types';
 import { FlowNode } from '@/components/flow/FlowNode';
 import { FlowEdges } from '@/components/flow/FlowEdges';
 import { NotePopover } from '@/components/flow/NotePopover';
-import { RightRail } from '@/components/chrome/RightRail';
+import { NotePanel } from '@/components/views/NotePanel';
+import { EdgePanel } from '@/components/views/EdgePanel';
 import { ExportMenu } from '@/components/chrome/ExportMenu';
 import { TemplateMenu } from '@/components/chrome/TemplateMenu';
 import { PasteDialog } from '@/components/chrome/PasteDialog';
@@ -25,7 +26,7 @@ import {
   loadWorkspace, rememberCurrent, createFlow, saveFlow, deleteFlow, moveFlow,
   createFolder, renameFolderDb, deleteFolderDb, currentDoc, type Workspace,
 } from '@/lib/store';
-import { UserButton } from '@clerk/nextjs';
+import { UserButton, useClerk, useUser } from '@clerk/nextjs';
 import s from '@/components/chrome/Chrome.module.css';
 
 
@@ -44,6 +45,8 @@ function clock() {
 }
 
 export default function Editor() {
+  const { user } = useUser();
+  const { signOut } = useClerk();
   const [doc, setDoc] = useState<FlowDoc>(() => blankDoc());
   const [ws, setWs] = useState<Workspace | null>(null);
   const [sideOpen, setSideOpen] = useState(true);
@@ -203,7 +206,6 @@ export default function Editor() {
 
   const prog = docProgress(doc);
   const notes = footnoteIndex(doc);
-  const noteCount = notes.size;
 
   /** 打勾：整步一次勾完/取消，同时写一条可撤销的日志 */
   const toggleDone = useCallback((id: string) => {
@@ -514,97 +516,16 @@ export default function Editor() {
   }, [undo, deleteNode, selected, pasting]);
 
   return (
-    <div className={s.app}>
-      {ws && (
-        <Sidebar
-          ws={ws} open={sideOpen}
-          onPick={pickFlow} onNew={newDoc} onRename={renameFlow}
-          onDelete={removeFlow} onMove={relocateFlow}
-          onNewFolder={newFolder} onRenameFolder={renameFolder} onDropFolder={removeFolder}
-        />
-      )}
-      <div className={s.shell}>
+    <div className={s.stage}>
 
-      <header className={`${s.masthead} ${toast ? s.mastheadToast : ''}`}>
-        <div style={{ flexGrow: 1 }}>
-          <div className={s.brand}>Runflow</div>
-          <input className={s.docTitleInput} value={doc.title} aria-label="流程图标题"
-                 placeholder="给这张图起个名字"
-                 onChange={e => setDoc(d => ({ ...d, title: e.target.value }))} />
-          {linkFrom !== null ? (
-            <div className={s.toastLine}>
-              <span className={s.toastText}>
-                {linkFrom === '' ? '连线中 · 点一下起点节点' : '连线中 · 再点一下终点节点（Esc 取消）'}
-              </span>
-            </div>
-          ) : toast ? (
-            <div className={s.toastLine}>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--rf-gold)"
-                   strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12.5l4.5 4.5L19 7" />
-              </svg>
-              <span className={s.toastText}>{toast}</span>
-            </div>
-          ) : (
-            <div className={s.meta}>
-              {doc.nodes.filter(n => n.shape !== 'decision').length} STEPS · {new Set(doc.nodes.map(n => n.owner).filter(Boolean)).size} TEAMS
-              {' · '}{totalDays(doc)} DAYS · {noteCount} NOTES ·{' '}
-              {saveState === 'error'
-                ? <span style={{ color: 'var(--rf-gold)', fontWeight: 500 }}>云端保存失败 · 先导出留一份</span>
-                : saveState === 'saving' ? '保存中…' : '已保存'}
-            </div>
-          )}
-        </div>
-        <div className={s.btnGroup}>
-          <UserButton />
-          <button className={s.sideToggle} onClick={() => setSideOpen(o => !o)}
-                  title={sideOpen ? '收起左栏' : '展开左栏'}>{sideOpen ? '⟨' : '⟩'}</button>
-          <button className={s.btn} onClick={() => newDoc(null)}>新建</button>
-          <TemplateMenu onPick={applyTemplate} />
-          <button className={s.btn} onClick={() => setPasting('')}>粘贴生成</button>
-          <button className={s.btn} onClick={() => fileRef.current?.click()}>导入</button>
-          <input ref={fileRef} type="file" accept="application/json,.json" hidden
-                 onChange={e => { openFile(e.target.files?.[0]); e.target.value = ''; }} />
-          <button className={`${s.btn} ${linkFrom !== null ? s.btnPrimary : ''}`}
-                  onClick={() => { setLinkFrom(v => (v === null ? '' : null)); setEdgeIndex(null); }}>连线</button>
-          <button className={s.btn} onClick={relayout}>重新排版</button>
-          <ExportMenu doc={doc} onDone={setToast} />
-          <span className={s.zoomGroup}>
-            <button className={s.zoomBtn} onClick={() => setVp(v => ({ ...v, z: clampZ(v.z / 1.2) }))} aria-label="缩小">−</button>
-            <button className={s.zoomBtn} onClick={() => refit(doc.nodes)} title="让整张图正好放进画布">{Math.round(vp.z * 100)}%</button>
-            <button className={s.zoomBtn} onClick={() => setVp(v => ({ ...v, z: clampZ(v.z * 1.2) }))} aria-label="放大">＋</button>
-          </span>
-          <button className={`${s.btn} ${s.btnPrimary}`} onClick={addStep}>＋ 节点</button>
-        </div>
-      </header>
+      {/* 顶端发丝线：整条流程的完成度 */}
+      <div className={s.hairline}><div className={s.hairFill} style={{ width: `${Math.round(prog.ratio * 100)}%` }} /></div>
 
-      <div className={s.progress}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, flexShrink: 0 }}>
-          <span className={s.bigNum}>{prog.done}</span>
-          <span className={s.ofNum}>/{prog.total}</span>
-        </div>
-        <div style={{ flexGrow: 1, paddingBottom: 3 }}>
-          <div className={s.track}><div className={s.fill} style={{ width: `${Math.round(prog.ratio * 100)}%` }} /></div>
-          <div className={s.progCaption}>
-            <span>COMPLETED {Math.round(prog.ratio * 100)}%</span>
-            <span>共 {totalDays(doc)} 天</span>
-          </div>
-        </div>
-      </div>
-
-      <nav className={s.tabs}>
-        {VIEWS.map(v => (
-          <button key={v} className={`${s.tab} ${v === view ? s.tabOn : ''}`} onClick={() => setView(v)}>{v}</button>
-        ))}
-      </nav>
-
-      {pasting !== null && (
-        <PasteDialog initial={pasting} onCancel={() => setPasting(null)} onGenerate={generateFrom} />
-      )}
-
-      <div className={s.body}>
+      {/* 画布铺满全屏（其他视图时整块换成面板） */}
+      {view === '流程图' ? (
         <div
           ref={canvasRef}
+          style={{ position: 'absolute', inset: 0 }}
           className={`${s.canvas} ${dropping ? s.canvasDrop : ''} ${spaceDown ? s.canvasPan : ''}`}
           onPointerDown={e => {
             // 中键随时可拖；空格按住随时可拖；否则只有按在空白处才拖
@@ -624,77 +545,159 @@ export default function Editor() {
           onDragLeave={e => { if (e.currentTarget === e.target) setDropping(false); }}
           onDrop={e => { e.preventDefault(); setDropping(false); openFile(e.dataTransfer.files?.[0]); }}
         >
-          {view === '流程图' ? (
-            <div style={{ position: 'absolute', inset: 0, transform: `translate(${vp.x}px, ${vp.y}px) scale(${vp.z})`, transformOrigin: '0 0' }}>
-              <FlowEdges doc={doc} selectedEdge={edgeIndex} onSelectEdge={selectEdge} />
-              {doc.nodes.map(n => (
-                <FlowNode
-                  key={n.id}
+          <div style={{ position: 'absolute', inset: 0, transform: `translate(${vp.x}px, ${vp.y}px) scale(${vp.z})`, transformOrigin: '0 0' }}>
+            <FlowEdges doc={doc} selectedEdge={edgeIndex} onSelectEdge={selectEdge} />
+            {doc.nodes.map(n => (
+              <FlowNode
+                key={n.id}
+                node={n}
+                footnote={notes.get(n.id)}
+                activeFootnote={selected === n.id}
+                onSelect={clickNode}
+                onToggle={toggleDone}
+                onOpenNote={openNote}
+                terminal={terminalRole(doc, n.id)}
+                onDragStart={startDrag}
+                onMarkerHover={scheduleHover}
+                panMode={spaceDown}
+              />
+            ))}
+
+            {(() => {
+              const id = pinnedNote ?? hoverNote;
+              const n = id ? doc.nodes.find(x => x.id === id) : null;
+              if (!n?.note) return null;
+              return (
+                <NotePopover
                   node={n}
-                  footnote={notes.get(n.id)}
-                  activeFootnote={selected === n.id}
-                  onSelect={clickNode}
-                  onToggle={toggleDone}
-                  onOpenNote={openNote}
-                  terminal={terminalRole(doc, n.id)}
-                  onDragStart={startDrag}
-                  onMarkerHover={scheduleHover}
-                  panMode={spaceDown}
+                  index={notes.get(n.id) ?? 0}
+                  x={n.x ?? 0}
+                  y={n.y ?? 0}
+                  canvasW={Math.max(0, (canvas.w - vp.x) / vp.z)}
+                  pinned={pinnedNote === n.id}
+                  expanded={pinnedNote === n.id && noteExpanded}
+                  onEnter={keepHover}
+                  onLeave={() => { if (pinnedNote !== n.id) scheduleHover(null); }}
+                  onClose={() => { setPinnedNote(null); setHoverNote(null); }}
+                  onToggleExpand={() => {
+                    if (pinnedNote !== n.id) { setPinnedNote(n.id); setNoteExpanded(true); }
+                    else setNoteExpanded(v => !v);
+                  }}
+                  onChange={note => changeNote(n.id, note)}
                 />
-              ))}
-
-              {(() => {
-                const id = pinnedNote ?? hoverNote;
-                const n = id ? doc.nodes.find(x => x.id === id) : null;
-                if (!n?.note) return null;
-                return (
-                  <NotePopover
-                    node={n}
-                    index={notes.get(n.id) ?? 0}
-                    x={n.x ?? 0}
-                    y={n.y ?? 0}
-                    canvasW={Math.max(0, (canvas.w - vp.x) / vp.z)}
-                    pinned={pinnedNote === n.id}
-                    expanded={pinnedNote === n.id && noteExpanded}
-                    onEnter={keepHover}
-                    onLeave={() => { if (pinnedNote !== n.id) scheduleHover(null); }}
-                    onClose={() => { setPinnedNote(null); setHoverNote(null); }}
-                    onToggleExpand={() => {
-                      if (pinnedNote !== n.id) { setPinnedNote(n.id); setNoteExpanded(true); }
-                      else setNoteExpanded(v => !v);
-                    }}
-                    onChange={note => changeNote(n.id, note)}
-                  />
-                );
-              })()}
-            </div>
-          ) : view === '泳道' ? (
-            <LanesView doc={doc} onSelect={setSelected} />
-          ) : view === '时间条' ? (
-            <TimelineView doc={doc} onSelect={setSelected} />
-          ) : view === '清单' ? (
-            <ChecklistView doc={doc} onToggleNode={toggleDone} onToggleStep={toggleStepAt} />
-          ) : (
-            <div className={s.placeholder}>「{view}」视图还没做 —— 同一份数据，换个渲染</div>
-          )}
-
+              );
+            })()}
+          </div>
         </div>
+      ) : (
+        <div className={s.viewPanel}>
+          {view === '泳道' ? <LanesView doc={doc} onSelect={setSelected} />
+            : view === '时间条' ? <TimelineView doc={doc} onSelect={setSelected} />
+            : <ChecklistView doc={doc} onToggleNode={toggleDone} onToggleStep={toggleStepAt} />}
+        </div>
+      )}
 
-        <RightRail
-          doc={doc}
-          noteId={selected}
-          onCreateNote={createNote}
-          onClearSelection={() => setSelected(null)}
-          onPatch={patch}
-          onDelete={deleteNode}
-          onAddAfter={id => { setSelected(id); addStep(); }}
-          edgeIndex={edgeIndex}
-          onPatchEdge={changeEdge}
-          onDeleteEdge={deleteEdge}
-          onCloseEdge={() => setEdgeIndex(null)}
+      {/* 左上：文档胶囊 —— 名字、进度、保存状态 */}
+      <div className={`${s.pill} ${s.docPill}`}>
+        <span className={s.docDot} />
+        <input className={s.docPillInput} value={doc.title} aria-label="流程图标题"
+               placeholder="给这张图起个名字"
+               onChange={e => setDoc(d => ({ ...d, title: e.target.value }))} />
+        <span className={s.docMeta}>
+          {prog.done}/{prog.total} ·{' '}
+          {saveState === 'error'
+            ? <span className={s.saveErr}>保存失败 · 先导出留一份</span>
+            : saveState === 'saving' ? '保存中…' : '已保存'}
+        </span>
+      </div>
+
+      {/* 顶部中央：四视图切换 */}
+      <div className={`${s.pill} ${s.viewPill}`}>
+        {VIEWS.map(v => (
+          <button key={v} className={`${s.viewSeg} ${v === view ? s.viewSegOn : ''}`} onClick={() => setView(v)}>{v}</button>
+        ))}
+      </div>
+
+      {/* 提示：连线引导 / 一次性消息 */}
+      {(linkFrom !== null || toast) && (
+        <div className={`${s.pill} ${s.floatToast}`}>
+          {linkFrom !== null
+            ? (linkFrom === '' ? '连线中 · 点一下起点节点' : '连线中 · 再点一下终点节点（Esc 取消）')
+            : toast}
+        </div>
+      )}
+
+      {/* 右上：账号 —— 头像（点开是 Clerk 菜单）+ 明确的登出 */}
+      <div className={`${s.pill} ${s.acctPill}`}>
+        <UserButton />
+        <span className={s.acctName}>{user?.firstName ?? user?.username ?? user?.primaryEmailAddress?.emailAddress?.split('@')[0] ?? ''}</span>
+        <button className={s.acctOut} onClick={() => signOut({ redirectUrl: '/' })}>登出</button>
+      </div>
+
+      {/* 左侧：资料库浮卡 / 收起后是一颗按钮 */}
+      {ws && (sideOpen ? (
+        <Sidebar
+          ws={ws} onClose={() => setSideOpen(false)}
+          onPick={pickFlow} onNew={newDoc} onRename={renameFlow}
+          onDelete={removeFlow} onMove={relocateFlow}
+          onNewFolder={newFolder} onRenameFolder={renameFolder} onDropFolder={removeFolder}
         />
-      </div>
-      </div>
+      ) : (
+        <button className={s.libToggle} onClick={() => setSideOpen(true)}>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M4 5h16M4 12h10M4 19h13" /></svg>
+          流程库
+        </button>
+      ))}
+
+      {/* 底部中央：工具条（只在流程图视图） */}
+      {view === '流程图' && (
+        <div className={`${s.pill} ${s.toolbarFloat}`}>
+          <button className={`${s.tbBtn} ${s.tbStrong}`} onClick={addStep}>＋ 节点</button>
+          <button className={`${s.tbBtn} ${linkFrom !== null ? s.tbOn : ''}`}
+                  onClick={() => { setLinkFrom(v => (v === null ? '' : null)); setEdgeIndex(null); }}>连线</button>
+          <button className={s.tbBtn} onClick={() => setPasting('')}>粘贴生成</button>
+          <TemplateMenu onPick={applyTemplate} up />
+          <button className={s.tbBtn} onClick={() => fileRef.current?.click()}>导入</button>
+          <button className={s.tbBtn} onClick={relayout}>重新排版</button>
+          <ExportMenu doc={doc} onDone={setToast} up />
+        </div>
+      )}
+      <input ref={fileRef} type="file" accept="application/json,.json" hidden
+             onChange={e => { openFile(e.target.files?.[0]); e.target.value = ''; }} />
+
+      {/* 右下：缩放（只在流程图视图） */}
+      {view === '流程图' && (
+        <div className={`${s.pill} ${s.zoomFloat}`}>
+          <button className={s.zoomBtn} onClick={() => setVp(v => ({ ...v, z: clampZ(v.z / 1.2) }))} aria-label="缩小">−</button>
+          <button className={s.zoomBtn} onClick={() => refit(doc.nodes)} title="让整张图正好放进画布">{Math.round(vp.z * 100)}%</button>
+          <button className={s.zoomBtn} onClick={() => setVp(v => ({ ...v, z: clampZ(v.z * 1.2) }))} aria-label="放大">＋</button>
+        </div>
+      )}
+
+      {/* 检查器：选中了才浮出来 */}
+      {view === '流程图' && edgeIndex !== null && (
+        <div className={s.inspectorFloat}>
+          <EdgePanel doc={doc} index={edgeIndex} onPatch={changeEdge}
+                     onDelete={deleteEdge} onClose={() => setEdgeIndex(null)} />
+        </div>
+      )}
+      {view === '流程图' && edgeIndex === null && selected && (
+        <div className={s.inspectorFloat}>
+          <NotePanel
+            doc={doc}
+            nodeId={selected}
+            onClose={() => setSelected(null)}
+            onPatch={patch}
+            onDelete={deleteNode}
+            onAddAfter={id => { setSelected(id); addStep(); }}
+            onCreateNote={createNote}
+          />
+        </div>
+      )}
+
+      {pasting !== null && (
+        <PasteDialog initial={pasting} onCancel={() => setPasting(null)} onGenerate={generateFrom} />
+      )}
     </div>
   );
 }

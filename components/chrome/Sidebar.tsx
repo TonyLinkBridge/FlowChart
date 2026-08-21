@@ -7,10 +7,10 @@ import s from './Sidebar.module.css';
 /** 左侧栏：你存过的所有流程图，按你自己建的分堆归类。
  *  「新建」从此是往列表里加一张，不再是把当前这张覆盖掉。 */
 export function Sidebar({
-  ws, open, onPick, onNew, onRename, onDelete, onMove, onNewFolder, onRenameFolder, onDropFolder,
+  ws, onClose, onPick, onNew, onRename, onDelete, onMove, onNewFolder, onRenameFolder, onDropFolder,
 }: {
   ws: Workspace;
-  open: boolean;
+  onClose: () => void;
   onPick: (id: string) => void;
   onNew: (folderId: string | null) => void;
   onRename: (id: string, title: string) => void;
@@ -21,7 +21,6 @@ export function Sidebar({
   onDropFolder: (id: string) => void;
 }) {
   const [editing, setEditing] = useState<string | null>(null);
-  if (!open) return <aside className={`${s.rail} ${s.railHidden}`} />;
 
   const inFolder = (fid: string | null) => ws.docs.filter(d => d.folderId === fid);
 
@@ -75,9 +74,10 @@ export function Sidebar({
   return (
     <aside className={s.rail}>
       <div className={s.head}>
-        <span className={s.brand}>Runflow</span>
+        <span className={s.brand}>流程库</span>
         <button className={s.headBtn} title="新建流程图" onClick={() => onNew(null)}>＋</button>
         <button className={s.headBtn} title="新建分组" onClick={onNewFolder} style={{ fontSize: 11 }}>分组＋</button>
+        <button className={s.headBtn} title="收起" onClick={onClose}>×</button>
       </div>
       <div className={s.list}>
         {ws.folders.map(f => Group(f))}

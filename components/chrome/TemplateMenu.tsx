@@ -6,14 +6,14 @@ import type { FlowDoc } from '@/lib/types';
 import s from './Chrome.module.css';
 
 /** 模板下拉。默认开的是空白桌布，想要现成的从这里挑。 */
-export function TemplateMenu({ onPick }: { onPick: (doc: FlowDoc, name: string) => void }) {
+export function TemplateMenu({ onPick, up }: { onPick: (doc: FlowDoc, name: string) => void; up?: boolean }) {
   const [open, setOpen] = useState(false);
 
   return (
     <span className={s.exportWrap}>
-      <button className={s.btn} onClick={() => setOpen(o => !o)}>模板</button>
+      <button className={up ? s.tbBtn : s.btn} onClick={() => setOpen(o => !o)}>模板</button>
       {open && (
-        <div className={s.menu}>
+        <div className={`${s.menu} ${up ? s.menuUp : ''}`}>
           {TEMPLATES.map(t => (
             <button key={t.id} className={s.menuRow}
                     onClick={() => { onPick(t.build(), t.name); setOpen(false); }}>

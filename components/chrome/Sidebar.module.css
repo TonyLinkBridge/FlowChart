@@ -1,7 +1,7 @@
-.rail { width: 236px; flex-shrink: 0; border-right: 1px solid var(--rf-ink); display: flex; flex-direction: column; background: var(--rf-paper); overflow: hidden; }
-.railHidden { width: 0; border-right: none; }
+/* 方案 B：资料库是浮在画布上的卡片，不是固定栏 */
+.rail { position: absolute; z-index: 30; top: 72px; left: 20px; width: 228px; max-height: calc(100% - 200px); display: flex; flex-direction: column; background: var(--rf-paper); border: 1px solid var(--rf-ink); }
 
-.head { padding: 16px 14px 12px; border-bottom: 1px solid var(--rf-ink); display: flex; align-items: center; gap: 8px; }
+.head { padding: 11px 13px; border-bottom: 1px solid var(--rf-ink); display: flex; align-items: center; gap: 8px; }
 .brand { font-size: 9.5px; font-weight: 600; letter-spacing: 2.4px; text-transform: uppercase; color: var(--rf-gold); }
 .headBtn { margin-left: auto; font-size: 15px; line-height: 1; color: var(--rf-ink-3); padding: 0 3px; }
 .headBtn:hover { color: var(--rf-ink); }

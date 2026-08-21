@@ -125,3 +125,67 @@
 /* 按住空格 = 可以拖画布，光标要变，不然没人知道空格有用 */
 .canvasPan { cursor: grab; }
 .canvasPan * { cursor: grab !important; }
+
+/* ═══ 方案 B · 沉浸画布：全屏画布，一切皆浮层 ═══ */
+.stage { position: relative; height: 100vh; overflow: hidden; background: var(--rf-paper); }
+
+/* 顶端进度发丝线：整条流程干到哪了，一眼扫到 */
+.hairline { position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--rf-fill); z-index: 45; }
+.hairFill { height: 100%; background: var(--rf-gold); transition: width 0.3s ease; }
+
+/* 浮层通用：纸底 + 墨线，没有圆角没有阴影 */
+.pill { position: absolute; z-index: 30; display: flex; align-items: center; background: var(--rf-paper); border: 1px solid var(--rf-ink); }
+
+.docPill { top: 18px; left: 20px; gap: 10px; padding: 8px 14px; }
+.docDot { width: 8px; height: 8px; background: var(--rf-gold); flex-shrink: 0; }
+.docPillInput {
+  border: none; outline: none; background: transparent; padding: 0;
+  font-family: var(--rf-font); font-size: 13px; font-weight: 600; letter-spacing: -0.2px;
+  color: var(--rf-ink); width: 148px;
+}
+.docPillInput::placeholder { color: var(--rf-rule-mid); }
+.docMeta { font-family: var(--rf-mono); font-size: 9px; color: var(--rf-ink-4); letter-spacing: 0.4px; border-left: 1px solid var(--rf-rule-faint); padding-left: 10px; white-space: nowrap; }
+.saveErr { color: var(--rf-gold); font-weight: 500; }
+
+/* 视图切换：顶部中央 */
+.viewPill { top: 18px; left: 50%; transform: translateX(-50%); padding: 3px; gap: 2px; }
+.viewSeg { font-size: 11.5px; padding: 6px 13px; color: var(--rf-ink-3); }
+.viewSegOn { background: var(--rf-ink); color: var(--rf-on-gold); font-weight: 500; }
+
+/* 提示：视图切换下方，金线 */
+.floatToast { top: 64px; left: 50%; transform: translateX(-50%); border-color: var(--rf-gold); padding: 7px 14px; gap: 8px; font-family: var(--rf-mono); font-size: 10px; letter-spacing: 0.4px; color: var(--rf-gold); white-space: nowrap; }
+
+/* 账号：右上 */
+.acctPill { top: 18px; right: 20px; gap: 9px; padding: 5px 6px 5px 6px; }
+.acctName { font-size: 11.5px; padding-right: 2px; }
+.acctOut { font-size: 11.5px; font-weight: 500; color: var(--rf-gold); border-left: 1px solid var(--rf-rule-faint); padding: 2px 4px 2px 10px; }
+.acctOut:hover { color: var(--rf-ink); }
+/* Clerk 头像方形化 */
+.acctPill :global(.cl-userButtonTrigger) { border-radius: 0; }
+.acctPill :global(.cl-avatarBox) { border-radius: 0; width: 24px; height: 24px; }
+
+/* 资料库：浮卡（收起时变一颗按钮） */
+.libCard { position: absolute; z-index: 30; top: 72px; left: 20px; width: 228px; max-height: calc(100% - 200px); display: flex; flex-direction: column; background: var(--rf-paper); border: 1px solid var(--rf-ink); }
+.libToggle { position: absolute; z-index: 30; top: 72px; left: 20px; display: flex; align-items: center; gap: 8px; background: var(--rf-paper); border: 1px solid var(--rf-ink); padding: 8px 13px; font-size: 11.5px; font-weight: 500; }
+
+/* 底部中央工具条 */
+.toolbarFloat { bottom: 20px; left: 50%; transform: translateX(-50%); }
+.tbBtn { font-size: 11.5px; padding: 10px 15px; color: var(--rf-ink-3); border-right: 1px solid var(--rf-rule-faint); white-space: nowrap; }
+.tbBtn:last-child { border-right: none; }
+.tbBtn:hover { color: var(--rf-ink); background: var(--rf-surface); }
+.tbOn { color: var(--rf-on-gold); background: var(--rf-ink); font-weight: 500; }
+.tbOn:hover { color: var(--rf-on-gold); background: var(--rf-ink); }
+.tbStrong { font-weight: 600; color: var(--rf-ink); }
+
+/* 右下缩放 */
+.zoomFloat { bottom: 20px; right: 20px; border-color: var(--rf-rule-mid); font-family: var(--rf-mono); font-size: 10.5px; }
+.zoomFloat .zoomBtn { border-right-color: var(--rf-rule-mid); }
+
+/* 检查器：选中才浮出来，右上 */
+.inspectorFloat { position: absolute; z-index: 32; top: 72px; right: 20px; width: 300px; max-height: calc(100% - 160px); display: flex; flex-direction: column; background: var(--rf-surface); border: 1px solid var(--rf-ink); overflow: hidden; }
+
+/* 泳道/时间条/清单：整块面板盖在画布位置 */
+.viewPanel { position: absolute; inset: 0; overflow: auto; background: var(--rf-paper); padding-top: 66px; }
+
+/* 工具条上的菜单要朝上开 */
+.menuUp { top: auto; bottom: calc(100% + 9px); }
