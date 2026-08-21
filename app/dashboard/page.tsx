@@ -75,7 +75,12 @@ export default function Editor() {
   const vpRef = useRef(vp);
   vpRef.current = vp;
   /** 换了一张图（新建/导入/模板/粘贴/重排）就重新适应一次 */
+  /** 用户拖过/缩放过镜头没。没动过 → 图长一步视野跟着居中；
+   *  动过 → 镜头是用户的，程序不抢，直到「适应」/换图/重排交还。 */
+  const userMovedRef = useRef(false);
+
   const refit = useCallback((nodes: FlowNodeData[]) => {
+    userMovedRef.current = false;
     setVp(fitView(nodes, canvasRef.current?.clientWidth ?? 0,
                   canvasRef.current?.clientHeight ?? 0));
   }, []);
@@ -133,7 +138,8 @@ export default function Editor() {
   const commit = useCallback((next: FlowDoc, label: string) => {
     remember(label, doc);
     setDoc(next);
-  }, [doc, remember]);
+    if (!userMovedRef.current) refit(next.nodes);
+  }, [doc, remember, refit]);
 
   /** 撤销 = 回到最近那条历史的「之前」。 */
   const undo = useCallback(() => {
@@ -402,6 +408,7 @@ export default function Editor() {
     if (!el) return;
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
+      userMovedRef.current = true;
       const r = el.getBoundingClientRect();
       const cx = e.clientX - r.left, cy = e.clientY - r.top;
       if (e.ctrlKey || e.metaKey || Math.abs(e.deltaY) >= Math.abs(e.deltaX)) {
@@ -532,6 +539,7 @@ export default function Editor() {
             // 中键随时可拖；空格按住随时可拖；否则只有按在空白处才拖
             const onNode = !!(e.target as Element).closest('[data-node]');
             if (!(e.button === 1 || spaceDown || (e.button === 0 && !onNode))) return;
+            userMovedRef.current = true;
             panRef.current = { sx: e.clientX, sy: e.clientY, ox: vpRef.current.x, oy: vpRef.current.y };
             e.currentTarget.setPointerCapture(e.pointerId);
           }}
@@ -671,9 +679,9 @@ export default function Editor() {
       {/* 右下：缩放（只在流程图视图） */}
       {view === '流程图' && (
         <div className={`${s.pill} ${s.zoomFloat}`}>
-          <button className={s.zoomBtn} onClick={() => setVp(v => ({ ...v, z: clampZ(v.z / 1.2) }))} aria-label="缩小">−</button>
+          <button className={s.zoomBtn} onClick={() => { userMovedRef.current = true; setVp(v => ({ ...v, z: clampZ(v.z / 1.2) })); }} aria-label="缩小">−</button>
           <button className={s.zoomBtn} onClick={() => refit(doc.nodes)} title="让整张图正好放进画布">{Math.round(vp.z * 100)}%</button>
-          <button className={s.zoomBtn} onClick={() => setVp(v => ({ ...v, z: clampZ(v.z * 1.2) }))} aria-label="放大">＋</button>
+          <button className={s.zoomBtn} onClick={() => { userMovedRef.current = true; setVp(v => ({ ...v, z: clampZ(v.z * 1.2) })); }} aria-label="放大">＋</button>
         </div>
       )}
 
