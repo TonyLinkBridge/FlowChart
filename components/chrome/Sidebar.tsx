@@ -8,6 +8,7 @@ import s from './Sidebar.module.css';
  *  「新建」从此是往列表里加一张，不再是把当前这张覆盖掉。 */
 export function Sidebar({
   ws, onClose, onPick, onNew, onRename, onDelete, onMove, onNewFolder, onRenameFolder, onDropFolder,
+  spaces, onMoveSpace,
 }: {
   ws: Workspace;
   onClose: () => void;
@@ -19,6 +20,9 @@ export function Sidebar({
   onNewFolder: () => void;
   onRenameFolder: (id: string, name: string) => void;
   onDropFolder: (id: string) => void;
+  /** 能搬去的其他空间：个人空间用 id null。空数组就不显示搬家菜单。 */
+  spaces: { id: string | null; name: string }[];
+  onMoveSpace: (id: string, orgId: string | null) => void;
 }) {
   const [editing, setEditing] = useState<string | null>(null);
 
@@ -44,6 +48,15 @@ export function Sidebar({
           <option value="">未分组</option>
           {ws.folders.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
         </select>
+        {spaces.length > 0 && (
+          <select className={s.move} value="" title="搬去别的空间（个人 ↔ Team）"
+                  onChange={e => { if (e.target.value) onMoveSpace(d.id, e.target.value === '@me' ? null : e.target.value); }}>
+            <option value="">搬家…</option>
+            {spaces.map(sp => (
+              <option key={sp.id ?? '@me'} value={sp.id ?? '@me'}>{sp.name}</option>
+            ))}
+          </select>
+        )}
         <button className={s.tool} title="删除" onClick={() => onDelete(d.id)}>×</button>
       </span>
     </div>

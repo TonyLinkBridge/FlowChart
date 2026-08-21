@@ -27,10 +27,10 @@ import { LanesView } from '@/components/views/LanesView';
 import { Sidebar } from '@/components/chrome/Sidebar';
 import { VersionsPanel } from '@/components/chrome/VersionsPanel';
 import {
-  loadWorkspace, rememberCurrent, createFlow, saveFlow, deleteFlow, moveFlow, fetchFlow, restoreVersion,
+  loadWorkspace, rememberCurrent, createFlow, saveFlow, deleteFlow, moveFlow, moveFlowSpace, fetchFlow, restoreVersion,
   createFolder, renameFolderDb, deleteFolderDb, currentDoc, SaveConflict, type Workspace,
 } from '@/lib/store';
-import { OrganizationSwitcher, UserButton, useClerk, useOrganization, useUser } from '@clerk/nextjs';
+import { OrganizationSwitcher, UserButton, useClerk, useOrganization, useOrganizationList, useUser } from '@clerk/nextjs';
 import s from '@/components/chrome/Chrome.module.css';
 
 
@@ -220,6 +220,17 @@ export default function Editor() {
 
   const [histOpen, setHistOpen] = useState(false);
 
+  /** 我加入的所有 Team —— 侧栏「搬家…」菜单的选项来源。
+   *  在 Team 里可以搬回个人空间；在任何空间都能搬去别的 Team。 */
+  const { userMemberships } = useOrganizationList({ userMemberships: { infinite: true } });
+  const spaces = useMemo(() => {
+    const teams = (userMemberships?.data ?? [])
+      .map(m => ({ id: m.organization.id as string | null, name: m.organization.name }))
+      .filter(t => t.id !== orgId);
+    return orgId ? [{ id: null, name: '我的个人空间' }, ...teams] : teams;
+  }, [userMemberships?.data, orgId]);
+
+
   /** 恢复历史版本：结果是一个新版本，历史不毁，恢复错了再恢复回去。 */
   const doRestore = useCallback((v: number) => {
     const id = wsRef.current?.currentId;
@@ -362,12 +373,35 @@ export default function Editor() {
       setToast(`${byName} 更新了这张图`);
     });
   }, []);
-  const { mates, sendCursor, announceSaved } = useCollab(
+  const { mates, ghosts, sendCursor, sendDrag, sendDragEnd, sendSel, announceSaved } = useCollab(
     ws?.currentId ?? null,
     { id: user?.id ?? '', name: myName },
     onPeerSaved,
   );
   announceRef.current = v => announceSaved(v, myName);
+
+  /** 我选中了哪个节点也广播出去 —— 对方屏幕上那个节点会描上我的颜色。 */
+  useEffect(() => { sendSel(selected); }, [selected, sendSel]);
+
+  /** 渲染用的图 = 数据 + 同事拖动中的「幽灵位置」。
+   *  幽灵只盖在渲染上，绝不写进 doc —— 数据对错交给版本号和三方合并。 */
+  const liveDoc = useMemo(() => {
+    const gs = Object.values(ghosts);
+    if (!gs.length) return doc;
+    const at = new Map(gs.map(g => [g.id, g]));
+    return { ...doc, nodes: doc.nodes.map(n => {
+      const g = at.get(n.id);
+      return g ? { ...n, x: g.x, y: g.y } : n;
+    }) };
+  }, [doc, ghosts]);
+
+  /** 节点 → 同事颜色：他选中的、他正在拖的，都描一圈他的色。 */
+  const peerMarks = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const mate of mates) if (mate.sel) m.set(mate.sel, mate.color);
+    for (const g of Object.values(ghosts)) m.set(g.id, g.color);
+    return m;
+  }, [mates, ghosts]);
 
   /** 还有改动没落库就要关页？让浏览器拦一下。 */
   useEffect(() => {
@@ -420,6 +454,27 @@ export default function Editor() {
       setDoc(row.doc); setHistory([]); setFuture([]); setSelected(null); refit(row.doc.nodes);
     }).catch(() => setSaveState('error'));
   }, [flushSave, refit]);
+
+  /** 搬家：图从当前空间挪去别处，本地列表里移掉；正开着的话切去下一张。 */
+  const relocateSpace = useCallback((id: string, target: string | null) => {
+    moveFlowSpace(id, target).then(() => {
+      const w = wsRef.current;
+      if (!w) return;
+      const docs = w.docs.filter(d => d.id !== id);
+      if (w.currentId === id) {
+        if (!docs.length) { setWs({ ...w, docs, currentId: null }); newDoc(null); return; }
+        lastLoadedRef.current = docs[0].doc;
+        syncRef.current = { id: docs[0].id, doc: docs[0].doc, version: docs[0].version };
+        setWs({ ...w, docs, currentId: docs[0].id });
+        setDoc(docs[0].doc); setHistory([]); setFuture([]); setSelected(null);
+        refit(docs[0].doc.nodes);
+        rememberCurrent(docs[0].id);
+      } else {
+        setWs({ ...w, docs });
+      }
+      setToast(target ? '已搬进 Team —— 切换空间就能看到' : '已搬回你的个人空间');
+    }).catch(e => setToast(e instanceof Error ? e.message : '搬家失败'));
+  }, [newDoc, refit]);
 
   /** 切换到另一张图。先 flush 再切 —— 不然最后 800ms 的改动静默丢掉。
    *  历史是「这一张」的，切图要清空，不然会跨图撤销。
@@ -618,17 +673,20 @@ export default function Editor() {
       // 3px 抖动阈值：手一抖就当拖动的话，就再也点不中节点了
       if (!d.moved && Math.hypot(dx, dy) < 3) return;
       d.moved = true;
+      const nx = Math.round(d.ox + dx), ny = Math.round(d.oy + dy);
+      sendDrag(d.id, nx, ny);   // 同事屏幕上实时看到这个节点跟着我的手走
       setDoc(cur => ({
         ...cur,
         nodes: cur.nodes.map(n => {
           if (n.id !== d.id) return n;
-          return { ...n, x: Math.round(d.ox + dx), y: Math.round(d.oy + dy) };
+          return { ...n, x: nx, y: ny };
         }),
       }));
     };
     const up = () => {
       const d = dragRef.current;
       if (d?.moved) {
+        sendDragEnd();
         // 整段拖动只算一步：压栈的是按下之前那份图
         remember(`拖动了「${d.before.nodes.find(n => n.id === d.id)?.title ?? d.id}」`, d.before);
       }
@@ -642,7 +700,7 @@ export default function Editor() {
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', up);
     };
-  }, [dragging, remember]);
+  }, [dragging, remember, sendDrag, sendDragEnd]);
 
   /** 在右栏点「写附注」：建一条空的，顺手把气泡钉开，不然点完像没反应。 */
   const createNote = useCallback((id: string) => {
@@ -747,11 +805,12 @@ export default function Editor() {
           onDrop={e => { e.preventDefault(); setDropping(false); openFile(e.dataTransfer.files?.[0]); }}
         >
           <div style={{ position: 'absolute', inset: 0, transform: `translate(${vp.x}px, ${vp.y}px) scale(${vp.z})`, transformOrigin: '0 0' }}>
-            <FlowEdges doc={doc} selectedEdge={edgeIndex} onSelectEdge={selectEdge} />
-            {doc.nodes.map(n => (
+            <FlowEdges doc={liveDoc} selectedEdge={edgeIndex} onSelectEdge={selectEdge} />
+            {liveDoc.nodes.map(n => (
               <FlowNode
                 key={n.id}
                 node={n}
+                peerRing={peerMarks.get(n.id)}
                 footnote={notes.get(n.id)}
                 activeFootnote={selected === n.id}
                 onSelect={clickNode}
@@ -770,7 +829,7 @@ export default function Editor() {
             // 气泡不进缩放层 —— 图缩到 33% 时字还没法读就没意义了。
             // 位置按屏幕坐标换算（跟着缩放走），气泡本身永远 1:1。
             const id = pinnedNote ?? hoverNote;
-            const n = id ? doc.nodes.find(x => x.id === id) : null;
+            const n = id ? liveDoc.nodes.find(x => x.id === id) : null;
             if (!n?.note) return null;
             return (
               <NotePopover
@@ -820,13 +879,14 @@ export default function Editor() {
           拖动、连线、按住空格时都先收起来 —— 不跟手势抢地方 */}
       {view === '流程图' && selected && !dragging && !spaceDown && edgeIndex === null
         && linkFrom === null && loadState === 'ready' && (() => {
+        const live = liveDoc.nodes.find(nn => nn.id === selected);
         const n = doc.nodes.find(nn => nn.id === selected);
-        if (!n) return null;
+        if (!n || !live) return null;
         return (
           <NodeToolbar
             node={n}
-            x={vp.x + ((n.x ?? 0) + nodeW(n) / 2) * vp.z}
-            y={vp.y + (n.y ?? 0) * vp.z}
+            x={vp.x + ((live.x ?? 0) + nodeW(live) / 2) * vp.z}
+            y={vp.y + (live.y ?? 0) * vp.z}
             onShape={sh => commit(patchNode(doc, n.id, { shape: sh }), '改了形状')}
             onStyle={(p, label) => restyle(n.id, p, label)}
             onHref={url => commit(patchNode(doc, n.id, { href: url }), url ? `给「${n.title}」挂了链接` : '清除了链接')}
@@ -900,6 +960,7 @@ export default function Editor() {
           onPick={pickFlow} onNew={newDoc} onRename={renameFlow}
           onDelete={removeFlow} onMove={relocateFlow}
           onNewFolder={newFolder} onRenameFolder={renameFolder} onDropFolder={removeFolder}
+          spaces={spaces} onMoveSpace={relocateSpace}
         />
       ) : (
         <button className={s.libToggle} onClick={() => setSideOpen(true)}>

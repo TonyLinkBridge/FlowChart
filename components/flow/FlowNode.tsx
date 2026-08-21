@@ -102,7 +102,7 @@ function LockMark() {
 }
 
 export function FlowNode({
-  node, footnote, activeFootnote, onSelect, onToggle, onOpenNote, terminal, onDragStart, onMarkerHover, panMode,
+  node, footnote, activeFootnote, onSelect, onToggle, onOpenNote, terminal, onDragStart, onMarkerHover, panMode, peerRing,
 }: {
   node: Node;
   footnote?: number;
@@ -116,8 +116,11 @@ export function FlowNode({
   onMarkerHover?: (id: string | null) => void;
   /** 空格按住时整个画布进入拖动模式，节点要让路，不然拖不动画布 */
   panMode?: boolean;
+  /** 同事正在选中/拖动这个节点 —— 描一圈他的颜色 */
+  peerRing?: string;
 }) {
-  const pos = { left: node.x ?? 0, top: node.y ?? 0 };
+  const pos: CSSProperties = { left: node.x ?? 0, top: node.y ?? 0 };
+  if (peerRing) { pos.outline = `1.5px solid ${peerRing}`; pos.outlineOffset = 2; }
   const st = node.style;
 
   /* 判断 —— 菱形 */

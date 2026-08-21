@@ -1,6 +1,6 @@
 import { admin } from '@/lib/supabase/admin';
 import { bad, checkDoc, readJson } from '@/lib/api/guard';
-import { checkpoint, flowAccess, folderInScope, getScope, logActivity } from '@/lib/api/team';
+import { checkpoint, flowAccess, folderInScope, getScope, isMemberOf, logActivity } from '@/lib/api/team';
 
 const cols = 'id,folder_id,doc,version,updated_at';
 
@@ -44,6 +44,18 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (f === null) patch.folder_id = null;
     else if (typeof f === 'string' && (await folderInScope(f, scope))) patch.folder_id = f;
     else return bad('分组不存在，或者不在当前空间');
+  }
+  // 搬家：null = 搬回请求者的个人空间（owner 换成他），字符串 = 搬进那个 Team
+  if ('toOrgId' in body) {
+    const to = body.toOrgId;
+    if (to === null) {
+      patch.org_id = null; patch.owner_id = scope.userId; patch.folder_id = null;
+    } else if (typeof to === 'string') {
+      const okOrg = to === scope.orgId ? true : await isMemberOf(scope.userId, to);
+      if (!okOrg) return bad('你不是那个 Team 的成员');
+      patch.org_id = to; patch.folder_id = null;   // 分组是空间内的，跨空间要清
+    } else return bad('目标空间不合法');
+    await logActivity({ flowId: id, orgId: access.row.org_id, actor: scope.userId, action: 'move', detail: to ? '移入 Team' : '移回个人空间' });
   }
   if (Object.keys(patch).length === 1) return bad('没有可更新的内容');
 

@@ -87,6 +87,11 @@ export async function moveFlow(id: string, folderId: string | null) {
   await call(`/api/flows/${id}`, { method: 'PATCH', body: JSON.stringify({ folderId }) });
 }
 
+/** 搬家：null = 搬回自己的个人空间，字符串 = 搬进那个 Team。 */
+export async function moveFlowSpace(id: string, orgId: string | null) {
+  await call(`/api/flows/${id}`, { method: 'PATCH', body: JSON.stringify({ toOrgId: orgId }) });
+}
+
 export async function createFolder(name: string): Promise<Folder | null> {
   return call<Folder>('/api/folders', { method: 'POST', body: JSON.stringify({ name }) });
 }

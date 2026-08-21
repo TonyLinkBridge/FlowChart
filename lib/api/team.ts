@@ -86,3 +86,12 @@ export async function logActivity(e: {
     actor: e.actor, actor_name: name, action: e.action, detail: e.detail ?? null,
   }).then(() => undefined, () => undefined);
 }
+
+/** 这个人是不是某个 Team 的成员（不限当前激活的那个）。 */
+export async function isMemberOf(userId: string, orgId: string): Promise<boolean> {
+  try {
+    const client = await clerkClient();
+    const ms = await client.users.getOrganizationMembershipList({ userId, limit: 100 });
+    return ms.data.some(m => m.organization.id === orgId);
+  } catch { return false; }
+}
