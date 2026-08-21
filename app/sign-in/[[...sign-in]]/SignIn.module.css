@@ -1,0 +1,27 @@
+.page { min-height: 100vh; display: flex; background: var(--rf-paper); color: var(--rf-ink); font-family: var(--rf-font); }
+
+/* 左半：说清楚这是什么。登录页是很多人第一次见到这个产品的地方 */
+.pitch { flex: 1; min-width: 0; padding: 56px 60px; display: flex; flex-direction: column; border-right: 1px solid var(--rf-ink); }
+.brand { font-size: 10px; font-weight: 600; letter-spacing: 2.6px; text-transform: uppercase; color: var(--rf-gold); }
+.head { font-size: 34px; font-weight: 600; letter-spacing: -1.2px; line-height: 1.35; margin-top: 34px; max-width: 460px; }
+.head span { color: var(--rf-gold); }
+.rule { border-top: 2px solid var(--rf-ink); margin-top: 40px; }
+
+.rows { margin-top: 4px; }
+.row { display: flex; gap: 18px; padding: 16px 0; border-bottom: 1px solid var(--rf-rule-faint); }
+.idx { font-family: var(--rf-mono); font-size: 9.5px; letter-spacing: 1px; color: var(--rf-gold); padding-top: 3px; flex-shrink: 0; width: 22px; }
+.rowText { font-size: 12.5px; line-height: 1.75; color: var(--rf-ink-3); }
+.rowText b { color: var(--rf-ink); font-weight: 600; }
+
+.foot { margin-top: auto; padding-top: 32px; font-family: var(--rf-mono); font-size: 9.5px; letter-spacing: 0.6px; color: var(--rf-ink-4); line-height: 1.9; }
+
+/* 右半：登录 */
+.panel { width: 480px; flex-shrink: 0; padding: 56px 48px; display: flex; flex-direction: column; justify-content: center; background: var(--rf-surface); }
+.panelLabel { font-family: var(--rf-mono); font-size: 9px; font-weight: 500; letter-spacing: 1.6px; color: var(--rf-ink-4); margin-bottom: 22px; }
+
+@media (max-width: 980px) {
+  .page { flex-direction: column; }
+  .pitch { border-right: none; border-bottom: 1px solid var(--rf-ink); padding: 40px 28px; }
+  .panel { width: auto; padding: 40px 28px; }
+  .head { font-size: 26px; }
+}
