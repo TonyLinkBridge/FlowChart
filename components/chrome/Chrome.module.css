@@ -184,8 +184,9 @@
 /* 检查器：选中才浮出来，右上 */
 .inspectorFloat { position: absolute; z-index: 32; top: 72px; right: 20px; width: 300px; max-height: calc(100% - 160px); display: flex; flex-direction: column; background: var(--rf-surface); border: 1px solid var(--rf-ink); overflow: hidden; }
 
-/* 泳道/时间条/清单：整块面板盖在画布位置 */
-.viewPanel { position: absolute; inset: 0; overflow: auto; background: var(--rf-paper); padding-top: 66px; }
+/* 泳道/时间条/清单：整块面板盖在画布位置。
+   资料库开着时 left 由行内样式推到卡片右侧，别互相压 */
+.viewPanel { position: absolute; inset: 0; overflow: auto; background: var(--rf-paper); padding-top: 66px; transition: left 0.15s ease; }
 
 /* 工具条上的菜单要朝上开 */
 .menuUp { top: auto; bottom: calc(100% + 9px); }

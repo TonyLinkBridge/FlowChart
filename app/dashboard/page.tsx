@@ -593,7 +593,7 @@ export default function Editor() {
       )}
 
       {view !== '流程图' && (
-        <div className={s.viewPanel}>
+        <div className={s.viewPanel} style={{ left: sideOpen ? 268 : 0 }}>
           {view === '泳道' ? <LanesView doc={doc} onSelect={setSelected} />
             : view === '时间条' ? <TimelineView doc={doc} onSelect={setSelected} />
             : <ChecklistView doc={doc} onToggleNode={toggleDone} onToggleStep={toggleStepAt} />}
