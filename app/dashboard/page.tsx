@@ -28,7 +28,6 @@ import {
 import { UserButton } from '@clerk/nextjs';
 import s from '@/components/chrome/Chrome.module.css';
 
-const LOG_STRIP_H = 38;   // 画布底部那条日志带的高度
 
 const VIEWS = ['流程图', '泳道', '时间条', '清单'] as const;
 
@@ -75,7 +74,7 @@ export default function Editor() {
   /** 换了一张图（新建/导入/模板/粘贴/重排）就重新适应一次 */
   const refit = useCallback((nodes: FlowNodeData[]) => {
     setVp(fitView(nodes, canvasRef.current?.clientWidth ?? 0,
-                  (canvasRef.current?.clientHeight ?? 0) - LOG_STRIP_H));
+                  canvasRef.current?.clientHeight ?? 0));
   }, []);
 
   /** 附注气泡：hover 出来只读，点一下钉住才展开可改。
@@ -157,6 +156,18 @@ export default function Editor() {
       .then(w => { setWs(w); const c = currentDoc(w); if (c) setDoc(c.doc); })
       .catch(() => setSaveState('error'));
   }, []);
+
+  /** 首次进来适应一次。
+   *  之前只在新建/切换/导入/粘贴/重排时适应，唯独一进来那次漏了 ——
+   *  所以图停在原始坐标上，贴着左上角。
+   *  画布宽高是异步量出来的，量到之前 fitView 会直接放弃，所以要等它。 */
+  const fitted = useRef(false);
+  useEffect(() => {
+    if (fitted.current || !ws || !doc.nodes.length) return;
+    if (!canvas.w || !canvas.h) return;      // 还没量到画布尺寸
+    fitted.current = true;
+    refit(doc.nodes);
+  }, [ws, doc.nodes, canvas.w, canvas.h, refit]);
 
   /** 自动保存：停手 800ms 才发一次请求，不然每敲一个字发一次谁也受不了。 */
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
