@@ -31,12 +31,13 @@ function summarize(note: Note) {
 }
 
 export function NotePopover({
-  node, index, x, y, canvasW, pinned, expanded,
+  node, index, x, y, nodeWpx = 260, canvasW, pinned, expanded,
   onEnter, onLeave, onClose, onToggleExpand, onChange,
 }: {
   node: FlowNode;
   index: number;
-  x: number; y: number;          // 节点左上角在画布里的位置
+  x: number; y: number;          // 节点左上角的屏幕坐标（缩放已换算）
+  nodeWpx?: number;              // 节点在屏幕上的宽度（随缩放变）
   canvasW: number;
   pinned: boolean;
   expanded: boolean;
@@ -50,7 +51,7 @@ export function NotePopover({
   if (!note) return null;
 
   // 默认贴右边；右边放不下就翻到左边
-  const right = x + 260 + GAP;
+  const right = x + nodeWpx + GAP;
   const flip = canvasW > 0 && right + POP_W > canvasW - 8;
   const left = flip ? Math.max(8, x - POP_W - GAP) : right;
 
@@ -59,7 +60,7 @@ export function NotePopover({
   const firstTodo = note.steps?.find(st => !st.done)?.text;
 
   return (
-    <div className={`${s.pop} ${pinned ? s.pinned : ''}`} style={{ left, top: y }}
+    <div data-pop className={`${s.pop} ${pinned ? s.pinned : ''}`} style={{ left, top: y }}
          onMouseEnter={onEnter} onMouseLeave={onLeave}>
       <div className={s.head}>
         <span className={s.idx}>{String(index).padStart(2, '0')}</span>

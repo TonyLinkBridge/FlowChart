@@ -407,6 +407,7 @@ export default function Editor() {
     const el = canvasRef.current;
     if (!el) return;
     const onWheel = (e: WheelEvent) => {
+      if ((e.target as Element).closest?.('[data-pop]')) return;   // 气泡里滚动归气泡
       e.preventDefault();
       userMovedRef.current = true;
       const r = el.getBoundingClientRect();
@@ -537,7 +538,7 @@ export default function Editor() {
           className={`${s.canvas} ${dropping ? s.canvasDrop : ''} ${spaceDown ? s.canvasPan : ''}`}
           onPointerDown={e => {
             // 中键随时可拖；空格按住随时可拖；否则只有按在空白处才拖
-            const onNode = !!(e.target as Element).closest('[data-node]');
+            const onNode = !!(e.target as Element).closest('[data-node],[data-pop]');
             if (!(e.button === 1 || spaceDown || (e.button === 0 && !onNode))) return;
             userMovedRef.current = true;
             panRef.current = { sx: e.clientX, sy: e.clientY, ox: vpRef.current.x, oy: vpRef.current.y };
@@ -572,31 +573,35 @@ export default function Editor() {
               />
             ))}
 
-            {(() => {
-              const id = pinnedNote ?? hoverNote;
-              const n = id ? doc.nodes.find(x => x.id === id) : null;
-              if (!n?.note) return null;
-              return (
-                <NotePopover
-                  node={n}
-                  index={notes.get(n.id) ?? 0}
-                  x={n.x ?? 0}
-                  y={n.y ?? 0}
-                  canvasW={Math.max(0, (canvas.w - vp.x) / vp.z)}
-                  pinned={pinnedNote === n.id}
-                  expanded={pinnedNote === n.id && noteExpanded}
-                  onEnter={keepHover}
-                  onLeave={() => { if (pinnedNote !== n.id) scheduleHover(null); }}
-                  onClose={() => { setPinnedNote(null); setHoverNote(null); }}
-                  onToggleExpand={() => {
-                    if (pinnedNote !== n.id) { setPinnedNote(n.id); setNoteExpanded(true); }
-                    else setNoteExpanded(v => !v);
-                  }}
-                  onChange={note => changeNote(n.id, note)}
-                />
-              );
-            })()}
           </div>
+
+          {(() => {
+            // 气泡不进缩放层 —— 图缩到 33% 时字还没法读就没意义了。
+            // 位置按屏幕坐标换算（跟着缩放走），气泡本身永远 1:1。
+            const id = pinnedNote ?? hoverNote;
+            const n = id ? doc.nodes.find(x => x.id === id) : null;
+            if (!n?.note) return null;
+            return (
+              <NotePopover
+                node={n}
+                index={notes.get(n.id) ?? 0}
+                x={vp.x + (n.x ?? 0) * vp.z}
+                y={vp.y + (n.y ?? 0) * vp.z}
+                nodeWpx={nodeW(n) * vp.z}
+                canvasW={canvas.w}
+                pinned={pinnedNote === n.id}
+                expanded={pinnedNote === n.id && noteExpanded}
+                onEnter={keepHover}
+                onLeave={() => { if (pinnedNote !== n.id) scheduleHover(null); }}
+                onClose={() => { setPinnedNote(null); setHoverNote(null); }}
+                onToggleExpand={() => {
+                  if (pinnedNote !== n.id) { setPinnedNote(n.id); setNoteExpanded(true); }
+                  else setNoteExpanded(v => !v);
+                }}
+                onChange={note => changeNote(n.id, note)}
+              />
+            );
+          })()}
         </div>
       )}
 
