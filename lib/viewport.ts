@@ -6,10 +6,10 @@ import type { FlowNode } from './types';
  *  缩放一进来就不够用了，索性把平移和缩放合成一个状态。 */
 export interface View { x: number; y: number; z: number }
 
-export const MIN_Z = 0.2, MAX_Z = 2.5;
+const MIN_Z = 0.2, MAX_Z = 2.5;
 export const clampZ = (z: number) => Math.min(MAX_Z, Math.max(MIN_Z, z));
 
-export function bounds(nodes: FlowNode[]) {
+function bounds(nodes: FlowNode[]) {
   if (!nodes.length) return { minX: 0, minY: 0, w: 0, h: 0 };
   const minX = Math.min(...nodes.map(n => n.x ?? 0));
   const minY = Math.min(...nodes.map(n => n.y ?? 0));
@@ -37,5 +37,3 @@ export function zoomAt(v: View, cx: number, cy: number, factor: number): View {
   return { x: cx - (cx - v.x) * k, y: cy - (cy - v.y) * k, z };
 }
 
-/** 屏幕坐标 → 画布坐标 */
-export const toCanvas = (v: View, sx: number, sy: number) => ({ x: (sx - v.x) / v.z, y: (sy - v.y) / v.z });

@@ -14,21 +14,17 @@
 
 ```bash
 pnpm install
-cp .env.example .env.local   # 填上 Supabase 的两个值
+cp .env.example .env.local   # 照里面的注释填 Clerk 和 Supabase 的值
 pnpm dev
 ```
 
-`.env.local` 需要：
+登录走 Clerk，数据库是 Supabase（只存数据，不管登录）。
+浏览器不直连数据库 —— 所有读写走 /api，服务端先验身份再按人过滤。
 
-```
-NEXT_PUBLIC_SUPABASE_URL=https://你的项目.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=你的 anon key
-```
-
-数据库建表脚本在 `supabase/schema.sql` —— 到 Supabase 后台的 SQL Editor 整段粘贴运行。
+全新数据库跑 `supabase/schema.sql`；老库从 Supabase Auth 迁移的跑 `supabase/migrate-to-clerk.sql`。脚本 —— 到 Supabase 后台的 SQL Editor 整段粘贴运行。
 
 ## 技术
 
-Next.js 16 · React 19 · Supabase（登录 + 数据）· 原生 CSS（无 Tailwind）
+Next.js 16 · React 19 · Clerk（登录）· Supabase（数据）· 原生 CSS（无 Tailwind）
 
 排版、连线、排期都是自己实现的，没有引流程图库。

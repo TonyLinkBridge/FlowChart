@@ -153,7 +153,7 @@ export default function Editor() {
   /** 进来先拉一次工作区。 */
   useEffect(() => {
     loadWorkspace()
-      .then(w => { setWs(w); const c = currentDoc(w); if (c) setDoc(c.doc); })
+      .then(w => { setWs(w); const c = currentDoc(w); if (c) { lastLoadedRef.current = c.doc; setDoc(c.doc); } })
       .catch(() => setSaveState('error'));
   }, []);
 
@@ -169,13 +169,28 @@ export default function Editor() {
     refit(doc.nodes);
   }, [ws, doc.nodes, canvas.w, canvas.h, refit]);
 
-  /** 自动保存：停手 800ms 才发一次请求，不然每敲一个字发一次谁也受不了。 */
+  /** 自动保存：停手 800ms 才发一次请求，不然每敲一个字发一次谁也受不了。
+   *  pending 记着「还没发出去的那份」—— 切图前必须 flush，
+   *  不然定时器一清，最后 800ms 的改动就静默丢了。 */
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingRef = useRef<{ id: string; doc: FlowDoc } | null>(null);
+  const lastLoadedRef = useRef<FlowDoc | null>(null);
+
+  const flushSave = useCallback(() => {
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    const pend = pendingRef.current;
+    pendingRef.current = null;
+    if (pend) saveFlow(pend.id, pend.doc).catch(() => setSaveState('error'));
+  }, []);
+
   useEffect(() => {
     if (!ws?.currentId) return;
+    if (doc === lastLoadedRef.current) return;   // 刚加载/切换过来的那份，不用回存
     if (saveTimer.current) clearTimeout(saveTimer.current);
     setSaveState('saving');
+    pendingRef.current = { id: ws.currentId, doc };
     saveTimer.current = setTimeout(() => {
+      pendingRef.current = null;
       saveFlow(ws.currentId!, doc)
         .then(() => {
           setSaveState('saved');
@@ -217,52 +232,59 @@ export default function Editor() {
       `${step.done ? '取消' : '勾完'}「${node.title}」第 ${stepIndex + 1} 步`);
   }, [doc, commit]);
 
-  /** 新建一张空白图。当前这张没存过就没了 —— 等接上数据库再谈保护。 */
+  /** 新建一张空白图，加进列表并切过去。先把手上没存完的发出去。 */
   const newDoc = useCallback((folderId: string | null = null) => {
+    flushSave();
     createFlow(blankDoc(), folderId).then(row => {
       if (!row) return;
+      lastLoadedRef.current = row.doc;
       setWs(w => w && { ...w, docs: [row, ...w.docs], currentId: row.id });
       rememberCurrent(row.id);
       setDoc(row.doc); setHistory([]); setSelected(null); refit(row.doc.nodes);
-    });
-  }, [refit]);
+    }).catch(() => setSaveState('error'));
+  }, [flushSave, refit]);
 
-  /** 切换到另一张图。历史是「这一张」的，切图要清空，不然会跨图撤销。 */
+  /** 切换到另一张图。先 flush 再切 —— 不然最后 800ms 的改动静默丢掉。
+   *  历史是「这一张」的，切图要清空，不然会跨图撤销。
+   *  （副作用全在更新函数外面 —— 这个坑今天已经踩过两次了。） */
   const pickFlow = useCallback((id: string) => {
-    setWs(w => {
-      const target = w?.docs.find(d => d.id === id);
-      if (!w || !target) return w;
-      setDoc(target.doc); setHistory([]); setSelected(null); setEdgeIndex(null); setPinnedNote(null);
-      refit(target.doc.nodes);
-      rememberCurrent(id);
-      return { ...w, currentId: id };
-    });
-  }, [refit]);
+    if (!ws || id === ws.currentId) return;
+    const target = ws.docs.find(d => d.id === id);
+    if (!target) return;
+    flushSave();
+    lastLoadedRef.current = target.doc;
+    setWs({ ...ws, currentId: id });
+    setDoc(target.doc); setHistory([]); setSelected(null); setEdgeIndex(null); setPinnedNote(null);
+    refit(target.doc.nodes);
+    rememberCurrent(id);
+  }, [ws, flushSave, refit]);
 
   const renameFlow = useCallback((id: string, title: string) => {
-    setWs(w => w && { ...w, docs: w.docs.map(d => d.id === id ? { ...d, doc: { ...d.doc, title } } : d) });
-    setWs(w => {
-      if (w?.currentId === id) setDoc(cur => ({ ...cur, title }));   // 当前这张交给自动保存
-      else saveFlow(id, { ...(w?.docs.find(d => d.id === id)?.doc as FlowDoc), title }).catch(() => {});
-      return w;
-    });
-  }, []);
+    if (!ws) return;
+    setWs({ ...ws, docs: ws.docs.map(d => d.id === id ? { ...d, doc: { ...d.doc, title } } : d) });
+    if (ws.currentId === id) {
+      setDoc(cur => ({ ...cur, title }));   // 当前这张交给自动保存
+    } else {
+      const other = ws.docs.find(d => d.id === id);
+      if (other) saveFlow(id, { ...other.doc, title }).catch(() => setSaveState('error'));
+    }
+  }, [ws]);
 
   const removeFlow = useCallback((id: string) => {
+    if (!ws) return;
+    if (pendingRef.current?.id === id) pendingRef.current = null;   // 别把刚删的那张又存回去
     deleteFlow(id).then(() => {
-      setWs(w => {
-        if (!w) return w;
-        const docs = w.docs.filter(d => d.id !== id);
-        if (!docs.length) { newDoc(null); return { ...w, docs, currentId: null }; }
-        const nextId = w.currentId === id ? docs[0].id : w.currentId;
-        if (nextId !== w.currentId) {
-          setDoc(docs[0].doc); setHistory([]); setSelected(null); refit(docs[0].doc.nodes);
-          rememberCurrent(nextId);
-        }
-        return { ...w, docs, currentId: nextId };
-      });
+      const docs = ws.docs.filter(d => d.id !== id);
+      if (!docs.length) { setWs({ ...ws, docs, currentId: null }); newDoc(null); return; }
+      const nextId = ws.currentId === id ? docs[0].id : ws.currentId;
+      setWs({ ...ws, docs, currentId: nextId });
+      if (nextId !== ws.currentId) {
+        lastLoadedRef.current = docs[0].doc;
+        setDoc(docs[0].doc); setHistory([]); setSelected(null); refit(docs[0].doc.nodes);
+        rememberCurrent(nextId);
+      }
     }).catch(() => setSaveState('error'));
-  }, [newDoc, refit]);
+  }, [ws, newDoc, refit]);
 
   const relocateFlow = useCallback((id: string, folderId: string | null) => {
     moveFlow(id, folderId).catch(() => setSaveState('error'));
@@ -526,7 +548,10 @@ export default function Editor() {
           ) : (
             <div className={s.meta}>
               {doc.nodes.filter(n => n.shape !== 'decision').length} STEPS · {new Set(doc.nodes.map(n => n.owner).filter(Boolean)).size} TEAMS
-              {' · '}{totalDays(doc)} DAYS · {noteCount} NOTES · 已自动保存 {'12:04'}
+              {' · '}{totalDays(doc)} DAYS · {noteCount} NOTES ·{' '}
+              {saveState === 'error'
+                ? <span style={{ color: 'var(--rf-gold)', fontWeight: 500 }}>云端保存失败 · 先导出留一份</span>
+                : saveState === 'saving' ? '保存中…' : '已保存'}
             </div>
           )}
         </div>
