@@ -35,11 +35,15 @@ export function NotePanel({
   }
 
   const note = node.note;
+  // 五块都要数 —— 之前漏了「说明」和「问谁」，
+  // 一条只写了说明的附注会被报成「还没写内容」
   const bits = note
     ? [
         note.steps?.length ? `${note.steps.length} 步` : null,
         note.fields?.length ? `${note.fields.length} 个填空` : null,
         note.links?.length ? `${note.links.length} 个链接` : null,
+        note.contact?.trim() ? '有联系人' : null,
+        note.text?.trim() ? '有说明' : null,
       ].filter(Boolean).join(' · ')
     : '';
 
