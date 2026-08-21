@@ -521,8 +521,9 @@ export default function Editor() {
       {/* 顶端发丝线：整条流程的完成度 */}
       <div className={s.hairline}><div className={s.hairFill} style={{ width: `${Math.round(prog.ratio * 100)}%` }} /></div>
 
-      {/* 画布铺满全屏（其他视图时整块换成面板） */}
-      {view === '流程图' ? (
+      {/* 画布常驻铺满全屏；其他视图时面板「盖」在上面，不拆画布 ——
+          滚轮监听是挂载时绑一次的，画布一销毁重建，监听指着旧元素，缩放就死了 */}
+      {(
         <div
           ref={canvasRef}
           style={{ position: 'absolute', inset: 0 }}
@@ -589,7 +590,9 @@ export default function Editor() {
             })()}
           </div>
         </div>
-      ) : (
+      )}
+
+      {view !== '流程图' && (
         <div className={s.viewPanel}>
           {view === '泳道' ? <LanesView doc={doc} onSelect={setSelected} />
             : view === '时间条' ? <TimelineView doc={doc} onSelect={setSelected} />
