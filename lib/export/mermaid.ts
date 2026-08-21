@@ -33,7 +33,13 @@ export function toMermaid(doc: FlowDoc, opts: { redactFields?: boolean } = {}): 
         lines.push(`%%    ${f.label}: ${f.value ? (opts.redactFields ? '(已清空)' : safe(f.value)) : '(待填)'}`);
       for (const l of n.note!.links ?? []) lines.push(`%%    → ${safe(l.label)} ${l.url}`);
       if (n.note!.contact) lines.push(`%%    问谁: ${safe(n.note!.contact)}`);
-      if (n.note!.text) lines.push(`%%    ${safe(n.note!.text.replace(/\*\*|`/g, ''))}`);
+      if (n.note!.text) {
+        // 多段说明逐行进注释 —— 压成一行没法读
+        for (const ln of n.note!.text.replace(/\*\*|`/g, '').split('\n')) {
+          const t = ln.trim();
+          if (t) lines.push(`%%    ${safe(t)}`);
+        }
+      }
     }
   }
   return lines.join('\n');

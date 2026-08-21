@@ -13,7 +13,7 @@
 .pinHint { margin-left: auto; font-family: var(--rf-mono); font-size: 8.5px; letter-spacing: 0.6px; color: var(--rf-rule-mid); }
 
 /* 主体：那段话。没写就退而显示第一步该干嘛，别弹个空卡片 */
-.body { padding: 13px 14px; font-size: 12.5px; line-height: 1.75; color: var(--rf-ink-2); overflow-y: auto; }
+.body { padding: 13px 14px; font-size: 12.5px; line-height: 1.75; color: var(--rf-ink-2); overflow-y: auto; white-space: pre-line; }
 .body code { font-family: var(--rf-mono); font-size: 11px; background: var(--rf-fill); padding: 1px 5px; }
 .fallback { color: var(--rf-ink-3); }
 .fallbackLabel { font-family: var(--rf-mono); font-size: 8.5px; letter-spacing: 1.2px; color: var(--rf-ink-4); display: block; margin-bottom: 6px; }

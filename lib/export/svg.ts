@@ -16,7 +16,7 @@ const esc = (s: string) =>
 /** 估字宽：中日韩字符按一个字宽算，拉丁按 0.55。
  *  SVG 没有自动折行，只能自己数 —— 估得不准最多是行末松紧不匀，不会溢出。 */
 const isWide = (ch: string) => /[⺀-鿿＀-￯　-〿]/.test(ch);
-function wrap(text: string, maxPx: number, size: number): string[] {
+function wrapOne(text: string, maxPx: number, size: number): string[] {
   const lines: string[] = [];
   let cur = '', w = 0;
   for (const ch of text) {
@@ -26,6 +26,18 @@ function wrap(text: string, maxPx: number, size: number): string[] {
   }
   if (cur) lines.push(cur);
   return lines;
+}
+/** 先按 \n 分段，段内再按宽度折行 —— 不然粘贴的多段邮件在导出里黏成一坨。
+ *  连续空行压成一个空行当段间距。 */
+function wrap(text: string, maxPx: number, size: number): string[] {
+  const out: string[] = [];
+  for (const para of text.split('\n')) {
+    const t = para.trim();
+    if (!t) { if (out.length && out[out.length - 1] !== '') out.push(''); continue; }
+    out.push(...wrapOne(t, maxPx, size));
+  }
+  while (out.length && out[out.length - 1] === '') out.pop();
+  return out;
 }
 
 /** 把一条结构化附注压成一段可读的话 —— 导出的图下面要印这个。 */
@@ -47,7 +59,7 @@ function noteToProse(n: FlowNode, redact: boolean): string {
       .map(f => `${f.label} ${f.value ? (redact ? '（已清空）' : f.value) : '（待填）'}`).join('；'));
   if (note.links?.length) parts.push('相关：' + note.links.map(l => l.label).join('、'));
   if (note.contact) parts.push('问谁：' + note.contact);
-  if (note.text) parts.push('说明：' + note.text.replace(/\*\*|`/g, ''));
+  if (note.text) parts.push('说明：\n' + note.text.replace(/\*\*|`/g, '').trim());
 
   return `${meta ? meta + '。' : ''}${parts.join('。')}${parts.length ? '。' : ''}`;
 }
