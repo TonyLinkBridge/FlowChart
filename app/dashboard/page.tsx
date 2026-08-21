@@ -14,6 +14,8 @@ import { FlowNode } from '@/components/flow/FlowNode';
 import { FlowEdges } from '@/components/flow/FlowEdges';
 import { NotePopover } from '@/components/flow/NotePopover';
 import { NodeToolbar } from '@/components/flow/NodeToolbar';
+import { mergeDocs } from '@/lib/merge';
+import { useCollab } from '@/hooks/useCollab';
 import { NotePanel } from '@/components/views/NotePanel';
 import { EdgePanel } from '@/components/views/EdgePanel';
 import { ExportMenu } from '@/components/chrome/ExportMenu';
@@ -24,8 +26,8 @@ import { TimelineView } from '@/components/views/TimelineView';
 import { LanesView } from '@/components/views/LanesView';
 import { Sidebar } from '@/components/chrome/Sidebar';
 import {
-  loadWorkspace, rememberCurrent, createFlow, saveFlow, deleteFlow, moveFlow,
-  createFolder, renameFolderDb, deleteFolderDb, currentDoc, type Workspace,
+  loadWorkspace, rememberCurrent, createFlow, saveFlow, deleteFlow, moveFlow, fetchFlow,
+  createFolder, renameFolderDb, deleteFolderDb, currentDoc, SaveConflict, type Workspace,
 } from '@/lib/store';
 import { UserButton, useClerk, useUser } from '@clerk/nextjs';
 import s from '@/components/chrome/Chrome.module.css';
@@ -79,6 +81,14 @@ export default function Editor() {
   /** 用户拖过/缩放过镜头没。没动过 → 图长一步视野跟着居中；
    *  动过 → 镜头是用户的，程序不抢，直到「适应」/换图/重排交还。 */
   const userMovedRef = useRef(false);
+
+  // 最新的 doc / ws 的实时引用 —— 异步回调里读，闭包不会拿到旧的
+  const docRef = useRef<FlowDoc>(null as unknown as FlowDoc);
+  docRef.current = doc;
+  const wsRef = useRef<Workspace | null>(null);
+  wsRef.current = ws;
+  // 广播「我存到第 N 版了」；在 useCollab 挂好后赋值
+  const announceRef = useRef<((v: number) => void) | null>(null);
 
   const refit = useCallback((nodes: FlowNodeData[]) => {
     userMovedRef.current = false;
@@ -178,7 +188,11 @@ export default function Editor() {
       .then(w => {
         setWs(w);
         const c = currentDoc(w);
-        if (c) { lastLoadedRef.current = c.doc; setDoc(c.doc); }
+        if (c) {
+          lastLoadedRef.current = c.doc;
+          setDoc(c.doc);
+          syncRef.current = { id: c.id, doc: c.doc, version: c.version };
+        }
         setLoadState('ready');
       })
       .catch(e => { setLoadErr(e instanceof Error ? e.message : '网络不通'); setLoadState('error'); });
@@ -201,34 +215,74 @@ export default function Editor() {
    *  pending 记着「还没发出去的那份」—— 切图前必须 flush，
    *  不然定时器一清，最后 800ms 的改动就静默丢了。 */
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const pendingRef = useRef<{ id: string; doc: FlowDoc } | null>(null);
+  const pendingRef = useRef<{ id: string; doc: FlowDoc; base: number } | null>(null);
   const lastLoadedRef = useRef<FlowDoc | null>(null);
+  /** 当前这张图「最后一次和服务器对上号」的样子 —— 撞车合并时的基准。 */
+  const syncRef = useRef<{ id: string | null; doc: FlowDoc | null; version: number }>({ id: null, doc: null, version: 1 });
+
+  /** 真正把一份 doc 发出去。撞到 409（同事在我之后存过）就三方合并再试，最多三轮。
+   *  合并结果要放回画布 —— 不然你看到的和库里的会岔开。 */
+  const performSave = useCallback(async (id: string, docToSave: FlowDoc, base: number, baseDoc: FlowDoc | null) => {
+    let attempt = docToSave;
+    let attemptBase = base;
+    let mergedInfo: string | null = null;
+    for (let round = 0; round < 3; round++) {
+      try {
+        const v = await saveFlow(id, attempt, attemptBase);
+        if (syncRef.current.id === id) syncRef.current = { id, doc: attempt, version: v };
+        setWs(w => w && { ...w, docs: w.docs.map(d => d.id === id ? { ...d, doc: attempt, updatedAt: Date.now(), version: v } : d) });
+        announceRef.current?.(v);
+        if (attempt !== docToSave && wsRef.current?.currentId === id) {
+          // 发生过合并：把合并结果放回画布；这一瞬间还在敲的字再叠一层
+          const cur = docRef.current;
+          if (cur === docToSave) { lastLoadedRef.current = attempt; setDoc(attempt); }
+          else setDoc(mergeDocs(docToSave, cur, attempt).doc);
+          if (mergedInfo) setToast(mergedInfo);
+        }
+        setSaveState('saved');
+        return;
+      } catch (e) {
+        if (e instanceof SaveConflict && baseDoc) {
+          const { doc: merged, clashes } = mergeDocs(baseDoc, attempt, e.serverDoc);
+          mergedInfo = clashes.length
+            ? `已合并同事的修改 · 「${clashes[0]}」两边都改过，保留了你的`
+            : '已合并同事的修改';
+          baseDoc = e.serverDoc;          // 下一轮的合并基准就是对方那版
+          attemptBase = e.serverVersion;
+          attempt = merged;
+          continue;
+        }
+        throw e;
+      }
+    }
+    throw new Error('保存一直撞车');
+  }, []);
 
   const flushSave = useCallback(() => {
     if (saveTimer.current) clearTimeout(saveTimer.current);
     const pend = pendingRef.current;
     pendingRef.current = null;
+    if (!pend) return;
+    // 切走的那张图撞车时，合并基准用工作区里留着的最后同步版
+    const baseDoc = wsRef.current?.docs.find(d => d.id === pend.id)?.doc ?? null;
     // 发失败要把这份塞回去 —— 点「重试」或网络回来时才补得上；丢了就是真丢了
-    if (pend) saveFlow(pend.id, pend.doc).catch(() => { pendingRef.current ??= pend; setSaveState('error'); });
-  }, []);
+    performSave(pend.id, pend.doc, pend.base, baseDoc)
+      .catch(() => { pendingRef.current ??= pend; setSaveState('error'); });
+  }, [performSave]);
 
   useEffect(() => {
     if (!ws?.currentId) return;
     if (doc === lastLoadedRef.current) return;   // 刚加载/切换过来的那份，不用回存
     if (saveTimer.current) clearTimeout(saveTimer.current);
     setSaveState('saving');
-    pendingRef.current = { id: ws.currentId, doc };
+    pendingRef.current = { id: ws.currentId, doc, base: syncRef.current.version };
     saveTimer.current = setTimeout(() => {
       pendingRef.current = null;
-      saveFlow(ws.currentId!, doc)
-        .then(() => {
-          setSaveState('saved');
-          setWs(w => w && { ...w, docs: w.docs.map(d => d.id === w.currentId ? { ...d, doc, updatedAt: Date.now() } : d) });
-        })
+      performSave(ws.currentId!, doc, syncRef.current.version, syncRef.current.doc)
         .catch(() => setSaveState('error'));
     }, 800);
     return () => { if (saveTimer.current) clearTimeout(saveTimer.current); };
-  }, [doc, ws?.currentId]);
+  }, [doc, ws?.currentId, performSave]);
 
   /** 手动重试：把欠着的那份（可能是切走前那张图的）和当前这张都补发一遍。 */
   const retrySave = useCallback(() => {
@@ -237,15 +291,13 @@ export default function Editor() {
     const id = ws?.currentId;
     setSaveState('saving');
     const jobs: Promise<void>[] = [];
-    if (pend && pend.id !== id) jobs.push(saveFlow(pend.id, pend.doc));
-    if (id) jobs.push(saveFlow(id, doc));   // 当前这张永远存最新的，不用旧 pending
-    Promise.all(jobs)
-      .then(() => {
-        setSaveState('saved');
-        setWs(w => w && { ...w, docs: w.docs.map(d => d.id === id ? { ...d, doc, updatedAt: Date.now() } : d) });
-      })
-      .catch(() => setSaveState('error'));
-  }, [ws?.currentId, doc]);
+    if (pend && pend.id !== id) {
+      const baseDoc = wsRef.current?.docs.find(d => d.id === pend.id)?.doc ?? null;
+      jobs.push(performSave(pend.id, pend.doc, pend.base, baseDoc));
+    }
+    if (id) jobs.push(performSave(id, docRef.current, syncRef.current.version, syncRef.current.doc));
+    Promise.all(jobs).catch(() => setSaveState('error'));
+  }, [ws?.currentId, performSave]);
 
   /** 网络断了存不上，网络一回来就自己补发，不用人守着点重试。 */
   useEffect(() => {
@@ -253,6 +305,32 @@ export default function Editor() {
     window.addEventListener('online', onOnline);
     return () => window.removeEventListener('online', onOnline);
   }, [saveState, retrySave]);
+
+  /* ── 协同：谁在线、光标在哪、同事保存了就拉最新 ──
+     手上干净（没未存的改动）→ 直接换成对方的版本；
+     手上有改动 → 什么都不做，下一次保存会撞 409 走三方合并。 */
+  const myName = user?.firstName ?? user?.username ?? user?.primaryEmailAddress?.emailAddress?.split('@')[0] ?? '我';
+  const onPeerSaved = useCallback((v: number, byName: string) => {
+    const id = wsRef.current?.currentId;
+    if (!id || v <= syncRef.current.version) return;
+    if (docRef.current !== syncRef.current.doc || pendingRef.current) return;
+    fetchFlow(id).then(row => {
+      if (!row || wsRef.current?.currentId !== id) return;
+      if (row.version <= syncRef.current.version) return;
+      if (docRef.current !== syncRef.current.doc || pendingRef.current) return;   // 拉取期间动手了，别覆盖
+      syncRef.current = { id, doc: row.doc, version: row.version };
+      lastLoadedRef.current = row.doc;
+      setDoc(row.doc);
+      setWs(w => w && { ...w, docs: w.docs.map(d => d.id === id ? { ...d, doc: row.doc, version: row.version, updatedAt: row.updatedAt } : d) });
+      setToast(`${byName} 更新了这张图`);
+    });
+  }, []);
+  const { mates, sendCursor, announceSaved } = useCollab(
+    ws?.currentId ?? null,
+    { id: user?.id ?? '', name: myName },
+    onPeerSaved,
+  );
+  announceRef.current = v => announceSaved(v, myName);
 
   /** 还有改动没落库就要关页？让浏览器拦一下。 */
   useEffect(() => {
@@ -299,6 +377,7 @@ export default function Editor() {
     createFlow(blankDoc(), folderId).then(row => {
       if (!row) return;
       lastLoadedRef.current = row.doc;
+      syncRef.current = { id: row.id, doc: row.doc, version: row.version };
       setWs(w => w && { ...w, docs: [row, ...w.docs], currentId: row.id });
       rememberCurrent(row.id);
       setDoc(row.doc); setHistory([]); setFuture([]); setSelected(null); refit(row.doc.nodes);
@@ -314,6 +393,7 @@ export default function Editor() {
     if (!target) return;
     flushSave();
     lastLoadedRef.current = target.doc;
+    syncRef.current = { id, doc: target.doc, version: target.version };
     setWs({ ...ws, currentId: id });
     setDoc(target.doc); setHistory([]); setFuture([]); setSelected(null); setEdgeIndex(null); setPinnedNote(null);
     refit(target.doc.nodes);
@@ -327,7 +407,9 @@ export default function Editor() {
       setDoc(cur => ({ ...cur, title }));   // 当前这张交给自动保存
     } else {
       const other = ws.docs.find(d => d.id === id);
-      if (other) saveFlow(id, { ...other.doc, title }).catch(() => setSaveState('error'));
+      // 改的不是当前这张：带上版本号防覆盖；真撞上就放弃这次改名（同事那边为准）
+      if (other) saveFlow(id, { ...other.doc, title }, other.version)
+        .catch(e => { if (!(e instanceof SaveConflict)) setSaveState('error'); });
     }
   }, [ws]);
 
@@ -341,6 +423,7 @@ export default function Editor() {
       setWs({ ...ws, docs, currentId: nextId });
       if (nextId !== ws.currentId) {
         lastLoadedRef.current = docs[0].doc;
+        syncRef.current = { id: docs[0].id, doc: docs[0].doc, version: docs[0].version };
         setDoc(docs[0].doc); setHistory([]); setFuture([]); setSelected(null); refit(docs[0].doc.nodes);
         rememberCurrent(nextId);
       }
@@ -612,6 +695,10 @@ export default function Editor() {
             e.currentTarget.setPointerCapture(e.pointerId);
           }}
           onPointerMove={e => {
+            // 光标位置广播给同一张图的同事 —— 发的是世界坐标，各自按自己镜头换算
+            const rct = e.currentTarget.getBoundingClientRect();
+            sendCursor((e.clientX - rct.left - vpRef.current.x) / vpRef.current.z,
+                       (e.clientY - rct.top - vpRef.current.y) / vpRef.current.z);
             const p = panRef.current;
             if (!p) return;
             setVp(v => ({ ...v, x: p.ox + (e.clientX - p.sx), y: p.oy + (e.clientY - p.sy) }));
@@ -670,6 +757,17 @@ export default function Editor() {
               />
             );
           })()}
+
+          {/* 同事的光标 —— 收到的是世界坐标，按自己的镜头换算成屏幕位置 */}
+          {mates.filter(m => m.x !== undefined).map(m => (
+            <div key={m.key} className={s.peerCursor}
+                 style={{ left: vp.x + (m.x ?? 0) * vp.z, top: vp.y + (m.y ?? 0) * vp.z }}>
+              <svg width="13" height="16" viewBox="0 0 13 16">
+                <path d="M0 0 L13 10 L7.5 11 L10 16 L7.8 16 L5.4 11.6 L0 14.5 Z" fill={m.color} />
+              </svg>
+              <span className={s.peerTag} style={{ background: m.color }}>{m.name}</span>
+            </div>
+          ))}
         </div>
       )}
 
@@ -720,6 +818,16 @@ export default function Editor() {
                       title="一般是网络断了。改动还留在本页，点击补发；不放心可先导出 JSON。">保存失败 · 点此重试</button>
             : saveState === 'saving' ? '保存中…' : '已保存'}
         </span>
+        {mates.length > 0 && (
+          <span className={s.mateRow} title={`同时在看：${mates.map(m => m.name).join('、')}`}>
+            {mates.slice(0, 4).map(m => (
+              <span key={m.key} className={s.mateChip} style={{ background: m.color }}>
+                {(m.name || '?').slice(0, 1).toUpperCase()}
+              </span>
+            ))}
+            {mates.length > 4 && <span className={s.mateMore}>+{mates.length - 4}</span>}
+          </span>
+        )}
       </div>
 
       {/* 顶部中央：四视图切换 */}

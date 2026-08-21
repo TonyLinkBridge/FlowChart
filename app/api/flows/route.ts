@@ -2,7 +2,7 @@ import { auth } from '@clerk/nextjs/server';
 import { admin } from '@/lib/supabase/admin';
 import { bad, checkDoc, ownsFolder, readJson } from '@/lib/api/guard';
 
-const cols = 'id,folder_id,doc,updated_at';
+const cols = 'id,folder_id,doc,version,updated_at';
 
 export async function GET() {
   const { userId } = await auth();

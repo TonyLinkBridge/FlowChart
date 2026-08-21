@@ -6,14 +6,20 @@ import type { FlowDoc } from './types';
  *  「各人只看得到自己的」就靠这一层，不靠前端自觉。 */
 
 export interface Folder { id: string; name: string }
-export interface StoredDoc { id: string; folderId: string | null; doc: FlowDoc; updatedAt: number }
+export interface StoredDoc { id: string; folderId: string | null; doc: FlowDoc; updatedAt: number; version: number }
 export interface Workspace { folders: Folder[]; docs: StoredDoc[]; currentId: string | null }
+
+/** 保存撞车：有同事在你之后存过。带着服务器的最新版回来，调用方拿去合并。 */
+export class SaveConflict extends Error {
+  constructor(public serverDoc: FlowDoc, public serverVersion: number) { super('conflict'); }
+}
 
 const CURRENT_KEY = 'runflow.current';   // 「上次看的是哪张」纯属本机偏好
 
-type FlowRow = { id: string; folder_id: string | null; doc: FlowDoc; updated_at: string };
+type FlowRow = { id: string; folder_id: string | null; doc: FlowDoc; version: number; updated_at: string };
 const toDoc = (r: FlowRow): StoredDoc => ({
   id: r.id, folderId: r.folder_id, doc: r.doc, updatedAt: new Date(r.updated_at).getTime(),
+  version: r.version ?? 1,
 });
 
 async function call<T>(url: string, init?: RequestInit): Promise<T> {
@@ -48,9 +54,29 @@ export async function createFlow(doc: FlowDoc, folderId: string | null): Promise
   return toDoc(await call<FlowRow>('/api/flows', { method: 'POST', body: JSON.stringify({ doc, folderId }) }));
 }
 
-/** 存一张图。调用方要防抖 —— 每敲一个字发一次请求谁也受不了。 */
-export async function saveFlow(id: string, doc: FlowDoc) {
-  await call(`/api/flows/${id}`, { method: 'PATCH', body: JSON.stringify({ doc }) });
+/** 存一张图。调用方要防抖 —— 每敲一个字发一次请求谁也受不了。
+ *  带 baseVersion 走乐观锁：撞车抛 SaveConflict（里面是服务器的最新版）。
+ *  不带就是老式整篇覆盖 —— 只给改名这类单字段小动作用。
+ *  返回保存后的版本号。 */
+export async function saveFlow(id: string, doc: FlowDoc, baseVersion?: number): Promise<number> {
+  const res = await fetch(`/api/flows/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(baseVersion === undefined ? { doc } : { doc, baseVersion }),
+  });
+  if (res.status === 409) {
+    const j = await res.json().catch(() => null);
+    if (j?.doc) throw new SaveConflict(j.doc, j.version);
+  }
+  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error ?? `请求失败 ${res.status}`);
+  const j = await res.json().catch(() => ({}));
+  return typeof j.version === 'number' ? j.version : (baseVersion ?? 0) + 1;
+}
+
+/** 单独拉一张图的最新版 —— 收到「同事保存了」的广播后用。 */
+export async function fetchFlow(id: string): Promise<StoredDoc | null> {
+  try { return toDoc(await call<FlowRow>(`/api/flows/${id}`)); }
+  catch { return null; }
 }
 
 export async function deleteFlow(id: string) {
