@@ -1,27 +1,52 @@
 .page { min-height: 100vh; display: flex; background: var(--rf-paper); color: var(--rf-ink); font-family: var(--rf-font); }
 
-/* 左半：说清楚这是什么。登录页是很多人第一次见到这个产品的地方 */
-.pitch { flex: 1; min-width: 0; padding: 56px 60px; display: flex; flex-direction: column; border-right: 1px solid var(--rf-ink); }
+/* 左：品牌面。介绍在首页说过了，这里只留气质 —— 一条会动的流程脊线 */
+.pitch { flex: 1; min-width: 0; padding: 40px 56px; display: flex; flex-direction: column; border-right: 1px solid var(--rf-ink); background-image: radial-gradient(#E7E3DA 1px, transparent 1px); background-size: 22px 22px; }
+.brandRow { display: flex; align-items: center; gap: 14px; }
 .brand { font-size: 10px; font-weight: 600; letter-spacing: 2.6px; text-transform: uppercase; color: var(--rf-gold); }
-.head { font-size: 34px; font-weight: 600; letter-spacing: -1.2px; line-height: 1.35; margin-top: 34px; max-width: 460px; }
-.head span { color: var(--rf-gold); }
-.rule { border-top: 2px solid var(--rf-ink); margin-top: 40px; }
+.back { margin-left: auto; font-family: var(--rf-mono); font-size: 9.5px; letter-spacing: 0.6px; color: var(--rf-ink-4); border-bottom: 1px solid var(--rf-rule-mid); padding-bottom: 1px; }
+.back:hover { color: var(--rf-ink); border-bottom-color: var(--rf-ink); }
 
-.rows { margin-top: 4px; }
-.row { display: flex; gap: 18px; padding: 16px 0; border-bottom: 1px solid var(--rf-rule-faint); }
-.idx { font-family: var(--rf-mono); font-size: 9.5px; letter-spacing: 1px; color: var(--rf-gold); padding-top: 3px; flex-shrink: 0; width: 22px; }
-.rowText { font-size: 12.5px; line-height: 1.75; color: var(--rf-ink-3); }
-.rowText b { color: var(--rf-ink); font-weight: 600; }
+.head { font-size: 34px; font-weight: 600; letter-spacing: -1.2px; line-height: 1.38; margin-top: 64px; max-width: 430px; }
+.head span { color: var(--rf-gold); }
+
+/* 流程脊线：黑条 → 金勾 → NOW → 空格，逐个长出来 */
+.spine { margin: 56px 0 0 6px; position: relative; width: 250px; }
+.sNode { display: flex; align-items: center; gap: 10px; box-sizing: border-box; width: 100%; font-size: 12px; opacity: 0; animation: rise 0.5s ease forwards; background: var(--rf-paper); }
+@keyframes rise { to { opacity: 1; transform: none; } }
+.sNode { transform: translateY(10px); }
+.s1 { background: var(--rf-ink); color: var(--rf-on-gold); font-weight: 600; padding: 11px 14px; animation-delay: 0.15s; }
+.s2 { border: 1px solid var(--rf-rule-mid); border-left: 3px solid var(--rf-gold); padding: 11px 14px; margin-top: 30px; animation-delay: 0.35s; }
+.s2 em { font-style: normal; color: var(--rf-ink-4); text-decoration: line-through; }
+.s3 { background: var(--rf-surface); border: 2px solid var(--rf-ink); border-left: 3px solid var(--rf-gold); padding: 10px 13px; font-weight: 600; margin-top: 30px; animation-delay: 0.55s; }
+.s4 { border: 1px solid var(--rf-rule-mid); padding: 11px 14px; margin-top: 30px; animation-delay: 0.75s; }
+.sBox { width: 12px; height: 12px; flex-shrink: 0; box-sizing: border-box; }
+.sDone { background: var(--rf-gold); }
+.sCur { border: 1.5px solid var(--rf-ink); }
+.sTodo { border: 1px solid var(--rf-rule-mid); }
+.sTag { margin-left: auto; font-family: var(--rf-mono); font-size: 7.5px; letter-spacing: 1px; color: var(--rf-ink-4); }
+.sNow { margin-left: auto; font-family: var(--rf-mono); font-size: 7.5px; font-weight: 500; letter-spacing: 0.8px; color: var(--rf-on-gold); background: var(--rf-ink); padding: 2px 5px; }
+.sEdge { position: absolute; left: 22px; width: 1px; height: 30px; background: var(--rf-ink); transform-origin: top; transform: scaleY(0); animation: grow 0.25s ease forwards; }
+@keyframes grow { to { transform: scaleY(1); } }
+.e1 { top: 40px; animation-delay: 0.3s; }
+.e2 { top: 111px; animation-delay: 0.5s; }
+.e3 { top: 181px; animation-delay: 0.7s; }
 
 .foot { margin-top: auto; padding-top: 32px; font-family: var(--rf-mono); font-size: 9.5px; letter-spacing: 0.6px; color: var(--rf-ink-4); line-height: 1.9; }
 
-/* 右半：登录 */
-.panel { width: 480px; flex-shrink: 0; padding: 56px 48px; display: flex; flex-direction: column; justify-content: center; background: var(--rf-surface); }
-.panelLabel { font-family: var(--rf-mono); font-size: 9px; font-weight: 500; letter-spacing: 1.6px; color: var(--rf-ink-4); margin-bottom: 22px; }
+/* 右：登录面 */
+.panel { width: 460px; flex-shrink: 0; padding: 40px 48px; display: flex; flex-direction: column; justify-content: center; background: var(--rf-surface); }
+.panelLabel { font-family: var(--rf-mono); font-size: 9px; font-weight: 500; letter-spacing: 1.8px; color: var(--rf-ink-4); margin-bottom: 20px; }
+.panelNote { margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--rf-rule-faint); font-family: var(--rf-mono); font-size: 9px; letter-spacing: 0.5px; color: var(--rf-ink-4); line-height: 1.9; }
 
-@media (max-width: 980px) {
+@media (prefers-reduced-motion: reduce) {
+  .sNode, .sEdge { animation: none; opacity: 1; transform: none; }
+}
+@media (max-width: 900px) {
   .page { flex-direction: column; }
-  .pitch { border-right: none; border-bottom: 1px solid var(--rf-ink); padding: 40px 28px; }
-  .panel { width: auto; padding: 40px 28px; }
-  .head { font-size: 26px; }
+  .pitch { border-right: none; border-bottom: 1px solid var(--rf-ink); padding: 28px 24px 40px; }
+  .head { margin-top: 36px; font-size: 26px; }
+  .spine { display: none; }
+  .foot { margin-top: 32px; }
+  .panel { width: auto; padding: 36px 24px; }
 }
