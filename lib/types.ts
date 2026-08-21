@@ -18,6 +18,19 @@ export interface Note {
   text?:    string;
 }
 
+/** 节点外观。全部可选 —— 一个不填就是默认的黑白纸面。
+ *  size 只存 s/l，中号是默认不落盘。 */
+export interface NodeStyle {
+  fill?:      string;        // 填充色 #rrggbb
+  border?:    string;        // 边框色 #rrggbb
+  dashed?:    boolean;       // 边框虚线
+  size?:      's' | 'l';     // 字号 小/大（中是默认）
+  bold?:      boolean;
+  italic?:    boolean;
+  underline?: boolean;
+  color?:     string;        // 文字颜色 #rrggbb
+}
+
 export interface FlowNode {
   id:      string;
   title:   string;
@@ -27,6 +40,9 @@ export interface FlowNode {
   done?:   boolean;        // 清单视图 + 进度条用
   note?:   Note;           // 有 note 才会显示脚注编号
   muted?:  boolean;        // 弱化分支（失败/终止）—— 虚线灰框
+  style?:  NodeStyle;      // 头顶工具条改的外观都在这
+  href?:   string;         // 节点挂的链接，标题旁出 ↗
+  locked?: boolean;        // 锁位置：拖不动，防手滑
   x?:      number;
   y?:      number;
 }

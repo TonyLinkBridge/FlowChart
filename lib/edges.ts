@@ -37,12 +37,21 @@ function wrapText(text: string, maxPx: number, size: number): string[] {
   return out.length ? out : [text];
 }
 
+/** 字号档位 → 像素。菱形整体小一号。 */
+export const FONT_PX = { s: 12, m: 13.5, l: 16 } as const;
+const DEC_PX = { s: 10.5, m: 12, l: 14 } as const;
+export const fontPx = (n: FlowNode) =>
+  (n.shape === 'decision' ? DEC_PX : FONT_PX)[n.style?.size ?? 'm'];
+/** 一行的高度（跟 CSS 的 line-height 1.35 对齐），屏幕和导出共用。 */
+export const lineH = (n: FlowNode) => Math.round(fontPx(n) * 1.35);
+
 /** 标题真正可用的宽度：去掉内边距、勾选框、右侧 owner/天数标签。 */
 function titleAvail(n: FlowNode): { px: number; size: number } {
-  if (n.shape === 'decision') return { px: 144, size: 12 };
-  if (n.shape === 'terminator') return { px: 178, size: 13.5 };
+  const size = fontPx(n);
+  if (n.shape === 'decision') return { px: 144, size };
+  if (n.shape === 'terminator') return { px: 178, size };
   const meta = n.owner ? Math.min(90, n.owner.length * 11 + (n.days ? 34 : 0)) : 8;
-  return { px: NODE_W - 30 - (n.muted ? 0 : 24) - meta, size: 13.5 };
+  return { px: NODE_W - 30 - (n.muted ? 0 : 24) - meta, size };
 }
 
 /** 标题按宽度折成的行。以前只数显式换行、还封顶两行 ——
@@ -54,7 +63,7 @@ export function titleLineList(n: FlowNode): string[] {
 export const titleLines = (n: FlowNode) => titleLineList(n).length;
 
 export const nodeH = (n: FlowNode) => {
-  const extra = (titleLines(n) - 1) * 18;
+  const extra = (titleLines(n) - 1) * lineH(n);
   // 菱形要长得更凶：越靠上下尖角越窄，行数一多不加倍就装不下
   if (n.shape === 'decision') return 64 + extra * 2;
   return (n.shape === 'terminator' ? 44 : 46) + extra;

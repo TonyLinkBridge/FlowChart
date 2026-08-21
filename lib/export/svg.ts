@@ -1,5 +1,6 @@
-import { edgeLabelPos, edgePath, nodeH, nodeW, ports, titleLineList } from '../edges';
+import { edgeLabelPos, edgePath, fontPx, lineH, nodeH, nodeW, ports, titleLineList } from '../edges';
 import { docProgress, footnoteIndex, nodeProgress, totalDays, type FlowDoc, type FlowNode } from '../types';
+import { terminalRole } from '../graph';
 
 const C = {
   paper: '#F4F2ED', surface: '#FFFFFF', ink: '#101010',
@@ -68,37 +69,60 @@ function noteToProse(n: FlowNode, redact: boolean): string {
 function multiline(n: FlowNode, x: number, midY: number, attrs: string, tail = '') {
   // 跟屏幕同一份折行 —— 屏幕能显示全的，导出也一个字不少
   const lines = titleLineList(n);
-  const step = 17;
+  const step = lineH(n);
   const startY = midY + 5 - ((lines.length - 1) * step) / 2;
   return lines.map((ln, i) =>
     `<text x="${x}" y="${startY + i * step}" ${attrs}>${esc(ln)}${i === lines.length - 1 ? tail : ''}</text>`
   ).join('');
 }
 
-function drawNode(n: FlowNode, fnIdx?: number): string {
+/** 深色底自动翻纸白字 —— 和屏幕上同一套判断。 */
+function dark(hexColor: string): boolean {
+  const r = parseInt(hexColor.slice(1, 3), 16);
+  const g = parseInt(hexColor.slice(3, 5), 16);
+  const b = parseInt(hexColor.slice(5, 7), 16);
+  return 0.299 * r + 0.587 * g + 0.114 * b < 140;
+}
+
+/** 标题的属性串：字号/粗斜/下划线/颜色全跟 node.style 走。 */
+function titleAttrs(n: FlowNode, fallbackFill: string,
+                    opts: { weight?: number; anchor?: string; through?: boolean } = {}) {
+  const st = n.style;
+  const fill = st?.color ?? (st?.fill ? (dark(st.fill) ? C.onGold : C.ink) : fallbackFill);
+  const deco = [st?.underline && 'underline', opts.through && 'line-through'].filter(Boolean).join(' ');
+  return `font-family="${FONT}" font-size="${fontPx(n)}" font-weight="${st?.bold ? 700 : opts.weight ?? 500}" fill="${fill}"`
+    + (st?.italic ? ' font-style="italic"' : '')
+    + (deco ? ` text-decoration="${deco}"` : '')
+    + (opts.anchor ? ` text-anchor="${opts.anchor}"` : '');
+}
+
+function drawNode(n: FlowNode, fnIdx?: number, role: 'start' | 'end' = 'end'): string {
   const p = ports(n), w = nodeW(n), h = nodeH(n);
+  const st = n.style;
   const t = (x: number, y: number, str: string, attrs: string) =>
     `<text x="${x}" y="${y}" ${attrs}>${esc(str)}</text>`;
 
   if (n.shape === 'decision') {
     return `<polygon points="${p.cx},${p.y + 1} ${p.right - 1},${p.mid} ${p.cx},${p.bottom - 1} ${p.left + 1},${p.mid}"
-      fill="${C.paper}" stroke="${C.ink}" stroke-width="1" stroke-linejoin="miter"/>
-      ${multiline(n, p.cx, p.mid, `font-family="${FONT}" font-size="12" fill="${C.ink}" text-anchor="middle"`)}`;
+      fill="${st?.fill ?? C.paper}" stroke="${st?.border ?? C.ink}" stroke-width="1" stroke-linejoin="miter"${st?.dashed ? ' stroke-dasharray="4 4"' : ''}/>
+      ${multiline(n, p.cx, p.mid, titleAttrs(n, C.ink, { anchor: 'middle' }))}`;
   }
   if (n.shape === 'terminator') {
-    const tag = n.id === 'offer' ? 'START' : 'END';
-    return `<rect x="${p.x}" y="${p.y}" width="${w}" height="${h}" fill="${C.ink}"/>
-      ${multiline(n, p.x + 15, p.mid, `font-family="${FONT}" font-size="13.5" font-weight="600" fill="${C.onGold}"`)}
-      ${t(p.right - 15, p.mid + 4, tag, `font-family="${MONO}" font-size="9" letter-spacing="1.2" fill="${C.ink4}" text-anchor="end"`)}`;
+    // 跟屏幕同一条规则：没人指向它就是 START —— 以前写死 id，别的图全印成 END
+    const tag = role === 'start' ? 'START' : 'END';
+    const tagFill = st?.fill && !dark(st.fill) ? C.ink3 : C.ink4;
+    return `<rect x="${p.x}" y="${p.y}" width="${w}" height="${h}" fill="${st?.fill ?? C.ink}"${st?.border ? ` stroke="${st.border}" stroke-width="1"${st.dashed ? ' stroke-dasharray="4 4"' : ''}` : ''}/>
+      ${multiline(n, p.x + 15, p.mid, titleAttrs(n, C.onGold, { weight: 600 }))}
+      ${t(p.right - 15, p.mid + 4, tag, `font-family="${MONO}" font-size="9" letter-spacing="1.2" fill="${tagFill}" text-anchor="end"`)}`;
   }
 
   const prog = nodeProgress(n);
-  const border = n.muted ? C.ruleMid : prog > 0 && prog < 1 ? C.ink : C.ruleMid;
+  const border = st?.border ?? (n.muted ? C.ruleMid : prog > 0 && prog < 1 ? C.ink : C.ruleMid);
   const sw = !n.muted && prog > 0 && prog < 1 ? 2 : 1;
-  const fill = n.muted ? 'none' : prog > 0 && prog < 1 ? C.surface : C.paper;
+  const fill = st?.fill ?? (n.muted ? 'none' : prog > 0 && prog < 1 ? C.surface : C.paper);
 
   let out = `<rect x="${p.x}" y="${p.y}" width="${w}" height="${h}" fill="${fill}"
-    stroke="${border}" stroke-width="${sw}"${n.muted ? ' stroke-dasharray="4 4"' : ''}/>`;
+    stroke="${border}" stroke-width="${sw}"${n.muted || st?.dashed ? ' stroke-dasharray="4 4"' : ''}/>`;
 
   if (!n.muted) {
     const bx = p.x + 15, by = p.mid - 7;
@@ -113,7 +137,7 @@ function drawNode(n: FlowNode, fnIdx?: number): string {
 
   const tx = n.muted ? p.x + 15 : p.x + 39;
   const titleFill = prog === 1 || n.muted ? C.ink4 : C.ink;
-  const attrs = `font-family="${FONT}" font-size="13.5" font-weight="${prog > 0 && prog < 1 ? 600 : 500}" fill="${titleFill}"${prog === 1 ? ` text-decoration="line-through"` : ''}`;
+  const attrs = titleAttrs(n, titleFill, { weight: prog > 0 && prog < 1 ? 600 : 500, through: prog === 1 });
   const fn = fnIdx === undefined ? ''
     : `<tspan font-family="${MONO}" font-size="8.5" fill="${C.gold}" dy="-5" dx="3">${String(fnIdx).padStart(2, '0')}</tspan>`;
   out += multiline(n, tx, p.mid, attrs, fn);
@@ -171,7 +195,7 @@ export function toSvg(doc: FlowDoc, opts: { redactFields?: boolean } = {}): stri
     chart += `<rect x="${x - 10}" y="${ly - 8}" width="20" height="13" fill="${C.paper}"/>
       <text x="${x}" y="${ly + 2}" font-family="${MONO}" font-size="10" fill="${e.dashed ? C.ink4 : C.ink}" text-anchor="middle">${esc(e.label!)}</text>`;
   }
-  for (const n of doc.nodes) chart += drawNode(n, notes.get(n.id));
+  for (const n of doc.nodes) chart += drawNode(n, notes.get(n.id), terminalRole(doc, n.id));
   chart += `</g>`;
 
   // 附注表

@@ -9,10 +9,11 @@ import { terminalRole } from '@/lib/graph';
 import { nodeH, nodeW } from '@/lib/edges';
 import { useElementSize } from '@/hooks/useElementSize';
 import { fitView, zoomAt, clampZ, type View } from '@/lib/viewport';
-import { docProgress, footnoteIndex, nodeProgress, toggleStep, type FlowDoc, type FlowEdge, type FlowNode as FlowNodeData, type Note } from '@/lib/types';
+import { docProgress, footnoteIndex, nodeProgress, toggleStep, type FlowDoc, type FlowEdge, type FlowNode as FlowNodeData, type NodeStyle, type Note, type Shape } from '@/lib/types';
 import { FlowNode } from '@/components/flow/FlowNode';
 import { FlowEdges } from '@/components/flow/FlowEdges';
 import { NotePopover } from '@/components/flow/NotePopover';
+import { NodeToolbar } from '@/components/flow/NodeToolbar';
 import { NotePanel } from '@/components/views/NotePanel';
 import { EdgePanel } from '@/components/views/EdgePanel';
 import { ExportMenu } from '@/components/chrome/ExportMenu';
@@ -387,6 +388,18 @@ export default function Editor() {
     setDoc(d => patchNode(d, id, p));
   }, []);
 
+  /** 头顶工具条改外观：合并进 node.style，清成空对象就整个去掉。
+   *  字号变了盒子高度会变，要顺手重排一次，不然下一行会被盖住。 */
+  const restyle = useCallback((id: string, p: Partial<NodeStyle>, label: string) => {
+    const n = doc.nodes.find(nn => nn.id === id);
+    if (!n) return;
+    const merged: NodeStyle = { ...n.style, ...p };
+    (Object.keys(merged) as (keyof NodeStyle)[]).forEach(k => { if (merged[k] === undefined) delete merged[k]; });
+    let next = patchNode(doc, id, { style: Object.keys(merged).length ? merged : undefined });
+    if ('size' in p) next = autoLayout(next);
+    commit(next, label);
+  }, [doc, commit]);
+
   const relayout = useCallback(() => {
     const laid = autoLayout(doc);
     commit(laid, '重新排版');
@@ -449,6 +462,7 @@ export default function Editor() {
     if (linkFrom !== null) return;                 // 连线模式下不抢手势
     const n = doc.nodes.find(x => x.id === id);
     if (!n) return;
+    if (n.locked) return;                          // 锁住的节点拖不动，点选照常
     dragRef.current = { id, sx: e.clientX, sy: e.clientY, ox: n.x ?? 0, oy: n.y ?? 0, before: doc, moved: false };
     setDragging(true);
   }, [doc, linkFrom]);
@@ -666,6 +680,32 @@ export default function Editor() {
             : <ChecklistView doc={doc} onToggleNode={toggleDone} onToggleStep={toggleStepAt} />}
         </div>
       )}
+
+      {/* 选中节点头顶的快捷工具条：外观快调在这，资料详编在右栏。
+          拖动、连线、按住空格时都先收起来 —— 不跟手势抢地方 */}
+      {view === '流程图' && selected && !dragging && !spaceDown && edgeIndex === null
+        && linkFrom === null && loadState === 'ready' && (() => {
+        const n = doc.nodes.find(nn => nn.id === selected);
+        if (!n) return null;
+        return (
+          <NodeToolbar
+            node={n}
+            x={vp.x + ((n.x ?? 0) + nodeW(n) / 2) * vp.z}
+            y={vp.y + (n.y ?? 0) * vp.z}
+            onShape={sh => commit(patchNode(doc, n.id, { shape: sh }), '改了形状')}
+            onStyle={(p, label) => restyle(n.id, p, label)}
+            onHref={url => commit(patchNode(doc, n.id, { href: url }), url ? `给「${n.title}」挂了链接` : '清除了链接')}
+            onNote={() => (n.note ? openNote(n.id) : createNote(n.id))}
+            onLink={() => { setLinkFrom(n.id); setEdgeIndex(null); }}
+            onToggleLock={() => commit(patchNode(doc, n.id, { locked: n.locked ? undefined : true }),
+                                       n.locked ? `解锁了「${n.title}」` : `锁住了「${n.title}」`)}
+            onToggleMute={() => commit(patchNode(doc, n.id, { muted: !n.muted }),
+                                       n.muted ? '取消弱化' : `弱化了「${n.title}」`)}
+            onAddAfter={addStep}
+            onDelete={() => deleteNode(n.id)}
+          />
+        );
+      })()}
 
       {/* 左上：文档胶囊 —— 名字、进度、保存状态 */}
       <div className={`${s.pill} ${s.docPill}`}>

@@ -1,5 +1,5 @@
 import { autoLayout } from './layout';
-import type { FlowDoc, FlowEdge, FlowNode, Note, Shape } from './types';
+import type { FlowDoc, FlowEdge, FlowNode, NodeStyle, Note, Shape } from './types';
 
 type ParseResult =
   | { ok: true; doc: FlowDoc; warnings: string[] }
@@ -63,6 +63,31 @@ function parseNote(raw: unknown): Note | undefined {
   return Object.keys(note).length ? note : undefined;
 }
 
+const HEX = /^#[0-9a-fA-F]{6}$/;
+const hex = (v: unknown) => (typeof v === 'string' && HEX.test(v) ? v : undefined);
+
+/** 外观字段过筛：颜色只认 #rrggbb，字号只认 s/l（中号是默认不落盘）。 */
+function parseStyle(raw: unknown): NodeStyle | undefined {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return undefined;
+  const o = raw as Record<string, unknown>;
+  const st: NodeStyle = {};
+  const fill = hex(o.fill); if (fill) st.fill = fill;
+  const border = hex(o.border); if (border) st.border = border;
+  if (o.dashed === true) st.dashed = true;
+  if (o.size === 's' || o.size === 'l') st.size = o.size;
+  if (o.bold === true) st.bold = true;
+  if (o.italic === true) st.italic = true;
+  if (o.underline === true) st.underline = true;
+  const color = hex(o.color); if (color) st.color = color;
+  return Object.keys(st).length ? st : undefined;
+}
+
+/** 节点链接只认 http(s) —— javascript: 之类伪协议进不来。 */
+function parseHref(v: unknown): string | undefined {
+  const s = str(v);
+  return s && /^https?:\/\//i.test(s) ? s.slice(0, LIMITS.url) : undefined;
+}
+
 /** 校验一个已经 parse 出来的值。外来数据一律当不可信处理：
  *  该丢的丢、该补的补，绝不让一个坏字段把整个应用带崩。
  *  浏览器导入和服务端接口共用这一份 —— 规则只写一遍，两边不会各说各话。
@@ -95,6 +120,9 @@ export function parseDocValue(raw: unknown, opts?: { allowEmpty?: boolean }): Pa
       done: n.done === true,
       muted: n.muted === true,
       note: parseNote(n.note),
+      style: parseStyle(n.style),
+      href: parseHref(n.href),
+      locked: n.locked === true,
       x: num(n.x), y: num(n.y),
     });
   }

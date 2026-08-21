@@ -70,3 +70,13 @@
 
 /* 黑色起止条上的脚注号：金色在黑底上偏暗，提亮一档 */
 .terminator .fn { color: #D2A648; }
+
+/* 节点挂的链接角标 */
+.hrefMark { margin-left: 4px; font-size: 10px; font-weight: 600; color: var(--rf-gold); text-decoration: none; }
+.hrefMark:hover { color: var(--rf-ink); }
+.terminator .hrefMark { color: var(--rf-on-gold); opacity: 0.85; }
+
+/* 锁定标记：右上角一把小锁 */
+.lockMark { position: absolute; top: 3px; right: 4px; color: var(--rf-ink-4); pointer-events: none; }
+.terminator .lockMark { color: var(--rf-on-gold); opacity: 0.6; }
+.diamond .lockMark { top: 50%; right: 10px; transform: translateY(-50%); }

@@ -17,6 +17,18 @@ export function toMermaid(doc: FlowDoc, opts: { redactFields?: boolean } = {}): 
     lines.push(`  ${n.id}${shape}`);
   }
 
+  // 节点外观跟着走 —— Mermaid 认 style 行，贴到 GitHub / 飞书里颜色不丢
+  for (const n of doc.nodes) {
+    const st = n.style;
+    if (!st?.fill && !st?.border && !st?.color && !st?.dashed) continue;
+    const parts: string[] = [];
+    if (st.fill) parts.push(`fill:${st.fill}`);
+    if (st.border) parts.push(`stroke:${st.border}`);
+    if (st.color) parts.push(`color:${st.color}`);
+    if (st.dashed) parts.push('stroke-dasharray:4 4');
+    lines.push(`  style ${n.id} ${parts.join(',')}`);
+  }
+
   for (const e of doc.edges) {
     const arrow = e.dashed ? '-.->' : '-->';
     lines.push(`  ${e.source} ${arrow}${e.label ? `|${safe(e.label)}|` : ''} ${e.target}`);
