@@ -1,4 +1,4 @@
-import { edgeLabelPos, edgePath, nodeH, nodeW, ports, titleLines } from '../edges';
+import { edgeLabelPos, edgePath, nodeH, nodeW, ports, titleLineList } from '../edges';
 import { docProgress, footnoteIndex, nodeProgress, totalDays, type FlowDoc, type FlowNode } from '../types';
 
 const C = {
@@ -64,9 +64,10 @@ function noteToProse(n: FlowNode, redact: boolean): string {
   return `${meta ? meta + '。' : ''}${parts.join('。')}${parts.length ? '。' : ''}`;
 }
 
-/** SVG 里没有自动换行，得自己按行画。最多两行 —— 跟屏幕上保持一致。 */
-function multiline(title: string, x: number, midY: number, attrs: string, tail = '') {
-  const lines = title.split('\n').slice(0, 2);
+/** SVG 里没有自动换行，得自己按行画。 */
+function multiline(n: FlowNode, x: number, midY: number, attrs: string, tail = '') {
+  // 跟屏幕同一份折行 —— 屏幕能显示全的，导出也一个字不少
+  const lines = titleLineList(n);
   const step = 17;
   const startY = midY + 5 - ((lines.length - 1) * step) / 2;
   return lines.map((ln, i) =>
@@ -82,12 +83,12 @@ function drawNode(n: FlowNode, fnIdx?: number): string {
   if (n.shape === 'decision') {
     return `<polygon points="${p.cx},${p.y + 1} ${p.right - 1},${p.mid} ${p.cx},${p.bottom - 1} ${p.left + 1},${p.mid}"
       fill="${C.paper}" stroke="${C.ink}" stroke-width="1" stroke-linejoin="miter"/>
-      ${multiline(n.title, p.cx, p.mid, `font-family="${FONT}" font-size="12" fill="${C.ink}" text-anchor="middle"`)}`;
+      ${multiline(n, p.cx, p.mid, `font-family="${FONT}" font-size="12" fill="${C.ink}" text-anchor="middle"`)}`;
   }
   if (n.shape === 'terminator') {
     const tag = n.id === 'offer' ? 'START' : 'END';
     return `<rect x="${p.x}" y="${p.y}" width="${w}" height="${h}" fill="${C.ink}"/>
-      ${multiline(n.title, p.x + 15, p.mid, `font-family="${FONT}" font-size="13.5" font-weight="600" fill="${C.onGold}"`)}
+      ${multiline(n, p.x + 15, p.mid, `font-family="${FONT}" font-size="13.5" font-weight="600" fill="${C.onGold}"`)}
       ${t(p.right - 15, p.mid + 4, tag, `font-family="${MONO}" font-size="9" letter-spacing="1.2" fill="${C.ink4}" text-anchor="end"`)}`;
   }
 
@@ -115,7 +116,7 @@ function drawNode(n: FlowNode, fnIdx?: number): string {
   const attrs = `font-family="${FONT}" font-size="13.5" font-weight="${prog > 0 && prog < 1 ? 600 : 500}" fill="${titleFill}"${prog === 1 ? ` text-decoration="line-through"` : ''}`;
   const fn = fnIdx === undefined ? ''
     : `<tspan font-family="${MONO}" font-size="8.5" fill="${C.gold}" dy="-5" dx="3">${String(fnIdx).padStart(2, '0')}</tspan>`;
-  out += multiline(n.title, tx, p.mid, attrs, fn);
+  out += multiline(n, tx, p.mid, attrs, fn);
 
   if (prog > 0 && prog < 1) {
     out += `<rect x="${p.right - 46}" y="${p.mid - 8}" width="34" height="15" fill="${C.ink}"/>

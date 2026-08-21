@@ -1,5 +1,6 @@
 import type { FlowNode as Node } from '@/lib/types';
 import { nodeProgress } from '@/lib/types';
+import { nodeH, nodeW } from '@/lib/edges';
 import s from './FlowNode.module.css';
 
 type State = 'done' | 'current' | 'todo';
@@ -70,7 +71,7 @@ export function FlowNode({
 
   /* 判断 —— 菱形 */
   if (node.shape === 'decision') {
-    const w = 200, h = 64;
+    const w = nodeW(node), h = nodeH(node);
     return (
       <div data-node className={s.diamond} style={{ ...pos, width: w, height: h }} onClick={() => onSelect?.(node.id)}
            onMouseEnter={footnote !== undefined ? () => onMarkerHover?.(node.id) : undefined}

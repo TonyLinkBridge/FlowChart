@@ -26,8 +26,7 @@
 .title {
   font-size: var(--rf-t-node); font-weight: 500; line-height: 1.35;
   white-space: pre-line;              /* 认标题里的换行 */
-  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
-  overflow: hidden;                   /* 超过两行就截断，别把节点撑爆 */
+  /* 不截断：标题多长盒子多高，高度估算在 lib/edges.ts 的 titleLines */
 }
 .current .title     { font-weight: 600; letter-spacing: -0.2px; }
 .terminator .title  { font-weight: 600; letter-spacing: -0.2px; }
@@ -65,7 +64,7 @@
 /* 判断菱形：SVG 描边多边形，锐角不糊 */
 .diamond { cursor: grab; user-select: none; touch-action: none; position: absolute; display: flex; align-items: center; justify-content: center; }
 .diamond svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-.diamondText { position: relative; z-index: 1; font-size: 12px; font-weight: 500; white-space: pre-line; text-align: center; line-height: 1.35; }
+.diamondText { position: relative; z-index: 1; font-size: 12px; font-weight: 500; white-space: pre-line; text-align: center; line-height: 1.35; max-width: 74%; }
 
 .node:active, .diamond:active { cursor: grabbing; }
 
