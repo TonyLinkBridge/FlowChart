@@ -27,12 +27,13 @@ function summarize(note: Note) {
   if (note.fields?.length) out.push(<span key="f">{note.fields.length} 个填空</span>);
   if (note.links?.length) out.push(<span key="l">{note.links.length} 个链接</span>);
   if (note.contact?.trim()) out.push(<span key="c">有联系人</span>);
+  if (note.text?.trim()) out.push(<span key="t">有说明</span>);
   return out;
 }
 
 export function NotePopover({
   node, index, x, y, nodeWpx = 260, canvasW, pinned, expanded,
-  onEnter, onLeave, onClose, onToggleExpand, onChange,
+  onPin, onEnter, onLeave, onClose, onToggleExpand, onChange,
 }: {
   node: FlowNode;
   index: number;
@@ -41,6 +42,7 @@ export function NotePopover({
   canvasW: number;
   pinned: boolean;
   expanded: boolean;
+  onPin: () => void;
   onEnter: () => void;
   onLeave: () => void;
   onClose: () => void;
@@ -60,8 +62,10 @@ export function NotePopover({
   const firstTodo = note.steps?.find(st => !st.done)?.text;
 
   return (
-    <div data-pop className={`${s.pop} ${pinned ? s.pinned : ''}`} style={{ left, top: y }}
-         onMouseEnter={onEnter} onMouseLeave={onLeave}>
+    <div data-pop className={`${s.pop} ${pinned ? s.pinned : ''}`}
+         style={{ left, top: y, cursor: pinned ? undefined : 'pointer' }}
+         onMouseEnter={onEnter} onMouseLeave={onLeave}
+         onClick={() => { if (!pinned) onPin(); }}>
       <div className={s.head}>
         <span className={s.idx}>{String(index).padStart(2, '0')}</span>
         <span className={s.who}>{node.title}</span>
@@ -71,7 +75,7 @@ export function NotePopover({
                  strokeWidth="1.8" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
           </button>
         ) : (
-          <span className={s.pinHint}>点一下钉住</span>
+          <span className={s.pinHint}>点一下 · 钉住并编辑</span>
         )}
       </div>
 

@@ -591,6 +591,7 @@ export default function Editor() {
                 canvasW={canvas.w}
                 pinned={pinnedNote === n.id}
                 expanded={pinnedNote === n.id && noteExpanded}
+                onPin={() => { setPinnedNote(n.id); setNoteExpanded(true); setSelected(n.id); }}
                 onEnter={keepHover}
                 onLeave={() => { if (pinnedNote !== n.id) scheduleHover(null); }}
                 onClose={() => { setPinnedNote(null); setHoverNote(null); }}
