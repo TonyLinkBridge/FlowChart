@@ -13,28 +13,48 @@ export default function SignInPage() {
           <Link href="/" className={s.back}>← 返回首页</Link>
         </div>
 
-        <h1 className={s.head}>
-          画一张<span>可以跑一遍</span>的流程图。
-        </h1>
+        <div className={s.pitchMain}>
+          <h1 className={s.head}>
+            把流程画清楚，<span>也真正执行起来。</span>
+          </h1>
 
-        <div className={s.spine} aria-hidden>
-          <div className={`${s.sNode} ${s.s1}`}>录用通知发出<span className={s.sTag}>START</span></div>
-          <i className={`${s.sEdge} ${s.e1}`} />
-          <div className={`${s.sNode} ${s.s2}`}><span className={`${s.sBox} ${s.sDone}`} /><em>收集材料</em></div>
-          <i className={`${s.sEdge} ${s.e2}`} />
-          <div className={`${s.sNode} ${s.s3}`}><span className={`${s.sBox} ${s.sCur}`} />第三方核验<span className={s.sNow}>NOW</span></div>
-          <i className={`${s.sEdge} ${s.e3}`} />
-          <div className={`${s.sNode} ${s.s4}`}><span className={`${s.sBox} ${s.sTodo}`} />出具报告</div>
+          <div className={s.proofs} aria-label="Runflow 功能">
+            <span>团队共编</span>
+            <span>自动保存</span>
+            <span>历史版本</span>
+          </div>
+
+          <div className={s.demo} aria-hidden>
+            <div className={s.spine}>
+              <div className={`${s.sNode} ${s.s1}`}>录用通知发出<span className={s.sTag}>START</span></div>
+              <i className={`${s.sEdge} ${s.e1}`} />
+              <div className={`${s.sNode} ${s.s2}`}><span className={`${s.sBox} ${s.sDone}`} /><em>收集材料</em></div>
+              <i className={`${s.sEdge} ${s.e2}`} />
+              <div className={`${s.sNode} ${s.s3}`}><span className={`${s.sBox} ${s.sCur}`} />第三方核验<span className={s.sNow}>NOW</span></div>
+              <i className={`${s.sEdge} ${s.e3}`} />
+              <div className={`${s.sNode} ${s.s4}`}><span className={`${s.sBox} ${s.sTodo}`} />出具报告</div>
+            </div>
+
+            <div className={s.signals}>
+              <span className={s.signal}><b>3</b> 人在线</span>
+              <span className={`${s.signal} ${s.signalGold}`}>V12 · 已保存</span>
+              <span className={s.signal}>刚刚更新</span>
+            </div>
+          </div>
         </div>
 
         <div className={s.foot}>
-          你画的流程图存在你自己的账号下<br />
-          别人登录进来看到的是他们自己的，互相看不到
+          个人空间保持私密<br />
+          Team 空间只与团队成员共享
         </div>
       </div>
 
       <div className={s.panel}>
-        <div className={s.panelLabel}>登录后继续</div>
+        <div className={s.panelIntro}>
+          <div className={s.panelLabel}>RUNFLOW ACCOUNT</div>
+          <h2 className={s.panelTitle}>欢迎回来</h2>
+          <p className={s.panelCopy}>登录后继续管理你的流程</p>
+        </div>
         <SignIn
           appearance={{
             variables: {
@@ -64,7 +84,7 @@ export default function SignInPage() {
             },
           }}
         />
-        <div className={s.panelNote}>内部工具 · 注册即用，不发验证邮件</div>
+        <div className={s.panelNote}>无需安装 · 登录即用 · 数据自动保存</div>
       </div>
     </div>
   );

@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { Archivo, IBM_Plex_Mono } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
+import { zhCN } from '@clerk/localizations/zh-CN';
+import { clerkProxyUrl } from '@/lib/clerk-proxy';
 import './globals.css';
 
 /* 自托管字体，不走 Google CDN —— 内部工具不该有外部请求，也没有闪字 */
@@ -14,7 +16,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <ClerkProvider afterSignOutUrl="/">
+    <ClerkProvider afterSignOutUrl="/" localization={zhCN} proxyUrl={clerkProxyUrl}>
       <html lang="zh-CN" className={`${archivo.variable} ${mono.variable}`}>
         <body>{children}</body>
       </html>
