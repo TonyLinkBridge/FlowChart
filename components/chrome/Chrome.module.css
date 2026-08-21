@@ -190,3 +190,17 @@
 
 /* 工具条上的菜单要朝上开 */
 .menuUp { top: auto; bottom: calc(100% + 9px); }
+
+/* ── 开工前的门厅：拉取工作区中 / 拉不下来时给重试 ── */
+.bootVeil { position: absolute; inset: 0; z-index: 55; display: flex; align-items: center; justify-content: center; background: rgba(244, 242, 237, 0.86); }
+.bootCard { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 26px 36px; background: var(--rf-paper); border: 1px solid var(--rf-ink); font-size: 13px; }
+.bootLine { display: flex; align-items: center; gap: 10px; }
+.bootDot { width: 8px; height: 8px; background: var(--rf-gold); animation: bootPulse 0.9s infinite alternate; }
+@keyframes bootPulse { from { opacity: 0.25; } to { opacity: 1; } }
+.bootWhy { color: var(--rf-ink-3); font-size: 12px; max-width: 320px; text-align: center; }
+.bootRetry { margin-top: 4px; padding: 9px 24px; border: 1px solid var(--rf-ink); background: var(--rf-ink); color: var(--rf-paper); font-size: 12px; font-weight: 600; letter-spacing: 0.08em; }
+.bootRetry:hover { background: var(--rf-gold); border-color: var(--rf-gold); }
+
+.tbBtn:disabled { opacity: 0.32; pointer-events: none; }
+button.saveErr { cursor: pointer; font: inherit; padding: 0; }
+button.saveErr:hover { text-decoration: underline; }

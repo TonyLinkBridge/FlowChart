@@ -118,9 +118,10 @@ export default function Editor() {
     return () => clearTimeout(t);
   }, [toast]);
 
-  /* D —— 底部日志，有后果、能撤销的改动落这里，不消失 */
+  /* 历史 = 撤销栈（⌘Z）+ 重做栈（⇧⌘Z）。底部日志面板砍掉了，
+     但历史本身要看得见：工具条上有撤销/重做按钮，悬停能看到要撤/重做哪一步。 */
   const [history, setHistory] = useState<HistoryEntry[]>([]);
-  const [historyOpen, setHistoryOpen] = useState(false);
+  const [future, setFuture] = useState<{ label: string; doc: FlowDoc }[]>([]);
   /** 按住空格才拖画布（Figma 那套）。
    *  之前靠「节点上阻止冒泡」来区分，但画布的平移是原生监听器，
    *  在冒泡到画布那层就触发了，而 React 的阻止冒泡要等到根节点 —— 晚一步，拦不住。 */
@@ -134,37 +135,54 @@ export default function Editor() {
     setHistory(h => [entry, ...h].slice(0, 80));
   }, []);
 
-  /** 提交一次结构性改动：存档 + 记日志。打字类的碎改动不走这里。 */
+  /** 提交一次结构性改动：存档 + 记日志。打字类的碎改动不走这里。
+   *  改出新东西后，旧的「重做」分支就作废 —— 不然重做会把刚改的盖掉。 */
   const commit = useCallback((next: FlowDoc, label: string) => {
     remember(label, doc);
+    setFuture([]);
     setDoc(next);
     if (!userMovedRef.current) refit(next.nodes);
   }, [doc, remember, refit]);
 
-  /** 撤销 = 回到最近那条历史的「之前」。 */
+  /** 撤销 = 回到最近那条历史的「之前」，同时把「现在」推进重做栈。 */
   const undo = useCallback(() => {
     if (!history.length) return;
-    setDoc(history[0].before);
+    const entry = history[0];
+    setFuture(f => [{ label: entry.label, doc }, ...f].slice(0, 80));
+    setDoc(entry.before);
     setHistory(h => h.slice(1));
     setSelected(null); setEdgeIndex(null);
-  }, [history]);
+    setToast(`已撤销 · ${entry.label}`);
+  }, [history, doc]);
 
-  /** 点历史里的某一条 = 直接跳回那个时候，中间那些一并丢掉。 */
-  const jumpTo = useCallback((index: number) => {
-    const target = history[index];
-    if (!target) return;
-    setDoc(target.before);
-    setHistory(h => h.slice(index + 1));
-    setSelected(null); setEdgeIndex(null); setPinnedNote(null);
-  }, [history]);
+  /** 重做 = 把刚撤销的那步再放回来。 */
+  const redo = useCallback(() => {
+    if (!future.length) return;
+    const entry = future[0];
+    setHistory(h => [{ id: ++seq.current, time: clock(), label: entry.label, before: doc }, ...h].slice(0, 80));
+    setDoc(entry.doc);
+    setFuture(f => f.slice(1));
+    setSelected(null); setEdgeIndex(null);
+    setToast(`已重做 · ${entry.label}`);
+  }, [future, doc]);
 
 
-  /** 进来先拉一次工作区。 */
-  useEffect(() => {
+  /** 进来先拉一次工作区。拉不下来就明说 + 给重试 ——
+   *  以前失败只会亮「保存失败」，人对着空画布画半天，其实一笔都没落库。 */
+  const [loadState, setLoadState] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [loadErr, setLoadErr] = useState('');
+  const bootstrap = useCallback(() => {
+    setLoadState('loading');
     loadWorkspace()
-      .then(w => { setWs(w); const c = currentDoc(w); if (c) { lastLoadedRef.current = c.doc; setDoc(c.doc); } })
-      .catch(() => setSaveState('error'));
+      .then(w => {
+        setWs(w);
+        const c = currentDoc(w);
+        if (c) { lastLoadedRef.current = c.doc; setDoc(c.doc); }
+        setLoadState('ready');
+      })
+      .catch(e => { setLoadErr(e instanceof Error ? e.message : '网络不通'); setLoadState('error'); });
   }, []);
+  useEffect(() => { bootstrap(); }, [bootstrap]);
 
   /** 首次进来适应一次。
    *  之前只在新建/切换/导入/粘贴/重排时适应，唯独一进来那次漏了 ——
@@ -189,7 +207,8 @@ export default function Editor() {
     if (saveTimer.current) clearTimeout(saveTimer.current);
     const pend = pendingRef.current;
     pendingRef.current = null;
-    if (pend) saveFlow(pend.id, pend.doc).catch(() => setSaveState('error'));
+    // 发失败要把这份塞回去 —— 点「重试」或网络回来时才补得上；丢了就是真丢了
+    if (pend) saveFlow(pend.id, pend.doc).catch(() => { pendingRef.current ??= pend; setSaveState('error'); });
   }, []);
 
   useEffect(() => {
@@ -209,6 +228,39 @@ export default function Editor() {
     }, 800);
     return () => { if (saveTimer.current) clearTimeout(saveTimer.current); };
   }, [doc, ws?.currentId]);
+
+  /** 手动重试：把欠着的那份（可能是切走前那张图的）和当前这张都补发一遍。 */
+  const retrySave = useCallback(() => {
+    const pend = pendingRef.current;
+    pendingRef.current = null;
+    const id = ws?.currentId;
+    setSaveState('saving');
+    const jobs: Promise<void>[] = [];
+    if (pend && pend.id !== id) jobs.push(saveFlow(pend.id, pend.doc));
+    if (id) jobs.push(saveFlow(id, doc));   // 当前这张永远存最新的，不用旧 pending
+    Promise.all(jobs)
+      .then(() => {
+        setSaveState('saved');
+        setWs(w => w && { ...w, docs: w.docs.map(d => d.id === id ? { ...d, doc, updatedAt: Date.now() } : d) });
+      })
+      .catch(() => setSaveState('error'));
+  }, [ws?.currentId, doc]);
+
+  /** 网络断了存不上，网络一回来就自己补发，不用人守着点重试。 */
+  useEffect(() => {
+    const onOnline = () => { if (saveState === 'error') retrySave(); };
+    window.addEventListener('online', onOnline);
+    return () => window.removeEventListener('online', onOnline);
+  }, [saveState, retrySave]);
+
+  /** 还有改动没落库就要关页？让浏览器拦一下。 */
+  useEffect(() => {
+    const onLeave = (e: BeforeUnloadEvent) => {
+      if (saveState === 'saving' || saveState === 'error' || pendingRef.current) e.preventDefault();
+    };
+    window.addEventListener('beforeunload', onLeave);
+    return () => window.removeEventListener('beforeunload', onLeave);
+  }, [saveState]);
 
   const prog = docProgress(doc);
   const notes = footnoteIndex(doc);
@@ -248,7 +300,7 @@ export default function Editor() {
       lastLoadedRef.current = row.doc;
       setWs(w => w && { ...w, docs: [row, ...w.docs], currentId: row.id });
       rememberCurrent(row.id);
-      setDoc(row.doc); setHistory([]); setSelected(null); refit(row.doc.nodes);
+      setDoc(row.doc); setHistory([]); setFuture([]); setSelected(null); refit(row.doc.nodes);
     }).catch(() => setSaveState('error'));
   }, [flushSave, refit]);
 
@@ -262,7 +314,7 @@ export default function Editor() {
     flushSave();
     lastLoadedRef.current = target.doc;
     setWs({ ...ws, currentId: id });
-    setDoc(target.doc); setHistory([]); setSelected(null); setEdgeIndex(null); setPinnedNote(null);
+    setDoc(target.doc); setHistory([]); setFuture([]); setSelected(null); setEdgeIndex(null); setPinnedNote(null);
     refit(target.doc.nodes);
     rememberCurrent(id);
   }, [ws, flushSave, refit]);
@@ -288,7 +340,7 @@ export default function Editor() {
       setWs({ ...ws, docs, currentId: nextId });
       if (nextId !== ws.currentId) {
         lastLoadedRef.current = docs[0].doc;
-        setDoc(docs[0].doc); setHistory([]); setSelected(null); refit(docs[0].doc.nodes);
+        setDoc(docs[0].doc); setHistory([]); setFuture([]); setSelected(null); refit(docs[0].doc.nodes);
         rememberCurrent(nextId);
       }
     }).catch(() => setSaveState('error'));
@@ -494,7 +546,8 @@ export default function Editor() {
       }
       if (e.code === 'Space' && !e.repeat) { e.preventDefault(); setSpaceDown(true); return; }
       if (e.key === 'Escape' && pasting !== null) { setPasting(null); return; }
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); }
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); if (e.shiftKey) redo(); else undo(); }
+      else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); }
       else if ((e.key === 'Backspace' || e.key === 'Delete') && selected) { e.preventDefault(); deleteNode(selected); }
       else if (e.key === 'Escape') { setSelected(null); setEdgeIndex(null); setLinkFrom(null); setPinnedNote(null); setHoverNote(null); }
     };
@@ -521,7 +574,7 @@ export default function Editor() {
       window.removeEventListener('blur', onBlur);
       window.removeEventListener('paste', onPaste);
     };
-  }, [undo, deleteNode, selected, pasting]);
+  }, [undo, redo, deleteNode, selected, pasting]);
 
   return (
     <div className={s.stage}>
@@ -623,7 +676,8 @@ export default function Editor() {
         <span className={s.docMeta}>
           {prog.done}/{prog.total} ·{' '}
           {saveState === 'error'
-            ? <span className={s.saveErr}>保存失败 · 先导出留一份</span>
+            ? <button className={s.saveErr} onClick={retrySave}
+                      title="一般是网络断了。改动还留在本页，点击补发；不放心可先导出 JSON。">保存失败 · 点此重试</button>
             : saveState === 'saving' ? '保存中…' : '已保存'}
         </span>
       </div>
@@ -669,6 +723,10 @@ export default function Editor() {
       {/* 底部中央：工具条（只在流程图视图） */}
       {view === '流程图' && (
         <div className={`${s.pill} ${s.toolbarFloat}`}>
+          <button className={s.tbBtn} onClick={undo} disabled={!history.length}
+                  title={history.length ? `撤销 · ${history[0].label}（⌘Z）` : '没有可撤销的改动'}>撤销</button>
+          <button className={s.tbBtn} onClick={redo} disabled={!future.length}
+                  title={future.length ? `重做 · ${future[0].label}（⇧⌘Z）` : '没有可重做的改动'}>重做</button>
           <button className={`${s.tbBtn} ${s.tbStrong}`} onClick={addStep}>＋ 节点</button>
           <button className={`${s.tbBtn} ${linkFrom !== null ? s.tbOn : ''}`}
                   onClick={() => { setLinkFrom(v => (v === null ? '' : null)); setEdgeIndex(null); }}>连线</button>
@@ -714,6 +772,23 @@ export default function Editor() {
 
       {pasting !== null && (
         <PasteDialog initial={pasting} onCancel={() => setPasting(null)} onGenerate={generateFrom} />
+      )}
+
+      {/* 工作区还没拉回来之前，罩住画布 —— 别让人对着还没落库的空图白画 */}
+      {loadState !== 'ready' && (
+        <div className={s.bootVeil}>
+          {loadState === 'loading' ? (
+            <div className={s.bootCard}>
+              <span className={s.bootLine}><span className={s.bootDot} />正在取回你的流程…</span>
+            </div>
+          ) : (
+            <div className={s.bootCard}>
+              <strong>工作区没能加载</strong>
+              <span className={s.bootWhy}>{loadErr || '网络不通'}</span>
+              <button className={s.bootRetry} onClick={bootstrap}>重试</button>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );

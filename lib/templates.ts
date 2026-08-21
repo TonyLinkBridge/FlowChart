@@ -79,11 +79,122 @@ const onboarding: FlowDoc = {
   ],
 };
 
+/** 费用报销：最常见的「审批不过就退回重来」结构 ——
+ *  回环是虚线，排版对有环的图会退化成按原始顺序分层，不会崩。 */
+const expense: FlowDoc = {
+  title: '费用报销',
+  direction: 'TB',
+  nodes: [
+    { id: 'go', title: '发起报销', shape: 'terminator' },
+
+    { id: 'fill', title: '填单 · 传票据', owner: '申请人', days: 1,
+      note: {
+        steps: [
+          { text: '报销系统里新建单据，选对费用类型', done: false },
+          { text: '发票原件拍照上传，纸质票留好', done: false },
+          { text: '超 500 元的单笔支出，附审批邮件截图', done: false },
+        ],
+        fields: [{ label: '报销单号' }, { label: '合计金额' }],
+        links: [{ label: '报销系统入口', url: '#' }],
+        contact: '财务小助手（企业微信）',
+        text: '发票抬头必须是公司全称，写错了财务会直接退回，一来一回多等一周。',
+      } },
+
+    { id: 'lead', title: '主管审批', owner: '主管', days: 1 },
+    { id: 'ok',   title: '主管通过？', shape: 'decision' },
+    { id: 'back', title: '退回修改', muted: true },
+
+    { id: 'fin', title: '财务复核', owner: '财务', days: 2,
+      note: {
+        steps: [
+          { text: '核对发票真伪与连号', done: false },
+          { text: '金额、类型与票据一致', done: false },
+          { text: '录入记账凭证', done: false },
+        ],
+        text: '**单张发票超过 5000** 走大额通道，财务会另外联系经办人。',
+      } },
+
+    { id: 'pay',  title: '打款', owner: '财务', days: 3 },
+    { id: 'done', title: '报销完成', shape: 'terminator' },
+  ],
+  edges: [
+    { source: 'go',   target: 'fill' },
+    { source: 'fill', target: 'lead' },
+    { source: 'lead', target: 'ok'   },
+    { source: 'ok',   target: 'fin',  label: '是' },
+    { source: 'ok',   target: 'back', label: '否', dashed: true },
+    { source: 'back', target: 'fill', label: '改完重交', dashed: true },
+    { source: 'fin',  target: 'pay'  },
+    { source: 'pay',  target: 'done' },
+  ],
+};
+
+/** 客户工单处理：进来先分级，紧急的走快车道，最后由客户确认关单。 */
+const ticket: FlowDoc = {
+  title: '客户工单处理',
+  direction: 'TB',
+  nodes: [
+    { id: 'in', title: '收到工单', shape: 'terminator' },
+
+    { id: 'triage', title: '分类定级', owner: '客服', days: 1,
+      note: {
+        steps: [
+          { text: '判断类型：咨询 / 故障 / 投诉', done: false },
+          { text: '在系统里定级 P1–P3，写清影响范围', done: false },
+        ],
+        contact: '值班群「工单调度」',
+      } },
+
+    { id: 'urgent', title: '是 P1 紧急？', shape: 'decision' },
+
+    { id: 'now', title: '立即响应', owner: '值班工程师', days: 1,
+      note: { text: '**30 分钟内**必须给客户第一响应 —— 哪怕只是一句「我们在查」。' } },
+
+    { id: 'queue', title: '排期处理', owner: '客服', days: 2 },
+
+    { id: 'fix', title: '处理并回复', owner: '工程师', days: 2,
+      note: {
+        steps: [
+          { text: '复现问题，定位原因', done: false },
+          { text: '给出结论或解决方案', done: false },
+          { text: '回复客户，附操作截图', done: false },
+        ],
+        fields: [{ label: '工单号' }],
+      } },
+
+    { id: 'happy', title: '客户确认解决？', shape: 'decision' },
+    { id: 'close', title: '关闭工单', shape: 'terminator' },
+  ],
+  edges: [
+    { source: 'in',     target: 'triage' },
+    { source: 'triage', target: 'urgent' },
+    { source: 'urgent', target: 'now',   label: '是' },
+    { source: 'urgent', target: 'queue', label: '否' },
+    { source: 'now',    target: 'fix' },
+    { source: 'queue',  target: 'fix' },
+    { source: 'fix',    target: 'happy' },
+    { source: 'happy',  target: 'close', label: '是' },
+    { source: 'happy',  target: 'fix',   label: '否 · 继续跟进', dashed: true },
+  ],
+};
+
 export const TEMPLATES: Template[] = [
   {
     id: 'onboarding',
     name: '新员工入职',
-    desc: '9 步 · 3 个部门 · 含判断分支和附注',
+    desc: '8 步 · 3 个部门 · 含判断分支和附注',
     build: () => autoLayout(structuredClone(onboarding)),
+  },
+  {
+    id: 'expense',
+    name: '费用报销',
+    desc: '8 步 · 审批分支 · 含退回重交回环',
+    build: () => autoLayout(structuredClone(expense)),
+  },
+  {
+    id: 'ticket',
+    name: '客户工单处理',
+    desc: '8 步 · 紧急分流 · 客户确认后才关单',
+    build: () => autoLayout(structuredClone(ticket)),
   },
 ];
