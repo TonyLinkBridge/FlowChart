@@ -15,6 +15,7 @@ import { FlowEdges } from '@/components/flow/FlowEdges';
 import { NotePopover } from '@/components/flow/NotePopover';
 import { NodeToolbar } from '@/components/flow/NodeToolbar';
 import { mergeDocs } from '@/lib/merge';
+import { initialSelectedNode, shouldClearCanvasSelection } from '@/lib/editor-selection.mjs';
 import { useCollab } from '@/hooks/useCollab';
 import { NotePanel } from '@/components/views/NotePanel';
 import { EdgePanel } from '@/components/views/EdgePanel';
@@ -112,7 +113,7 @@ export default function Editor() {
   const keepHover = useCallback(() => {
     if (hoverTimer.current) clearTimeout(hoverTimer.current);
   }, []);
-  const [selected, setSelected] = useState<string | null>('verify');
+  const [selected, setSelected] = useState<string | null>(initialSelectedNode);
   const [view, setView] = useState<(typeof VIEWS)[number]>('流程图');
 
   /** 点节点上的金色小数字 —— 右栏切到附注，并翻到那一条 */
@@ -783,8 +784,12 @@ export default function Editor() {
           className={`${s.canvas} ${dropping ? s.canvasDrop : ''} ${spaceDown ? s.canvasPan : ''}`}
           onPointerDown={e => {
             // 中键随时可拖；空格按住随时可拖；否则只有按在空白处才拖
-            const onNode = !!(e.target as Element).closest('[data-node],[data-pop]');
-            if (!(e.button === 1 || spaceDown || (e.button === 0 && !onNode))) return;
+            const overInteractive = !!(e.target as Element).closest('[data-node],[data-pop]');
+            if (shouldClearCanvasSelection({ button: e.button, overInteractive })) {
+              setSelected(null);
+              setEdgeIndex(null);
+            }
+            if (!(e.button === 1 || spaceDown || (e.button === 0 && !overInteractive))) return;
             userMovedRef.current = true;
             panRef.current = { sx: e.clientX, sy: e.clientY, ox: vpRef.current.x, oy: vpRef.current.y };
             e.currentTarget.setPointerCapture(e.pointerId);
