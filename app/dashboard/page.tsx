@@ -16,6 +16,7 @@ import { NotePopover } from '@/components/flow/NotePopover';
 import { NodeToolbar } from '@/components/flow/NodeToolbar';
 import { mergeDocs } from '@/lib/merge';
 import { initialSelectedNode, shouldClearCanvasSelection } from '@/lib/editor-selection.mjs';
+import { canvasWheelGesture } from '@/lib/canvas-wheel.mjs';
 import { useCollab } from '@/hooks/useCollab';
 import { NotePanel } from '@/components/views/NotePanel';
 import { EdgePanel } from '@/components/views/EdgePanel';
@@ -643,7 +644,7 @@ export default function Editor() {
     setDragging(true);
   }, [doc, linkFrom]);
 
-  /** 滚轮缩放（以光标为锚点）+ 拖空白处平移。
+  /** 普通滚轮/双指滑动平移；捏合或 Ctrl/⌘ + 滚轮才缩放。
    *  用原生监听是因为要 preventDefault —— React 的 onWheel 是被动的，拦不住页面滚动。 */
   useEffect(() => {
     const el = canvasRef.current;
@@ -654,10 +655,11 @@ export default function Editor() {
       userMovedRef.current = true;
       const r = el.getBoundingClientRect();
       const cx = e.clientX - r.left, cy = e.clientY - r.top;
-      if (e.ctrlKey || e.metaKey || Math.abs(e.deltaY) >= Math.abs(e.deltaX)) {
-        setVp(v => zoomAt(v, cx, cy, e.deltaY < 0 ? 1.12 : 1 / 1.12));
+      const gesture = canvasWheelGesture(e);
+      if (gesture.kind === 'zoom') {
+        setVp(v => zoomAt(v, cx, cy, gesture.factor));
       } else {
-        setVp(v => ({ ...v, x: v.x - e.deltaX }));
+        setVp(v => ({ ...v, x: v.x + gesture.x, y: v.y + gesture.y }));
       }
     };
     el.addEventListener('wheel', onWheel, { passive: false });
