@@ -233,6 +233,12 @@ button.saveErr:hover { text-decoration: underline; }
 .histNow { font-family: var(--rf-mono); font-size: 9.5px; color: var(--rf-ink-4); }
 .histRestore { font-size: 11px; color: var(--rf-ink); text-decoration: underline; text-underline-offset: 2px; }
 .histRestore:hover { color: var(--rf-gold); }
+.histRestore:disabled { opacity: 0.4; cursor: not-allowed; }
+.histNotice { padding: 12px 14px; border-bottom: 1px solid var(--rf-rule-mid); font-size: 12px; background: var(--rf-surface); }
+.histNotice p { margin: 0 0 8px; overflow-wrap: anywhere; }
+.histNotice [role="alert"] { color: #8b2623; }
+.histNotice button { min-height: 32px; text-decoration: underline; text-underline-offset: 3px; }
+.histNotice button:focus-visible, .histRestore:focus-visible { outline: 2px solid var(--rf-gold); outline-offset: 3px; }
 .histSection { padding: 12px 14px 5px; font-family: var(--rf-mono); font-size: 9.5px; letter-spacing: 0.14em; color: var(--rf-ink-4); }
 .histAct { display: flex; gap: 6px; align-items: baseline; padding: 4px 14px; font-size: 11px; color: var(--rf-ink-3); }
 .histActDetail { color: var(--rf-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 110px; }

@@ -11,8 +11,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
 
   const [vers, acts] = await Promise.all([
     admin().from('flow_versions')
-      .select('version,saved_by,saved_name,note,created_at')
-      .eq('flow_id', id).order('version', { ascending: false }).limit(50),
+      .select('id,version,saved_by,saved_name,note,created_at')
+      .eq('flow_id', id).order('version', { ascending: false })
+      .order('created_at', { ascending: false }).limit(50),
     admin().from('activity_logs')
       .select('action,actor_name,detail,created_at')
       .eq('flow_id', id).order('created_at', { ascending: false }).limit(50),

@@ -1,5 +1,6 @@
 import { blankDoc } from './doc';
 import type { FlowDoc } from './types';
+import type { RestorePreview, RestoreRequest, RestoreResult, VersionSnapshot } from './version-restore';
 
 /** 工作区：你存过的所有流程图 + 你自己建的分堆。
  *  浏览器不直接连数据库 —— 全部走 /api，接口先验 Clerk 身份再按你的 ID 过滤。
@@ -109,14 +110,12 @@ export const currentDoc = (w: Workspace) => w.docs.find(d => d.id === w.currentI
 
 /* ── 版本历史 ── */
 
-export interface FlowVersion {
-  version: number; savedBy: string; savedName: string | null; note: string | null; createdAt: number;
-}
+export type FlowVersion = VersionSnapshot;
 export interface ActivityEntry {
   action: string; actorName: string | null; detail: string | null; createdAt: number;
 }
 
-type VersionRow = { version: number; saved_by: string; saved_name: string | null; note: string | null; created_at: string };
+type VersionRow = { id: string; version: number; saved_by: string; saved_name: string | null; note: string | null; created_at: string };
 type ActivityRow = { action: string; actor_name: string | null; detail: string | null; created_at: string };
 
 /** 一张图的版本列表 + 最近动态。 */
@@ -124,7 +123,7 @@ export async function fetchHistory(id: string): Promise<{ versions: FlowVersion[
   const r = await call<{ versions: VersionRow[]; activity: ActivityRow[] }>(`/api/flows/${id}/versions`);
   return {
     versions: r.versions.map(v => ({
-      version: v.version, savedBy: v.saved_by, savedName: v.saved_name,
+      id: v.id, version: v.version, savedBy: v.saved_by, savedName: v.saved_name,
       note: v.note, createdAt: new Date(v.created_at).getTime(),
     })),
     activity: r.activity.map(a => ({
@@ -139,7 +138,12 @@ export async function snapshotVersion(id: string, note?: string) {
   await call(`/api/flows/${id}/versions`, { method: 'POST', body: JSON.stringify({ note }) });
 }
 
-/** 恢复到某个历史版本 —— 结果本身成为一个新版本，历史永不覆盖。 */
-export async function restoreVersion(id: string, version: number): Promise<{ doc: FlowDoc; version: number }> {
-  return call(`/api/flows/${id}/restore`, { method: 'POST', body: JSON.stringify({ version }) });
+/** Read-only comparison against one exact snapshot, not an ambiguous version number. */
+export async function previewVersion(id: string, snapshotId: string): Promise<RestorePreview> {
+  return call(`/api/flows/${id}/restore?snapshotId=${encodeURIComponent(snapshotId)}`, { cache: 'no-store' });
+}
+
+/** A stale preview is rejected by the server; no unsafe legacy fallback. */
+export async function restoreVersion(id: string, request: RestoreRequest): Promise<RestoreResult> {
+  return call(`/api/flows/${id}/restore`, { method: 'POST', body: JSON.stringify(request) });
 }

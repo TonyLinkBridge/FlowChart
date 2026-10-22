@@ -17,6 +17,10 @@ import { NodeToolbar } from '@/components/flow/NodeToolbar';
 import { mergeDocs } from '@/lib/merge';
 import { initialSelectedNode, shouldClearCanvasSelection } from '@/lib/editor-selection.mjs';
 import { canvasWheelGesture } from '@/lib/canvas-wheel.mjs';
+import { sameVersionValue } from '@/lib/version-diff';
+import { SaveBarrier } from '@/lib/save-barrier';
+import { acceptRestoredDocument, publishMergedSave } from '@/lib/save-document';
+import type { RestoreRequest } from '@/lib/version-restore';
 import { useCollab } from '@/hooks/useCollab';
 import { NotePanel } from '@/components/views/NotePanel';
 import { EdgePanel } from '@/components/views/EdgePanel';
@@ -233,22 +237,6 @@ export default function Editor() {
   }, [userMemberships?.data, orgId]);
 
 
-  /** 恢复历史版本：结果是一个新版本，历史不毁，恢复错了再恢复回去。 */
-  const doRestore = useCallback((v: number) => {
-    const id = wsRef.current?.currentId;
-    if (!id) return;
-    restoreVersion(id, v).then(r => {
-      syncRef.current = { id, doc: r.doc, version: r.version };
-      lastLoadedRef.current = r.doc;
-      setDoc(r.doc);
-      setHistory([]); setFuture([]); setSelected(null); setPinnedNote(null);
-      setWs(w => w && { ...w, docs: w.docs.map(d => d.id === id ? { ...d, doc: r.doc, version: r.version, updatedAt: Date.now() } : d) });
-      refit(r.doc.nodes);
-      announceRef.current?.(r.version);
-      setToast(`已恢复到 V${v}，生成新版本 V${r.version}`);
-    }).catch(e => setToast(e instanceof Error ? e.message : '恢复失败'));
-  }, [refit]);
-
   /** 首次进来适应一次。
    *  之前只在新建/切换/导入/粘贴/重排时适应，唯独一进来那次漏了 ——
    *  所以图停在原始坐标上，贴着左上角。
@@ -269,10 +257,11 @@ export default function Editor() {
   const lastLoadedRef = useRef<FlowDoc | null>(null);
   /** 当前这张图「最后一次和服务器对上号」的样子 —— 撞车合并时的基准。 */
   const syncRef = useRef<{ id: string | null; doc: FlowDoc | null; version: number }>({ id: null, doc: null, version: 1 });
+  const saveBarrier = useRef(new SaveBarrier());
 
   /** 真正把一份 doc 发出去。撞到 409（同事在我之后存过）就三方合并再试，最多三轮。
    *  合并结果要放回画布 —— 不然你看到的和库里的会岔开。 */
-  const performSave = useCallback(async (id: string, docToSave: FlowDoc, base: number, baseDoc: FlowDoc | null) => {
+  const performSaveInner = useCallback(async (id: string, docToSave: FlowDoc, base: number, baseDoc: FlowDoc | null) => {
     let attempt = docToSave;
     let attemptBase = base;
     let mergedInfo: string | null = null;
@@ -284,9 +273,7 @@ export default function Editor() {
         announceRef.current?.(v);
         if (attempt !== docToSave && wsRef.current?.currentId === id) {
           // 发生过合并：把合并结果放回画布；这一瞬间还在敲的字再叠一层
-          const cur = docRef.current;
-          if (cur === docToSave) { lastLoadedRef.current = attempt; setDoc(attempt); }
-          else setDoc(mergeDocs(docToSave, cur, attempt).doc);
+          publishMergedSave(docToSave, attempt, docRef, lastLoadedRef, setDoc);
           if (mergedInfo) setToast(mergedInfo);
         }
         setSaveState('saved');
@@ -307,6 +294,9 @@ export default function Editor() {
     }
     throw new Error('保存一直撞车');
   }, []);
+
+  const performSave = useCallback((id: string, docToSave: FlowDoc, base: number, baseDoc: FlowDoc | null) =>
+    saveBarrier.current.track(id, performSaveInner(id, docToSave, base, baseDoc)), [performSaveInner]);
 
   const flushSave = useCallback(() => {
     if (saveTimer.current) clearTimeout(saveTimer.current);
@@ -348,6 +338,42 @@ export default function Editor() {
     if (id) jobs.push(performSave(id, docRef.current, syncRef.current.version, syncRef.current.doc));
     Promise.all(jobs).catch(() => setSaveState('error'));
   }, [ws?.currentId, performSave]);
+
+  /** Preview must include unsaved local work, and restoration must not race its saves. */
+  const prepareRestore = useCallback(async (id: string) => {
+    const requireCurrent = () => {
+      if (wsRef.current?.currentId !== id || syncRef.current.id !== id)
+        throw new Error('当前流程已切换，请在对应流程中重新查看差异');
+    };
+    requireCurrent();
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    await saveBarrier.current.waitFor(id);
+    requireCurrent();
+    if (pendingRef.current?.id === id || !sameVersionValue(docRef.current, syncRef.current.doc)) {
+      if (pendingRef.current?.id === id) pendingRef.current = null;
+      await performSave(id, docRef.current, syncRef.current.version, syncRef.current.doc);
+    }
+    await saveBarrier.current.waitFor(id);
+    requireCurrent();
+    if (!sameVersionValue(docRef.current, syncRef.current.doc))
+      throw new Error('内容仍在变化，请等待保存完成后重新查看差异');
+  }, [performSave]);
+
+  async function doRestore(id: string, request: RestoreRequest) {
+    await prepareRestore(id);
+    const result = await restoreVersion(id, request);
+    setWs(w => w && { ...w, docs: w.docs.map(d => d.id === id && d.version <= result.version
+      ? { ...d, doc: result.doc, version: result.version, updatedAt: Date.now() } : d) });
+    // A response for a previously open flow must never replace the new flow's canvas.
+    if (acceptRestoredDocument(id, result, wsRef.current?.currentId ?? null, syncRef, docRef, lastLoadedRef, setDoc)) {
+      setHistory([]); setFuture([]); setSelected(null); setEdgeIndex(null); setPinnedNote(null);
+      setSaveState('saved');
+      refit(result.doc.nodes);
+      announceRef.current?.(result.version);
+      setToast(`已恢复为 V${result.version} · 原 V${result.backup.version} 已自动备份`);
+    }
+    return result;
+  }
 
   /** 网络断了存不上，网络一回来就自己补发，不用人守着点重试。 */
   useEffect(() => {
@@ -1011,6 +1037,7 @@ export default function Editor() {
           flowId={ws.currentId}
           currentVersion={ws.docs.find(d => d.id === ws.currentId)?.version ?? 1}
           onClose={() => setHistOpen(false)}
+          onPrepareRestore={prepareRestore}
           onRestore={doRestore}
         />
       )}
