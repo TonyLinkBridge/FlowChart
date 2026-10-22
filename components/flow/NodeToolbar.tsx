@@ -1,6 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/arc/popover/popover';
+import { Tooltip } from '@/components/arc/tooltip/tooltip';
 import type { FlowNode, NodeStyle, Shape } from '@/lib/types';
 import s from './NodeToolbar.module.css';
 
@@ -14,8 +16,8 @@ type Panel = 'shape' | 'fill' | 'border' | 'text' | 'more' | null;
 
 /** 色票一排 + 任意取色 + 恢复默认。
  *  取色器拖动时事件是连发的，停 500ms 才提交 —— 不然一次挑色能塞满整个撤销栈。 */
-function ColorField({ value, onPick, onClear }: {
-  value?: string; onPick: (c: string) => void; onClear: () => void;
+function ColorField({ value, onPick, onClear, customLabel }: {
+  value?: string; onPick: (c: string) => void; onClear: () => void; customLabel?: string;
 }) {
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
@@ -29,6 +31,7 @@ function ColorField({ value, onPick, onClear }: {
         <label className={s.customSwatch} title="任意颜色">
           <input
             type="color"
+            aria-label={customLabel}
             value={value ?? '#101010'}
             onChange={e => {
               const c = e.currentTarget.value;
@@ -75,6 +78,20 @@ export function NodeToolbar({
   const st = node.style;
   const shape = node.shape ?? 'process';
   const toggle = (p: Panel) => setOpen(cur => (cur === p ? null : p));
+  const fillKeys = (event: KeyboardEvent<HTMLElement>) => {
+    // Keep the existing canvas undo/redo route, but not Space-pan/Delete/paste shortcuts.
+    const history = (event.metaKey || event.ctrlKey) && ['z', 'y'].includes(event.key.toLowerCase());
+    if (!history) event.stopPropagation();
+  };
+  const hintKeys = (event: KeyboardEvent<HTMLButtonElement>) => {
+    // Dismiss a hint or activate its button, not the canvas underneath it.
+    // Radix handles Escape in native capture and may remove the ARIA link before React's handler.
+    const dismissHint = event.key === 'Escape' && (event.defaultPrevented || event.currentTarget.hasAttribute('aria-describedby'));
+    if (dismissHint || [' ', 'Delete', 'Backspace'].includes(event.key)) event.stopPropagation();
+  };
+  const hintKeyUp = (event: KeyboardEvent<HTMLButtonElement>) => {
+    if (event.key === ' ') event.stopPropagation();
+  };
 
   const applyHref = () => {
     const v = hrefDraft.trim();
@@ -88,28 +105,55 @@ export function NodeToolbar({
         <button className={`${s.btn} ${open === 'shape' ? s.btnOn : ''}`} onClick={() => toggle('shape')}>
           形状 <span className={s.caret}>▾</span>
         </button>
-        <button className={`${s.btn} ${open === 'fill' ? s.btnOn : ''}`} onClick={() => toggle('fill')} title="填充色">
+        <Popover open={open === 'fill'} onOpenChange={next => {
+          if (next) setOpen('fill');
+          else setOpen(current => current === 'fill' ? null : current);
+        }}>
+        <PopoverTrigger asChild>
+        <button className={`${s.btn} ${open === 'fill' ? s.btnOn : ''}`} title="填充色"
+          onKeyDown={fillKeys} onKeyUp={event => event.stopPropagation()}>
           <span className={s.fillDot} style={{ background: st?.fill ?? 'transparent' }}>
             {!st?.fill && <span className={s.none} />}
           </span>
           填充
         </button>
+        </PopoverTrigger>
+        <PopoverContent data-pop className={s.fillPanel} aria-label="填充色" side="bottom" align="start"
+          inert={open !== 'fill'} aria-hidden={open !== 'fill' || undefined}
+          onEscapeKeyDown={event => event.stopPropagation()}
+          onKeyDown={fillKeys} onKeyUp={event => event.stopPropagation()}
+          onPaste={event => event.stopPropagation()}>
+          <ColorField value={st?.fill} customLabel="自定义填充色"
+            onPick={c => onStyle({ fill: c }, '改了填充色')}
+            onClear={() => onStyle({ fill: undefined }, '去掉了填充色')} />
+        </PopoverContent>
+        </Popover>
         <button className={`${s.btn} ${open === 'border' ? s.btnOn : ''}`} onClick={() => toggle('border')} title="边框">
           <span className={`${s.borderDot} ${st?.dashed ? s.borderDashed : ''}`}
                 style={{ borderColor: st?.border ?? 'var(--rf-ink)' }} />
           边框
         </button>
-        <button className={`${s.btn} ${open === 'text' ? s.btnOn : ''}`} onClick={() => toggle('text')} title="文字样式">
+        <Tooltip content="文字样式">
+        <button type="button" className={`${s.btn} ${s.hintBtn} ${open === 'text' ? s.btnOn : ''}`}
+          aria-label="文字样式" aria-expanded={open === 'text'} onClick={() => toggle('text')}
+          onKeyDown={hintKeys} onKeyUp={hintKeyUp}>
           Aa <span className={s.caret}>▾</span>
         </button>
+        </Tooltip>
         <span className={s.sep} />
         <button className={s.btn} onClick={onNote}>附注</button>
         <button className={s.btn} onClick={onLink}>连线</button>
-        <button className={`${s.btn} ${node.locked ? s.btnLive : ''}`} onClick={onToggleLock}
-                title={node.locked ? '已锁定位置 · 点击解锁' : '锁定位置，拖不动'}>
+        <Tooltip content={node.locked ? '解锁位置' : '锁定位置'}>
+        <button type="button" className={`${s.btn} ${s.hintBtn} ${node.locked ? s.btnLive : ''}`} onClick={onToggleLock}
+          aria-label={node.locked ? '解锁位置' : '锁定位置'} onKeyDown={hintKeys} onKeyUp={hintKeyUp}>
           <Lock on={!!node.locked} />
         </button>
-        <button className={`${s.btn} ${open === 'more' ? s.btnOn : ''}`} onClick={() => toggle('more')}>⋯</button>
+        </Tooltip>
+        <Tooltip content="更多节点操作">
+        <button type="button" className={`${s.btn} ${s.hintBtn} ${open === 'more' ? s.btnOn : ''}`}
+          aria-label="更多节点操作" aria-expanded={open === 'more'} onClick={() => toggle('more')}
+          onKeyDown={hintKeys} onKeyUp={hintKeyUp}>⋯</button>
+        </Tooltip>
       </div>
 
       {open === 'shape' && (
@@ -120,14 +164,6 @@ export function NodeToolbar({
               {label}
             </button>
           ))}
-        </div>
-      )}
-
-      {open === 'fill' && (
-        <div className={s.panel}>
-          <ColorField value={st?.fill}
-                      onPick={c => onStyle({ fill: c }, '改了填充色')}
-                      onClear={() => onStyle({ fill: undefined }, '去掉了填充色')} />
         </div>
       )}
 

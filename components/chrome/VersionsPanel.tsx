@@ -84,7 +84,8 @@ function VersionsPanelBody({ flowId, currentVersion, onClose, onPrepareRestore, 
   };
 
   return <>
-    <div className={s.histFloat} data-pop>
+    <div className={s.histFloat} data-pop
+      onKeyDown={event => event.stopPropagation()} onKeyUp={event => event.stopPropagation()}>
       <div className={s.histHead}>
         <span className={s.histTitle}>版本历史</span>
         <button type="button" className={s.histClose} onClick={onClose} aria-label="关闭版本历史" disabled={restoring}>×</button>

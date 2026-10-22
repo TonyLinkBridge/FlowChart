@@ -16,6 +16,9 @@ import { EdgeInsertControls } from '@/components/flow/EdgeInsertControls';
 import { NotePopover } from '@/components/flow/NotePopover';
 import { NodeToolbar } from '@/components/flow/NodeToolbar';
 import { mergeDocs } from '@/lib/merge';
+import { applyStyleHistory } from '@/lib/style-history';
+import { replayInsertion, type InsertionChange } from '@/lib/insertion-history';
+import { replayScopedChange, type ScopedChange } from '@/lib/scoped-history';
 import { initialSelectedNode, shouldClearCanvasSelection } from '@/lib/editor-selection.mjs';
 import { canvasWheelGesture } from '@/lib/canvas-wheel.mjs';
 import { sameVersionValue } from '@/lib/version-diff';
@@ -35,6 +38,8 @@ import { ChecklistView } from '@/components/views/ChecklistView';
 import { TimelineView } from '@/components/views/TimelineView';
 import { LanesView } from '@/components/views/LanesView';
 import { Sidebar } from '@/components/chrome/Sidebar';
+import { FlowTitleEditor } from '@/components/chrome/FlowTitleEditor';
+import { OnlinePeers } from '@/components/chrome/OnlinePeers';
 import { VersionsPanel } from '@/components/chrome/VersionsPanel';
 import {
   loadWorkspace, rememberCurrent, createFlow, saveFlow, deleteFlow, moveFlow, moveFlowSpace, fetchFlow, restoreVersion,
@@ -51,7 +56,7 @@ const VIEWS = ['流程图', '泳道', '时间条', '清单'] as const;
 /** 一条历史。before 是「做这件事之前」的图 —— 点它就回到那个时候。
  *  以前撤销栈和日志是两份：栈里有数据但看不见，日志看得见但点不动。
  *  合成一份，历史才是真的能翻回去的。 */
-type HistoryEntry = { id: number; time: string; label: string; before: FlowDoc };
+type HistoryEntry = { id: number; time: string; label: string; before: FlowDoc; styleAfter?: FlowDoc; insertion?: InsertionChange; scoped?: ScopedChange };
 
 function clock() {
   const d = new Date();
@@ -151,7 +156,7 @@ export default function Editor() {
   /* 历史 = 撤销栈（⌘Z）+ 重做栈（⇧⌘Z）。底部日志面板砍掉了，
      但历史本身要看得见：工具条上有撤销/重做按钮，悬停能看到要撤/重做哪一步。 */
   const [history, setHistory] = useState<HistoryEntry[]>([]);
-  const [future, setFuture] = useState<{ label: string; doc: FlowDoc }[]>([]);
+  const [future, setFuture] = useState<{ label: string; doc: FlowDoc; styleBefore?: FlowDoc; styleAfter?: FlowDoc; insertion?: InsertionChange; scoped?: ScopedChange }[]>([]);
   /** 按住空格才拖画布（Figma 那套）。
    *  之前靠「节点上阻止冒泡」来区分，但画布的平移是原生监听器，
    *  在冒泡到画布那层就触发了，而 React 的阻止冒泡要等到根节点 —— 晚一步，拦不住。 */
@@ -160,15 +165,17 @@ export default function Editor() {
   spaceRef.current = spaceDown;
   const seq = useRef(1);
   /** 记一条历史。before 在外面算好 —— 更新函数必须是纯的。 */
-  const remember = useCallback((label: string, before: FlowDoc) => {
-    const entry: HistoryEntry = { id: ++seq.current, time: clock(), label, before };
+  const remember = useCallback((label: string, before: FlowDoc, styleAfter?: FlowDoc, insertion?: InsertionChange, scoped?: ScopedChange) => {
+    const entry: HistoryEntry = { id: ++seq.current, time: clock(), label, before, styleAfter, insertion, scoped };
     setHistory(h => [entry, ...h].slice(0, 80));
   }, []);
 
   /** 提交一次结构性改动：存档 + 记日志。打字类的碎改动不走这里。
    *  改出新东西后，旧的「重做」分支就作废 —— 不然重做会把刚改的盖掉。 */
-  const commit = useCallback((next: FlowDoc, label: string, fit = true) => {
-    remember(label, doc);
+  const commit = useCallback((next: FlowDoc, label: string, fit = true, kind?: 'style' | InsertionChange | ScopedChange) => {
+    remember(label, doc, kind === 'style' ? next : undefined,
+      typeof kind === 'object' && !('kind' in kind) ? kind : undefined,
+      typeof kind === 'object' && 'kind' in kind ? kind : undefined);
     setFuture([]);
     setDoc(next);
     if (fit && !userMovedRef.current) refit(next.nodes);
@@ -178,8 +185,11 @@ export default function Editor() {
   const undo = useCallback(() => {
     if (!history.length) return;
     const entry = history[0];
-    setFuture(f => [{ label: entry.label, doc }, ...f].slice(0, 80));
-    setDoc(entry.before);
+    setFuture(f => [{ label: entry.label, doc, styleBefore: entry.styleAfter ? entry.before : undefined,
+      styleAfter: entry.styleAfter, insertion: entry.insertion, scoped: entry.scoped }, ...f].slice(0, 80));
+    setDoc(entry.scoped ? replayScopedChange(doc, entry.scoped, 'undo')
+      : entry.insertion ? replayInsertion(doc, entry.insertion, 'undo')
+      : entry.styleAfter ? applyStyleHistory(doc, entry.styleAfter, entry.before) : entry.before);
     setHistory(h => h.slice(1));
     setSelected(null); setEdgeIndex(null);
     setToast(`已撤销 · ${entry.label}`);
@@ -189,8 +199,12 @@ export default function Editor() {
   const redo = useCallback(() => {
     if (!future.length) return;
     const entry = future[0];
-    setHistory(h => [{ id: ++seq.current, time: clock(), label: entry.label, before: doc }, ...h].slice(0, 80));
-    setDoc(entry.doc);
+    const next = entry.scoped ? replayScopedChange(doc, entry.scoped, 'redo', entry.doc)
+      : entry.insertion ? replayInsertion(doc, entry.insertion, 'redo', entry.doc)
+      : entry.styleBefore && entry.styleAfter ? applyStyleHistory(doc, entry.styleBefore, entry.styleAfter) : entry.doc;
+    setHistory(h => [{ id: ++seq.current, time: clock(), label: entry.label, before: doc,
+      styleAfter: entry.styleBefore ? next : undefined, insertion: entry.insertion, scoped: entry.scoped }, ...h].slice(0, 80));
+    setDoc(next);
     setFuture(f => f.slice(1));
     setSelected(null); setEdgeIndex(null);
     setToast(`已重做 · ${entry.label}`);
@@ -473,7 +487,8 @@ export default function Editor() {
           : n.note,
       }),
     };
-    commit(next, `${willDone ? '勾完' : '取消勾选'}「${node.title}」`);
+    commit(next, `${willDone ? '勾完' : '取消勾选'}「${node.title}」`, true,
+      { kind: 'completion', before: doc, after: next, nodeId: id });
   }, [doc, commit]);
 
   /** 勾单条子步骤 —— 节点进度自动跟着汇总，不用另外维护 */
@@ -481,8 +496,9 @@ export default function Editor() {
     const node = doc.nodes.find(n => n.id === nodeId);
     const step = node?.note?.steps?.[stepIndex];
     if (!node || !step) return;
-    commit(toggleStep(doc, nodeId, stepIndex),
-      `${step.done ? '取消' : '勾完'}「${node.title}」第 ${stepIndex + 1} 步`);
+    const next = toggleStep(doc, nodeId, stepIndex);
+    commit(next, `${step.done ? '取消' : '勾完'}「${node.title}」第 ${stepIndex + 1} 步`, true,
+      { kind: 'completion', before: doc, after: next, nodeId });
   }, [doc, commit]);
 
   /** 新建一张空白图，加进列表并切过去。先把手上没存完的发出去。 */
@@ -591,14 +607,14 @@ export default function Editor() {
   /** 加一步。有选中就接在它后面，没有就丢个孤立节点。 */
   const addStep = useCallback(() => {
     const { doc: next, id } = addNode(doc, selected);
-    commit(next, '加了一步');
+    commit(next, '加了一步', true, { kind: 'add-node', before: doc, after: next, nodeId: id });
     setSelected(id);
   }, [doc, selected, commit]);
 
   const insertStep = useCallback((index: number) => {
     const result = insertNodeOnEdge(doc, index);
     if ('error' in result) { setToast(result.error); return; }
-    commit(result.doc, '在线上插入一步', false);
+    commit(result.doc, '在线上插入一步', false, { before: doc, after: result.doc, nodeId: result.id, edgeIndex: index });
     setHoveredEdge(null);
     setSelected(result.id); setEdgeIndex(null); setLinkFrom(null);
     setPinnedNote(null); setHoverNote(null);
@@ -625,7 +641,7 @@ export default function Editor() {
     (Object.keys(merged) as (keyof NodeStyle)[]).forEach(k => { if (merged[k] === undefined) delete merged[k]; });
     let next = patchNode(doc, id, { style: Object.keys(merged).length ? merged : undefined });
     if ('size' in p) next = autoLayout(next);
-    commit(next, label);
+    commit(next, label, true, 'style');
   }, [doc, commit]);
 
   const relayout = useCallback(() => {
@@ -916,6 +932,7 @@ export default function Editor() {
                   else setNoteExpanded(v => !v);
                 }}
                 onChange={note => changeNote(n.id, note)}
+                onToggleStep={index => toggleStepAt(n.id, index)}
               />
             );
           })()}
@@ -973,9 +990,10 @@ export default function Editor() {
       {/* 左上：文档胶囊 —— 名字、进度、保存状态 */}
       <div className={`${s.pill} ${s.docPill}`}>
         <span className={s.docDot} />
-        <input className={s.docPillInput} value={doc.title} aria-label="流程图标题"
-               placeholder="给这张图起个名字"
-               onChange={e => setDoc(d => ({ ...d, title: e.target.value }))} />
+        {ws?.currentId ? <FlowTitleEditor className={s.docPillTitle} flowId={ws.currentId} value={doc.title}
+          onConfirm={(id, title) => {
+            if (wsRef.current?.currentId === id) setDoc(d => ({ ...d, title }));
+          }} /> : <span className={s.docPillTitle}>{doc.title}</span>}
         <span className={s.docMeta}>
           {prog.done}/{prog.total} ·{' '}
           {saveState === 'error'
@@ -983,16 +1001,7 @@ export default function Editor() {
                       title="一般是网络断了。改动还留在本页，点击补发；不放心可先导出 JSON。">保存失败 · 点此重试</button>
             : saveState === 'saving' ? '保存中…' : '已保存'}
         </span>
-        {mates.length > 0 && (
-          <span className={s.mateRow} title={`同时在看：${mates.map(m => m.name).join('、')}`}>
-            {mates.slice(0, 4).map(m => (
-              <span key={m.key} className={s.mateChip} style={{ background: m.color }}>
-                {(m.name || '?').slice(0, 1).toUpperCase()}
-              </span>
-            ))}
-            {mates.length > 4 && <span className={s.mateMore}>+{mates.length - 4}</span>}
-          </span>
-        )}
+        <OnlinePeers key={ws?.currentId ?? 'no-flow'} peers={mates} />
         <button className={s.histBtn} onClick={() => setHistOpen(o => !o)}>历史</button>
       </div>
 

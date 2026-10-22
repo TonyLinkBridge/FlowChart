@@ -1,12 +1,30 @@
 /* 方案 B：资料库是浮在画布上的卡片，不是固定栏 */
 .rail { position: absolute; z-index: 30; top: 72px; left: 20px; width: 228px; max-height: calc(100% - 200px); display: flex; flex-direction: column; background: var(--rf-paper); border: 1px solid var(--rf-ink); }
 
-.head { padding: 11px 13px; border-bottom: 1px solid var(--rf-ink); display: flex; align-items: center; gap: 8px; }
+.head { padding: 11px 13px; border-bottom: 1px solid var(--rf-ink); display: flex; flex-shrink: 0; align-items: center; gap: 8px; }
 .brand { font-size: 9.5px; font-weight: 600; letter-spacing: 2.4px; text-transform: uppercase; color: var(--rf-gold); }
 .headBtn { margin-left: auto; font-size: 15px; line-height: 1; color: var(--rf-ink-3); padding: 0 3px; }
 .headBtn:hover { color: var(--rf-ink); }
 
-.list { flex-grow: 1; overflow-y: auto; padding-bottom: 20px; }
+.search {
+  --space-2: 6px; --space-3: 8px; --control-height-md: 32px; --radius-control: 0;
+  --border-strong: var(--rf-rule-mid); --surface: var(--rf-paper); --surface-muted: var(--rf-fill);
+  --foreground: var(--rf-ink); --text-muted: var(--rf-ink-4);
+  --text-sm: 11px; --leading-body: 1.6; --tracking-body: normal;
+  --duration-fast: 160ms; --ease-standard: cubic-bezier(.22, 1, .36, 1);
+  padding: 12px 13px; border-bottom: 1px solid var(--rf-rule-light); min-width: 0; flex-shrink: 0;
+}
+.search:focus-within { outline: 1px solid var(--rf-gold); outline-offset: -4px; }
+.search button:focus-visible { outline: 2px solid var(--rf-gold); outline-offset: -2px; }
+.searchHint { margin: 8px 0 0; color: var(--rf-ink-4); font-size: 9px; line-height: 1.6; }
+
+.list {
+  --foreground: var(--rf-gold); --radius-pill: 0;
+  --duration-fast: 160ms; --duration-considered: 260ms; --ease-standard: cubic-bezier(.22, 1, .36, 1);
+  flex: 1 1 auto; min-height: 0;
+}
+.listViewport { padding-bottom: 20px; overscroll-behavior-y: contain; }
+.listViewport:focus-visible { outline: 2px solid var(--rf-gold); outline-offset: -2px; }
 
 .group { padding: 14px 14px 4px; display: flex; align-items: baseline; gap: 6px; }
 .groupName {

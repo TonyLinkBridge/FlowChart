@@ -9,8 +9,11 @@ import type { Note } from '@/lib/types';
 
 afterEach(cleanup);
 // Motion restores scroll after measuring auto height; jsdom has no scrolling/layout implementation.
-beforeAll(() => { vi.spyOn(window, 'scrollTo').mockImplementation(() => {}); });
-afterAll(() => vi.restoreAllMocks());
+beforeAll(() => {
+  vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
+  vi.stubGlobal('ResizeObserver', class { observe() {} unobserve() {} disconnect() {} });
+});
+afterAll(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 const mail = 'Dear Provider,\nLocal fake email only.\n'.repeat(100) + 'END-MAIL-KEEP';
 const original: Note = {
   text: mail, contact: '测试联系人',
@@ -44,7 +47,7 @@ describe('附注侧栏使用 Arc Accordion', () => {
     for (const title of titles)
       expect(trigger(title).getAttribute('aria-expanded')).toBe(title === '附注／邮件模板' ? 'true' : 'false');
     expect(screen.getByRole('textbox').getAttribute('contenteditable')).toBe('true');
-    await userEvent.click(trigger('原文编辑'));
+    await userEvent.click(screen.getByRole('tab', { name: '原文编辑' }));
     expect((screen.getByRole('textbox') as HTMLTextAreaElement).value).toBe(mail);
     expect(changes).toEqual([]);
   });
@@ -53,7 +56,7 @@ describe('附注侧栏使用 Arc Accordion', () => {
     const { changes } = setup();
     await userEvent.click(trigger('展开'));
     await screen.findByRole('dialog');
-    await userEvent.click(trigger('原文编辑'));
+    await userEvent.click(screen.getByRole('tab', { name: '原文编辑' }));
     fireEvent.change(screen.getByRole('textbox'), { target: { value: mail + '\n本地修改' } });
     await userEvent.click(trigger('操作步骤'));
     expect(trigger('附注／邮件模板').getAttribute('aria-expanded')).toBe('false');
@@ -64,7 +67,7 @@ describe('附注侧栏使用 Arc Accordion', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     await userEvent.click(trigger('展开'));
     await screen.findByRole('dialog');
-    await userEvent.click(trigger('原文编辑'));
+    await userEvent.click(screen.getByRole('tab', { name: '原文编辑' }));
     expect((screen.getByRole('textbox') as HTMLTextAreaElement).value).toBe(mail + '\n本地修改');
     expect(changes).toEqual([{ ...original, text: mail + '\n本地修改' }]);
   });
@@ -120,7 +123,7 @@ describe('附注侧栏使用 Arc Accordion', () => {
     await userEvent.click(trigger('展开'));
     const dialog = await screen.findByRole('dialog');
     const email = trigger('附注／邮件模板');
-    await userEvent.click(trigger('原文编辑'));
+    await userEvent.click(screen.getByRole('tab', { name: '原文编辑' }));
     const panel = document.getElementById(email.getAttribute('aria-controls')!)!;
     expect(panel.getAttribute('aria-labelledby')).toBe(email.id);
     expect(email.closest('h3')).toBeTruthy();
@@ -139,7 +142,7 @@ describe('附注侧栏使用 Arc Accordion', () => {
     const { changes } = setup({});
     await userEvent.click(trigger('展开'));
     await screen.findByRole('dialog');
-    await userEvent.click(trigger('原文编辑'));
+    await userEvent.click(screen.getByRole('tab', { name: '原文编辑' }));
     fireEvent.change(screen.getByRole('textbox'), { target: { value: '第一段假邮件' } });
     expect(changes).toEqual([{ text: '第一段假邮件' }]);
     cleanup();

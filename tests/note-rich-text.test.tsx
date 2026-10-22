@@ -33,9 +33,9 @@ describe('附注展开栏接入 Arc Rich Text Editor', () => {
     const { changes } = setup();
     expect(screen.getByRole('textbox').getAttribute('contenteditable')).toBe('true');
     expect(changes).toEqual([]);
-    await userEvent.click(screen.getByRole('button', { name: '原文编辑' }));
+    await userEvent.click(screen.getByRole('tab', { name: '原文编辑' }));
     expect((screen.getByRole('textbox', { name: '附注／邮件模板原文' }) as HTMLTextAreaElement).value).toBe(mail);
-    await userEvent.click(screen.getByRole('button', { name: '格式编辑' }));
+    await userEvent.click(screen.getByRole('tab', { name: '格式编辑' }));
     expect(changes).toEqual([]);
   });
 
@@ -44,7 +44,7 @@ describe('附注展开栏接入 Arc Rich Text Editor', () => {
     const editor = screen.getByRole('textbox');
     browserEdit(editor, editor.innerHTML.replace('First line.', 'First line edited.'));
     expect(changes).toEqual([{ ...original, text: mail.replace('First line.', 'First line edited.') }]);
-    await userEvent.click(screen.getByRole('button', { name: '原文编辑' }));
+    await userEvent.click(screen.getByRole('tab', { name: '原文编辑' }));
     expect((screen.getByRole('textbox') as HTMLTextAreaElement).value).toBe(mail.replace('First line.', 'First line edited.'));
   });
 
@@ -78,7 +78,7 @@ describe('附注展开栏接入 Arc Rich Text Editor', () => {
     const { changes } = setup({ ...original, text });
     const source = await screen.findByRole('textbox', { name: '附注／邮件模板原文' });
     expect((source as HTMLTextAreaElement).value).toBe(text); expect(changes).toEqual([]);
-    expect((screen.getByRole('button', { name: '格式编辑' }) as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByRole('tab', { name: '格式编辑' }) as HTMLButtonElement).disabled).toBe(true);
     fireEvent.change(source, { target: { value: text + '原文直接补充' } });
     expect(changes.at(-1)?.text).toBe(text + '原文直接补充');
   });
@@ -90,17 +90,17 @@ describe('附注展开栏接入 Arc Rich Text Editor', () => {
     const editor = screen.getByRole('textbox'); editor.focus();
     await userEvent.keyboard('{Control>}z{/Control}');
     expect(changes).toEqual([]);
-    await userEvent.click(screen.getByRole('button', { name: '原文编辑' }));
+    await userEvent.click(screen.getByRole('tab', { name: '原文编辑' }));
     expect((screen.getByRole('textbox') as HTMLTextAreaElement).value).toBe('另一张\n新的邮件\n');
   });
 
   it('retains a long template and keeps non-expanded editors on their original textarea', async () => {
     const text = 'Dear Case Manager,\n完整英文邮件\n\n'.repeat(120) + 'END-MAIL-KEEP\n';
     const { changes } = setup({ ...original, text });
-    await userEvent.click(screen.getByRole('button', { name: '原文编辑' }));
+    await userEvent.click(screen.getByRole('tab', { name: '原文编辑' }));
     expect((screen.getByRole('textbox') as HTMLTextAreaElement).value).toBe(text); expect(changes).toEqual([]);
     cleanup(); render(<NoteSections note={original} onChange={() => {}} onRemoveNote={() => {}} />);
-    expect(screen.queryByRole('button', { name: '格式编辑' })).toBeNull();
+    expect(screen.queryByRole('tab', { name: '格式编辑' })).toBeNull();
     expect((screen.getByPlaceholderText('补充说明。支持 **粗体** 和 `代码`。') as HTMLTextAreaElement).value).toBe(mail);
   });
 });

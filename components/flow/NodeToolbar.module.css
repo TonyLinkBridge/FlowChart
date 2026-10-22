@@ -23,6 +23,7 @@
 .btn:hover { color: var(--rf-ink); background: var(--rf-surface); }
 .btnOn { color: var(--rf-ink); background: var(--rf-surface); }
 .btnLive { color: var(--rf-gold); }
+.hintBtn:focus-visible { outline: 2px solid var(--rf-gold); outline-offset: 2px; }
 .caret { font-size: 8px; color: var(--rf-ink-4); }
 .sep { width: 1px; background: var(--rf-ink); opacity: 0.25; }
 
@@ -44,6 +45,31 @@
   background: var(--rf-paper);
   border: 1px solid var(--rf-ink);
 }
+
+/* Only the portaled fill picker maps Arc tokens; the other panels stay unchanged. */
+.fillPanel {
+  --border: var(--rf-ink);
+  --radius-panel: 0px;
+  --surface-raised: var(--rf-paper);
+  --foreground: var(--rf-ink);
+  --shadow-floating: none;
+  --duration-fast: 140ms;
+  --duration-instant: 80ms;
+  --duration-spring: 400ms;
+  --ease-enter: cubic-bezier(.16, 1, .3, 1);
+  --ease-standard: cubic-bezier(.22, 1, .36, 1);
+  --ease-spring: linear(0, .128, .449, .681, .821, .902, .947, .972, .986, .993, 1);
+  width: 232px;
+  min-width: min(232px, calc(100vw - 20px));
+  padding: 10px;
+  font-family: var(--rf-font);
+}
+.fillPanel button:focus-visible, .fillPanel label:focus-within {
+  outline: 2px solid var(--rf-gold);
+  outline-offset: 2px;
+}
+.fillPanel[inert] { pointer-events: none; }
+.btn[aria-haspopup='dialog']:focus-visible { outline: 2px solid var(--rf-gold); outline-offset: 2px; }
 
 .segRow { display: flex; align-items: center; gap: 4px; }
 .gap { flex: 1; }

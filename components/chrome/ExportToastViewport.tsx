@@ -13,7 +13,8 @@ const getServerSnapshot = () => false;
 export function ExportToastViewport() {
   const mounted = useSyncExternalStore(subscribe, getClientSnapshot, getServerSnapshot);
   return mounted && createPortal(
-    <div className={s.portal} data-pop onKeyDown={event => event.stopPropagation()} onKeyUp={event => event.stopPropagation()}>
+    <div className={s.portal} data-pop onKeyDown={event => event.stopPropagation()} onKeyUp={event => event.stopPropagation()}
+      onPaste={event => event.stopPropagation()}>
       <ToastStack label="导出通知" position="bottom-right" className={s.viewport} />
     </div>, document.body,
   );

@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useId, useState } from 'react';
+import { SearchField } from '@/components/arc/search-field/search-field';
+import { ScrollArea } from '@/components/arc/scroll-area/scroll-area';
 import type { Folder, StoredDoc, Workspace } from '@/lib/store';
 import { DeleteFlowButton } from './DeleteFlowButton';
 import s from './Sidebar.module.css';
@@ -26,8 +28,13 @@ export function Sidebar({
   onMoveSpace: (id: string, orgId: string | null) => void;
 }) {
   const [editing, setEditing] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
+  const listId = useId(), hintId = useId();
+  const term = query.trim().toLocaleLowerCase();
+  const visibleDocs = term ? ws.docs.filter(d => d.id === editing || d.doc.title.toLocaleLowerCase().includes(term)) : ws.docs;
 
-  const inFolder = (fid: string | null) => ws.docs.filter(d => d.folderId === fid);
+  const inFolder = (fid: string | null) => visibleDocs.filter(d => d.folderId === fid);
+  const newFlow = (folderId: string | null) => { setQuery(''); onNew(folderId); };
 
   const Row = (d: StoredDoc) => (
     <div key={d.id} data-flow-row className={`${s.row} ${d.id === ws.currentId ? s.rowOn : ''}`} onClick={() => onPick(d.id)}>
@@ -65,7 +72,7 @@ export function Sidebar({
 
   const Group = (f: Folder | null) => {
     const docs = inFolder(f?.id ?? null);
-    if (!f && !docs.length) return null;
+    if (!docs.length && (!f || term)) return null;
     return (
       <div key={f?.id ?? 'none'}>
         <div className={s.group}>
@@ -73,7 +80,7 @@ export function Sidebar({
             <>
               <input className={s.groupName} value={f.name}
                      onChange={e => onRenameFolder(f.id, e.target.value)} />
-              <button className={s.groupDrop} title="新建到这个分组" onClick={() => onNew(f.id)}>＋</button>
+              <button className={s.groupDrop} title="新建到这个分组" onClick={() => newFlow(f.id)}>＋</button>
               <button className={s.groupDrop} title="删掉分组（图不会删）" onClick={() => onDropFolder(f.id)}>×</button>
             </>
           ) : (
@@ -89,14 +96,29 @@ export function Sidebar({
     <aside className={s.rail}>
       <div className={s.head}>
         <span className={s.brand}>流程库</span>
-        <button className={s.headBtn} title="新建流程图" onClick={() => onNew(null)}>＋</button>
-        <button className={s.headBtn} title="新建分组" onClick={onNewFolder} style={{ fontSize: 11 }}>分组＋</button>
+        <button className={s.headBtn} title="新建流程图" onClick={() => newFlow(null)}>＋</button>
+        <button className={s.headBtn} title="新建分组" onClick={() => { setQuery(''); onNewFolder(); }} style={{ fontSize: 11 }}>分组＋</button>
         <button className={s.headBtn} title="收起" onClick={onClose}>×</button>
       </div>
-      <div className={s.list}>
+      <div className={s.search} data-pop onKeyDown={event => event.stopPropagation()}
+        onKeyUp={event => event.stopPropagation()} onPaste={event => event.stopPropagation()}>
+        <SearchField label="搜索流程" placeholder="按名称搜索" value={query} onValueChange={setQuery}
+          aria-controls={listId} aria-describedby={hintId} onKeyDown={event => {
+            if (event.key === 'Escape' && !event.nativeEvent.isComposing && event.nativeEvent.keyCode !== 229) {
+              event.preventDefault(); setQuery('');
+            }
+          }} />
+        <p id={hintId} className={s.searchHint}>仅搜索当前空间已加载的流程名称</p>
+      </div>
+      <ScrollArea className={s.list} viewportClassName={s.listViewport} label="流程库名单" fade={12} data-pop
+        onKeyDown={event => event.stopPropagation()} onKeyUp={event => event.stopPropagation()}
+        onPaste={event => event.stopPropagation()} onWheel={event => event.stopPropagation()}>
+        <div id={listId}>
+        {term && !visibleDocs.length && <div className={s.empty} role="status">没有匹配的流程</div>}
         {ws.folders.map(f => Group(f))}
         {Group(null)}
-      </div>
+        </div>
+      </ScrollArea>
     </aside>
   );
 }

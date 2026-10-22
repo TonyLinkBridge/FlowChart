@@ -10,6 +10,7 @@ import type { Note } from '@/lib/types';
 
 beforeAll(() => {
   vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
+  vi.stubGlobal('ResizeObserver', class { observe() {} unobserve() {} disconnect() {} });
   // Selection layout and scrolling are browser boundaries absent in jsdom.
   Range.prototype.getBoundingClientRect = () => ({ x: 100, y: 150, top: 150, left: 100, right: 200, bottom: 170, width: 100, height: 20, toJSON() {} });
   Range.prototype.getClientRects = () => [] as unknown as DOMRectList;
@@ -17,7 +18,7 @@ beforeAll(() => {
   vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(40);
 });
 afterEach(cleanup);
-afterAll(() => vi.restoreAllMocks());
+afterAll(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 function select(editor: HTMLElement, collapsed = false) {
   editor.focus();
   const range = document.createRange(); range.selectNodeContents(editor.firstElementChild!);

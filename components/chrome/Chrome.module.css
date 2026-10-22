@@ -139,13 +139,9 @@
 .pill { position: absolute; z-index: 30; display: flex; align-items: center; background: var(--rf-paper); border: 1px solid var(--rf-ink); }
 
 .docPill { top: 18px; left: 20px; gap: 10px; padding: 8px 14px; }
+.docPill:has([data-online-peers]) { max-width: calc(50% - 150px); }
 .docDot { width: 8px; height: 8px; background: var(--rf-gold); flex-shrink: 0; }
-.docPillInput {
-  border: none; outline: none; background: transparent; padding: 0;
-  font-family: var(--rf-font); font-size: 13px; font-weight: 600; letter-spacing: -0.2px;
-  color: var(--rf-ink); width: 148px;
-}
-.docPillInput::placeholder { color: var(--rf-rule-mid); }
+.docPillTitle { width: 214px; min-width: 0; flex-shrink: 1; }
 .docMeta { font-family: var(--rf-mono); font-size: 9px; color: var(--rf-ink-4); letter-spacing: 0.4px; border-left: 1px solid var(--rf-rule-faint); padding-left: 10px; white-space: nowrap; }
 .saveErr { color: var(--rf-gold); font-weight: 500; }
 
@@ -254,7 +250,8 @@ button.saveErr:hover { text-decoration: underline; }
   .stage { height: 100dvh; }
   .canvas, .canvasTools { top: 156px !important; bottom: 156px !important; }
   .docPill { top: 12px; left: 12px; right: 12px; gap: 8px; padding: 8px 10px; min-height: 38px; }
-  .docPillInput { flex: 1; min-width: 0; width: 0; }
+  .docPill:has([data-online-peers]) { max-width: none; }
+  .docPillTitle { flex: 1; min-width: 0; width: 0; }
   .docMeta { flex-shrink: 0; font-size: 8.5px; padding-left: 8px; }
   .histBtn { flex-shrink: 0; margin-left: 0; min-height: 22px; }
   .viewPill { top: 60px; left: 12px; right: 12px; transform: none; justify-content: center; }

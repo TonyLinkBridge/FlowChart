@@ -2,6 +2,7 @@
 
 import { useRef, useState, useSyncExternalStore } from 'react';
 import { RichTextEditor, htmlToNoteMarkdown, noteMarkdownToHtml, type RichTextValue } from '@/components/arc/rich-text-editor/rich-text-editor';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/arc/tabs/tabs';
 import s from './NoteRichTextEditor.module.css';
 
 const subscribe = () => () => {};
@@ -52,21 +53,30 @@ function NoteEditorSession({ initialValue, onChange }: { initialValue: string; o
   return <div className={s.root} data-note-rich data-pop
     onKeyDown={event => event.stopPropagation()} onKeyUp={event => event.stopPropagation()}
     onPaste={event => event.stopPropagation()}>
-    <div className={s.modes} role="group" aria-label="附注编辑方式">
-      <button type="button" aria-pressed={rich} disabled={mounted && !supported} onClick={() => {
-        ready.current = false; setMode('rich');
-      }}>格式编辑</button>
-      <button type="button" aria-pressed={!rich} onClick={() => setMode('source')}>原文编辑</button>
-    </div>
-    {rich ? <RichTextEditor className={s.surface} value={state.html} aria-label="附注／邮件模板格式编辑"
-      placeholder="补充说明或邮件模板" blockHint="输入 / 选择段落格式" onChange={changeRich} /> :
-      <textarea className={s.source} value={state.text} aria-label="附注／邮件模板原文"
-        placeholder="补充说明。支持 **粗体** 和 `代码`。" onChange={event => {
-          const text = event.target.value;
-          ready.current = false;
-          setState({ text, html: noteMarkdownToHtml(text) });
-          onChange(text);
-        }} />}
+    <Tabs className={s.tabs} value={rich ? 'rich' : 'source'} onValueChange={next => {
+      if (next === 'rich' && supported) { ready.current = false; setMode('rich'); }
+      else if (next === 'source') setMode('source');
+    }}>
+      <TabsList className={s.modes} aria-label="附注编辑方式">
+        <TabsTrigger value="rich" disabled={!supported}>格式编辑</TabsTrigger>
+        <TabsTrigger value="source">原文编辑</TabsTrigger>
+      </TabsList>
+      {/* Keep panel semantics, but mount only the active editor. No overlapping editable exit copy. */}
+      <TabsContent value="rich" forceMount hidden={!rich} className={s.modePanel}>
+        {rich && <RichTextEditor className={s.surface} value={state.html} aria-label="附注／邮件模板格式编辑"
+          placeholder="补充说明或邮件模板" blockHint="输入 / 选择段落格式" onChange={changeRich} />}
+      </TabsContent>
+      <TabsContent value="source" forceMount hidden={rich} className={s.modePanel}>
+        {!rich && <textarea className={s.source} value={state.text} aria-label="附注／邮件模板原文"
+          placeholder="补充说明。支持 **粗体** 和 `代码`。" onChange={event => {
+            const text = event.target.value;
+            ready.current = false;
+            setMode('source');
+            setState({ text, html: noteMarkdownToHtml(text) });
+            onChange(text);
+          }} />}
+      </TabsContent>
+    </Tabs>
     <p className={s.hint}>{mounted && !supported
       ? '为保留原始格式，这段内容使用原文编辑，不自动转换。'
       : '选中文字可设置格式；原文随时可查看。小预览与导出沿用原有显示。'}</p>

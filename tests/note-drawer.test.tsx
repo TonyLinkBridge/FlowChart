@@ -8,8 +8,11 @@ import type { FlowNode, Note } from '@/lib/types';
 
 afterEach(cleanup);
 // Motion's auto-height measurement restores scroll; browser scrolling is verified in the local UI instead.
-beforeAll(() => { vi.spyOn(window, 'scrollTo').mockImplementation(() => {}); });
-afterAll(() => vi.restoreAllMocks());
+beforeAll(() => {
+  vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
+  vi.stubGlobal('ResizeObserver', class { observe() {} unobserve() {} disconnect() {} });
+});
+afterAll(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 const longMail = 'Dear Provider,\nThis is a local fake email template.\n'.repeat(100) + 'END-MAIL-KEEP';
 const original: Note = {
   text: longMail, contact: '测试联系人',
@@ -57,7 +60,7 @@ describe('附注展开使用 Arc Drawer', () => {
     expect(dialog.getAttribute('aria-describedby')).toBeTruthy();
     expect(within(dialog).getByRole('heading', { level: 2 }).textContent).toContain('测试：法院诉讼邮件');
     expect(within(dialog).getByRole('textbox').getAttribute('contenteditable')).toBe('true');
-    await userEvent.click(within(dialog).getByRole('button', { name: '原文编辑' }));
+    await userEvent.click(within(dialog).getByRole('tab', { name: '原文编辑' }));
     expect((within(dialog).getByPlaceholderText('补充说明。支持 **粗体** 和 `代码`。') as HTMLTextAreaElement).value).toBe(longMail);
     for (const value of ['核对假资料', '测试编号', 'FAKE-ONLY-123', '假资料链接', 'https://example.com/test', '测试联系人'])
       expect(within(dialog).getByDisplayValue(value)).toBeTruthy();
@@ -95,7 +98,7 @@ describe('附注展开使用 Arc Drawer', () => {
     const { changes } = setup();
     await userEvent.click(screen.getByRole('button', { name: '展开' }));
     const dialog = await screen.findByRole('dialog');
-    await userEvent.click(within(dialog).getByRole('button', { name: '原文编辑' }));
+    await userEvent.click(within(dialog).getByRole('tab', { name: '原文编辑' }));
     const text = within(dialog).getByPlaceholderText('补充说明。支持 **粗体** 和 `代码`。');
     fireEvent.change(text, { target: { value: longMail + '\n本地修改' } });
     expect(changes).toEqual([{ ...original, text: longMail + '\n本地修改' }]);
@@ -104,7 +107,7 @@ describe('附注展开使用 Arc Drawer', () => {
     expect(screen.getByText(/END-MAIL-KEEP/).textContent).toContain('本地修改');
     await userEvent.click(screen.getByRole('button', { name: '展开' }));
     const reopened = await screen.findByRole('dialog');
-    await userEvent.click(within(reopened).getByRole('button', { name: '原文编辑' }));
+    await userEvent.click(within(reopened).getByRole('tab', { name: '原文编辑' }));
     expect((within(reopened).getByPlaceholderText('补充说明。支持 **粗体** 和 `代码`。') as HTMLTextAreaElement).value).toBe(longMail + '\n本地修改');
     expect(changes).toHaveLength(1);
   });
@@ -155,7 +158,7 @@ describe('附注展开使用 Arc Drawer', () => {
     const { changes } = setup({});
     await userEvent.click(screen.getByRole('button', { name: '展开' }));
     const dialog = await screen.findByRole('dialog');
-    await userEvent.click(within(dialog).getByRole('button', { name: '原文编辑' }));
+    await userEvent.click(within(dialog).getByRole('tab', { name: '原文编辑' }));
     fireEvent.change(within(dialog).getByPlaceholderText('补充说明。支持 **粗体** 和 `代码`。'), { target: { value: '第一段说明' } });
     expect(changes).toEqual([{ text: '第一段说明' }]);
   });

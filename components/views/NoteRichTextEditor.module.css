@@ -25,14 +25,18 @@
   --ease-standard: cubic-bezier(.22, 1, .36, 1);
   min-width: 0;
 }
-.modes { display: flex; gap: 0; margin: 0 0 14px; }
+.tabs {
+  --surface: var(--rf-paper); --radius-control: 0; --shadow-resting: none;
+  --control-height-sm: 30px; --space-1: 2px; --space-3: 10px; --space-4: 14px;
+  --leading-body: 1.75;
+}
+.modes { --surface: var(--rf-ink); --accent-strong: var(--rf-paper); }
+.modePanel[data-state='inactive'] { display: none; }
 /* Reserve the first-line toolbar's space so it cannot intercept the source-mode button. */
 .surface { padding-top: 44px; }
-.modes button { font-size: 11px; padding: 6px 10px; border: 1px solid var(--rf-rule-mid); }
-.modes button + button { border-left: 0; }
-.modes button[aria-pressed='true'] { background: var(--rf-ink); color: var(--rf-paper); }
-.modes button:disabled { cursor: not-allowed; color: var(--rf-ink-4); }
-.modes button:focus-visible, .source:focus-visible { outline: 2px solid var(--rf-gold); outline-offset: 3px; }
+.modes button { font-size: 11px; }
+.modes button:focus-visible { outline: 2px solid var(--rf-gold); outline-offset: -2px; }
+.modePanel:focus-visible, .source:focus-visible { outline: 2px solid var(--rf-gold); outline-offset: 3px; }
 .source { width: 100%; min-height: 200px; resize: vertical; padding: 9px 11px; border: 1px solid var(--rf-rule-mid); background: transparent; color: var(--rf-ink-2); font: inherit; font-size: var(--rf-t-body); line-height: 1.75; }
 .hint { font-size: 10px; line-height: 1.7; color: var(--rf-ink-4); margin: 12px 0 0; }
 @media (prefers-reduced-motion: reduce) { .root { --duration-instant: 0s; --duration-fast: 0s; --duration-standard: 0s; } }

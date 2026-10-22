@@ -34,7 +34,7 @@ function summarize(note: Note) {
 
 export function NotePopover({
   node, index, x, y, nodeWpx = 260, canvasW, pinned, expanded,
-  onPin, onEnter, onLeave, onClose, onToggleExpand, onChange,
+  onPin, onEnter, onLeave, onClose, onToggleExpand, onChange, onToggleStep,
 }: {
   node: FlowNode;
   index: number;
@@ -49,6 +49,7 @@ export function NotePopover({
   onClose: () => void;
   onToggleExpand: () => void;
   onChange: (n: Note | undefined) => void;
+  onToggleStep?: (index: number) => void;
 }) {
   const note = node.note;
   if (!note) return null;
@@ -107,7 +108,7 @@ export function NotePopover({
       description="附注／邮件模板 · 编辑沿用原有自动保存，关闭不会撤销已输入内容。"
       onKeyDown={event => event.stopPropagation()}
       onPaste={event => event.stopPropagation()}>
-      <NoteSections note={note} onChange={onChange} onRemoveNote={() => onChange(undefined)} collapsible />
+      <NoteSections note={note} onChange={onChange} onRemoveNote={() => onChange(undefined)} onToggleStep={onToggleStep} collapsible />
       <div className={s.drawerFoot}>
         <DrawerClose asChild><button type="button" className={s.drawerClose}>收起，返回预览</button></DrawerClose>
       </div>

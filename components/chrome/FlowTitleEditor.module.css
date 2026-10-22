@@ -1,0 +1,15 @@
+.root {
+  --foreground: var(--rf-ink); --background: var(--rf-paper);
+  --surface: var(--rf-paper); --surface-muted: var(--rf-fill);
+  --text-secondary: var(--rf-ink-3); --text-muted: var(--rf-ink-4);
+  --border: var(--rf-rule-mid); --border-strong: var(--rf-ink);
+  --focus-ring: color-mix(in srgb, var(--rf-gold) 24%, transparent);
+  --danger: #a62d27; --success: var(--rf-gold); --radius-control: 0; --radius-pill: 0;
+  --font-body: var(--rf-font); --tracking-body: -0.2px; --text-xl: 13px; --text-xs: 10px;
+  --leading-body: 1.6; --duration-fast: 160ms; --duration-standard: 240ms;
+  --duration-instant: 120ms; --duration-considered: 480ms;
+  --ease-standard: cubic-bezier(.22, 1, .36, 1);
+  min-width: 0;
+}
+.root [data-variant='title'] { --weight: 600; --pad-y: 0px; --leading: 18px; }
+.root button:focus-visible { outline: 2px solid var(--rf-gold); outline-offset: 2px; }

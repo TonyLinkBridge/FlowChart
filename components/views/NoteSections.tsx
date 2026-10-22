@@ -2,6 +2,8 @@
 
 import { Fragment } from 'react';
 import { Accordion } from '@/components/arc/accordion/accordion';
+import { CopyButton } from '@/components/arc/copy-button/copy-button';
+import { Checkbox } from '@/components/arc/checkbox/checkbox';
 import { NoteRichTextEditor } from './NoteRichTextEditor';
 import {
   addField, addLink, addStep, emptyNote, isEmptyNote,
@@ -29,10 +31,12 @@ function SecHead({ label, tools }: { label: string; tools?: React.ReactNode }) {
   );
 }
 
-export function NoteSections({ note, onChange, onRemoveNote, collapsible = false }: {
+export function NoteSections({ note, onChange, onRemoveNote, onToggleStep, collapsible = false }: {
   note?: Note;
   onChange: (n: Note) => void;
   onRemoveNote: () => void;
+  /** Discrete checks use the editor's existing undoable step action; typing still uses onChange. */
+  onToggleStep?: (index: number) => void;
   /** Only the expanded note drawer groups its editors; other consumers retain their existing layout. */
   collapsible?: boolean;
 }) {
@@ -65,13 +69,15 @@ export function NoteSections({ note, onChange, onRemoveNote, collapsible = false
         )}
         {steps.map((st, i) => (
           <div key={i} className={`${s.step} ${st.done ? s.stepDone : ''}`}>
-            <span className={`${s.box} ${st.done ? s.boxDone : s.boxTodo}`} role="checkbox" aria-checked={st.done}
-                  onClick={() => onChange(setStep(note, i, { done: !st.done }))}>
-              {st.done && (
-                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="var(--rf-on-gold)"
-                     strokeWidth="3.6" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7" /></svg>
-              )}
-            </span>
+            <div className={s.stepCheck} data-pop
+              onKeyDown={event => event.stopPropagation()} onKeyUp={event => event.stopPropagation()}
+              onPaste={event => event.stopPropagation()}>
+              <Checkbox checked={st.done} aria-label={`操作步骤 ${i + 1}：${st.text.trim() || '未命名步骤'}`}
+                onCheckedChange={next => {
+                  if (onToggleStep) onToggleStep(i);
+                  else onChange(setStep(note, i, { done: next === true }));
+                }} />
+            </div>
             <span className={s.stepIdx}>{i + 1}</span>
             <input className={s.rowInput} value={st.text} placeholder="这一步要做什么"
                    onChange={e => onChange(setStep(note, i, { text: e.target.value }))} />
@@ -121,7 +127,12 @@ export function NoteSections({ note, onChange, onRemoveNote, collapsible = false
     ) },
     { title: '附注／邮件模板', content: (
       <div className={s.sec}>
-        <SecHead label="说明" />
+        <SecHead label="说明" tools={collapsible && (
+          <span className={s.copyTools} data-pop
+            onKeyDown={event => event.stopPropagation()} onKeyUp={event => event.stopPropagation()}>
+            <CopyButton value={note.text ?? ''} label="复制原文" disabled={!note.text?.trim()} />
+          </span>
+        )} />
         {collapsible ? <NoteRichTextEditor value={note.text ?? ''} onChange={text => onChange({ ...note, text })} /> : <>
         <textarea className={s.area} value={note.text ?? ''}
                   placeholder="补充说明。支持 **粗体** 和 `代码`。"
