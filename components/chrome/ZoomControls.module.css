@@ -1,0 +1,5 @@
+.controls { position: absolute; z-index: 30; right: 20px; bottom: 20px; }
+.percentage { font-family: var(--rf-mono, monospace); font-size: 10.5px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+@media (max-width: 1000px) {
+  .controls { right: 12px; bottom: 104px; }
+}

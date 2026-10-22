@@ -1,10 +1,11 @@
 import type { FlowDoc } from '@/lib/types';
 import { edgeLabelPos, edgePath } from '@/lib/edges';
 
-export function FlowEdges({ doc, selectedEdge, onSelectEdge }: {
+export function FlowEdges({ doc, selectedEdge, onSelectEdge, onHoverEdge }: {
   doc: FlowDoc;
   selectedEdge?: number | null;
   onSelectEdge?: (i: number) => void;
+  onHoverEdge?: (i: number | null) => void;
 }) {
   const by = new Map(doc.nodes.map(n => [n.id, n]));
   return (
@@ -18,7 +19,9 @@ export function FlowEdges({ doc, selectedEdge, onSelectEdge }: {
           return (
             <g key={i}>
               {/* 1px 的线太细点不中，叠一条透明粗线当热区 */}
-              <path d={d} stroke="transparent" strokeWidth="12" style={{ cursor: 'pointer' }}
+              <path data-pop data-edge-index={i} d={d} stroke="transparent" strokeWidth="12" style={{ cursor: 'pointer' }}
+                    onPointerDown={ev => ev.stopPropagation()}
+                    onPointerEnter={() => onHoverEdge?.(i)} onPointerLeave={() => onHoverEdge?.(null)}
                     onClick={ev => { ev.stopPropagation(); onSelectEdge?.(i); }} />
               <path d={d} strokeWidth={on ? 2 : 1} pointerEvents="none"
                     stroke={on ? 'var(--rf-gold)' : e.dashed ? 'var(--rf-ink-4)' : 'var(--rf-ink)'}

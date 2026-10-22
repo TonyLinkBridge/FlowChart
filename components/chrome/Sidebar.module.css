@@ -30,11 +30,28 @@
 .rowOn .name { font-weight: 600; }
 .name:focus { border-bottom: 1px solid var(--rf-ink); }
 .meta { font-family: var(--rf-mono); font-size: 8.5px; color: var(--rf-rule-mid); flex-shrink: 0; }
-.row:hover .meta { display: none; }
+.row:hover .meta, .row:focus-within .meta { display: none; }
 .tools { display: none; gap: 6px; flex-shrink: 0; align-items: center; }
-.row:hover .tools { display: flex; }
+.row:hover .tools, .row:focus-within .tools { display: flex; }
 .tool { font-size: 11px; color: var(--rf-ink-4); line-height: 1; }
 .tool:hover { color: var(--rf-ink); }
+.tool:focus-visible { outline: 2px solid var(--rf-gold); outline-offset: 3px; }
 .move { font-family: var(--rf-font); font-size: 9.5px; border: 1px solid var(--rf-rule-mid); background: transparent; color: var(--rf-ink-4); padding: 1px 2px; outline: none; max-width: 62px; }
 
 .empty { padding: 10px 14px; font-size: 11px; color: var(--rf-rule-mid); line-height: 1.6; }
+
+.deleteName { margin: 0; padding: 12px; border: 1px solid var(--rf-rule-mid); background: var(--rf-surface); color: var(--rf-ink); font-weight: 600; overflow-wrap: anywhere; }
+.deleteHint { margin: 12px 0 20px; color: var(--rf-ink-3); }
+.deleteActions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.deleteActions button { min-height: 40px; padding: 9px 16px; font: inherit; font-weight: 500; }
+.deleteCancel { border: 1px solid var(--rf-rule-mid); }
+.deleteConfirm { background: var(--rf-ink); color: var(--rf-paper); }
+.deleteConfirm:hover { background: var(--rf-ink-2); }
+.deleteCancel:hover { background: var(--rf-fill); }
+@media (hover: none) {
+  .tools { display: flex; }
+  .meta { display: none; }
+}
+@media (max-width: 1000px) {
+  .rail { top: 156px; left: 12px; width: min(228px, calc(100% - 24px)); max-height: calc(100% - 320px); }
+}

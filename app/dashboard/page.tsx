@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { addNode, blankDoc, connect, patchEdge, patchNode, removeEdge, removeNode } from '@/lib/doc';
+import { addNode, blankDoc, connect, insertNodeOnEdge, patchEdge, patchNode, removeEdge, removeNode } from '@/lib/doc';
 import { autoLayout } from '@/lib/layout';
 import { parseDoc } from '@/lib/io';
 import { emptyNote } from '@/lib/note';
@@ -12,6 +12,7 @@ import { fitView, zoomAt, clampZ, type View } from '@/lib/viewport';
 import { docProgress, footnoteIndex, nodeProgress, toggleStep, type FlowDoc, type FlowEdge, type FlowNode as FlowNodeData, type NodeStyle, type Note, type Shape } from '@/lib/types';
 import { FlowNode } from '@/components/flow/FlowNode';
 import { FlowEdges } from '@/components/flow/FlowEdges';
+import { EdgeInsertControls } from '@/components/flow/EdgeInsertControls';
 import { NotePopover } from '@/components/flow/NotePopover';
 import { NodeToolbar } from '@/components/flow/NodeToolbar';
 import { mergeDocs } from '@/lib/merge';
@@ -25,6 +26,9 @@ import { useCollab } from '@/hooks/useCollab';
 import { NotePanel } from '@/components/views/NotePanel';
 import { EdgePanel } from '@/components/views/EdgePanel';
 import { ExportMenu } from '@/components/chrome/ExportMenu';
+import { ToastStackProvider } from '@/components/arc/toast-stack/toast-stack';
+import { ExportToastViewport } from '@/components/chrome/ExportToastViewport';
+import { ZoomControls } from '@/components/chrome/ZoomControls';
 import { TemplateMenu } from '@/components/chrome/TemplateMenu';
 import { PasteDialog } from '@/components/chrome/PasteDialog';
 import { ChecklistView } from '@/components/views/ChecklistView';
@@ -65,6 +69,14 @@ export default function Editor() {
    *  改成统一：结构性改动一律走 commit()，撤销就是弹栈。 */
 
   const [edgeIndex, setEdgeIndex] = useState<number | null>(null);
+  const [hoveredEdge, setHoveredEdge] = useState<number | null>(null);
+  const edgeHoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hoverEdge = useCallback((index: number | null) => {
+    if (edgeHoverTimer.current) clearTimeout(edgeHoverTimer.current);
+    if (index !== null) setHoveredEdge(index);
+    else edgeHoverTimer.current = setTimeout(() => setHoveredEdge(null), 180);
+  }, []);
+  useEffect(() => () => { if (edgeHoverTimer.current) clearTimeout(edgeHoverTimer.current); }, []);
   /** 连线模式：null=没开，''=开了但还没点起点，'xx'=起点是 xx */
   const [linkFrom, setLinkFrom] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -155,11 +167,11 @@ export default function Editor() {
 
   /** 提交一次结构性改动：存档 + 记日志。打字类的碎改动不走这里。
    *  改出新东西后，旧的「重做」分支就作废 —— 不然重做会把刚改的盖掉。 */
-  const commit = useCallback((next: FlowDoc, label: string) => {
+  const commit = useCallback((next: FlowDoc, label: string, fit = true) => {
     remember(label, doc);
     setFuture([]);
     setDoc(next);
-    if (!userMovedRef.current) refit(next.nodes);
+    if (fit && !userMovedRef.current) refit(next.nodes);
   }, [doc, remember, refit]);
 
   /** 撤销 = 回到最近那条历史的「之前」，同时把「现在」推进重做栈。 */
@@ -310,9 +322,12 @@ export default function Editor() {
       .catch(() => { pendingRef.current ??= pend; setSaveState('error'); });
   }, [performSave]);
 
+  const savedVersion = ws?.docs.find(d => d.id === ws.currentId)?.version;
   useEffect(() => {
     if (!ws?.currentId) return;
-    if (doc === lastLoadedRef.current) return;   // 刚加载/切换过来的那份，不用回存
+    // Compare with the last acknowledged content, not the object first loaded.
+    // A version change rechecks undo performed while an older save was in flight.
+    if (sameVersionValue(doc, syncRef.current.doc)) return;
     if (saveTimer.current) clearTimeout(saveTimer.current);
     setSaveState('saving');
     pendingRef.current = { id: ws.currentId, doc, base: syncRef.current.version };
@@ -322,7 +337,7 @@ export default function Editor() {
         .catch(() => setSaveState('error'));
     }, 800);
     return () => { if (saveTimer.current) clearTimeout(saveTimer.current); };
-  }, [doc, ws?.currentId, performSave]);
+  }, [doc, ws?.currentId, savedVersion, performSave]);
 
   /** 手动重试：把欠着的那份（可能是切走前那张图的）和当前这张都补发一遍。 */
   const retrySave = useCallback(() => {
@@ -580,6 +595,16 @@ export default function Editor() {
     setSelected(id);
   }, [doc, selected, commit]);
 
+  const insertStep = useCallback((index: number) => {
+    const result = insertNodeOnEdge(doc, index);
+    if ('error' in result) { setToast(result.error); return; }
+    commit(result.doc, '在线上插入一步', false);
+    setHoveredEdge(null);
+    setSelected(result.id); setEdgeIndex(null); setLinkFrom(null);
+    setPinnedNote(null); setHoverNote(null);
+    setToast('已插入一步 · 上下游已接好，可撤销');
+  }, [doc, commit]);
+
   const deleteNode = useCallback((id: string) => {
     const node = doc.nodes.find(n => n.id === id);
     commit(removeNode(doc, id), `删了「${node?.title ?? id}」`);
@@ -628,6 +653,7 @@ export default function Editor() {
   }, [doc, linkFrom, commit]);
 
   const selectEdge = useCallback((i: number) => {
+    setHoveredEdge(null);
     setEdgeIndex(i); setSelected(null); setLinkFrom(null);
   }, []);
 
@@ -798,6 +824,7 @@ export default function Editor() {
   }, [undo, redo, deleteNode, selected, pasting]);
 
   return (
+    <ToastStackProvider>
     <div className={s.stage}>
 
       {/* 顶端发丝线：整条流程的完成度 */}
@@ -816,6 +843,7 @@ export default function Editor() {
             if (shouldClearCanvasSelection({ button: e.button, overInteractive })) {
               setSelected(null);
               setEdgeIndex(null);
+              setHoveredEdge(null);
             }
             if (!(e.button === 1 || spaceDown || (e.button === 0 && !overInteractive))) return;
             userMovedRef.current = true;
@@ -838,7 +866,7 @@ export default function Editor() {
           onDrop={e => { e.preventDefault(); setDropping(false); openFile(e.dataTransfer.files?.[0]); }}
         >
           <div style={{ position: 'absolute', inset: 0, transform: `translate(${vp.x}px, ${vp.y}px) scale(${vp.z})`, transformOrigin: '0 0' }}>
-            <FlowEdges doc={liveDoc} selectedEdge={edgeIndex} onSelectEdge={selectEdge} />
+            <FlowEdges doc={liveDoc} selectedEdge={edgeIndex} onSelectEdge={selectEdge} onHoverEdge={hoverEdge} />
             {liveDoc.nodes.map(n => (
               <FlowNode
                 key={n.id}
@@ -857,6 +885,11 @@ export default function Editor() {
             ))}
 
           </div>
+
+          {view === '流程图' && loadState === 'ready' && (
+            <EdgeInsertControls doc={liveDoc} viewport={vp} activeEdge={hoveredEdge ?? edgeIndex}
+              onHoverEdge={hoverEdge} onInsert={insertStep} />
+          )}
 
           {(() => {
             // 气泡不进缩放层 —— 图缩到 33% 时字还没法读就没意义了。
@@ -916,6 +949,7 @@ export default function Editor() {
         const n = doc.nodes.find(nn => nn.id === selected);
         if (!n || !live) return null;
         return (
+          <div className={s.canvasTools}>
           <NodeToolbar
             node={n}
             x={vp.x + ((live.x ?? 0) + nodeW(live) / 2) * vp.z}
@@ -932,6 +966,7 @@ export default function Editor() {
             onAddAfter={addStep}
             onDelete={() => deleteNode(n.id)}
           />
+          </div>
         );
       })()}
 
@@ -1016,7 +1051,7 @@ export default function Editor() {
           <TemplateMenu onPick={applyTemplate} up />
           <button className={s.tbBtn} onClick={() => fileRef.current?.click()}>导入</button>
           <button className={s.tbBtn} onClick={relayout}>重新排版</button>
-          <ExportMenu doc={doc} onDone={setToast} up />
+          <ExportMenu doc={doc} up sharedNotifications />
         </div>
       )}
       <input ref={fileRef} type="file" accept="application/json,.json" hidden
@@ -1024,11 +1059,10 @@ export default function Editor() {
 
       {/* 右下：缩放（只在流程图视图） */}
       {view === '流程图' && (
-        <div className={`${s.pill} ${s.zoomFloat}`}>
-          <button className={s.zoomBtn} onClick={() => { userMovedRef.current = true; setVp(v => ({ ...v, z: clampZ(v.z / 1.2) })); }} aria-label="缩小">−</button>
-          <button className={s.zoomBtn} onClick={() => refit(doc.nodes)} title="让整张图正好放进画布">{Math.round(vp.z * 100)}%</button>
-          <button className={s.zoomBtn} onClick={() => { userMovedRef.current = true; setVp(v => ({ ...v, z: clampZ(v.z * 1.2) })); }} aria-label="放大">＋</button>
-        </div>
+        <ZoomControls zoom={vp.z}
+          onZoomOut={() => { userMovedRef.current = true; setVp(v => ({ ...v, z: clampZ(v.z / 1.2) })); }}
+          onFit={() => refit(doc.nodes)}
+          onZoomIn={() => { userMovedRef.current = true; setVp(v => ({ ...v, z: clampZ(v.z * 1.2) })); }} />
       )}
 
       {/* 检查器：选中了才浮出来 */}
@@ -1083,5 +1117,7 @@ export default function Editor() {
         </div>
       )}
     </div>
+    <ExportToastViewport />
+    </ToastStackProvider>
   );
 }

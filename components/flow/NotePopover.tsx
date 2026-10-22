@@ -2,6 +2,7 @@
 
 import { Fragment } from 'react';
 import { NoteSections } from '@/components/views/NoteSections';
+import { Drawer, DrawerClose, DrawerContent, DrawerTrigger } from '@/components/arc/drawer/drawer';
 import type { FlowNode, Note } from '@/lib/types';
 import s from './NotePopover.module.css';
 
@@ -62,6 +63,11 @@ export function NotePopover({
   const firstTodo = note.steps?.find(st => !st.done)?.text;
 
   return (
+    <Drawer key={node.id} open={expanded} onOpenChange={next => {
+      if (next === expanded) return;
+      if (next && !pinned) onPin();
+      else onToggleExpand();
+    }}>
     <div data-pop className={`${s.pop} ${pinned ? s.pinned : ''}`}
          style={{ left, top: y, cursor: pinned ? undefined : 'pointer' }}
          onMouseEnter={onEnter} onMouseLeave={onLeave}
@@ -79,7 +85,6 @@ export function NotePopover({
         )}
       </div>
 
-      {!expanded && (
         <div className={s.body}>
           {hasText ? inline(note.text!)
             : firstTodo ? (
@@ -88,20 +93,25 @@ export function NotePopover({
               </span>
             ) : <span className={s.fallback}>这条附注还没写说明。</span>}
         </div>
-      )}
 
-      {bits.length > 0 && (
         <div className={s.summary}>
           {bits.map((b, i) => <Fragment key={i}>{i > 0 && <span>·</span>}{b}</Fragment>)}
-          <button className={s.more} onClick={onToggleExpand}>{expanded ? '收起' : '展开'}</button>
+          {!bits.length && <span>还没写内容</span>}
+          <DrawerTrigger asChild>
+            <button type="button" className={s.more} onClick={event => event.stopPropagation()}>展开</button>
+          </DrawerTrigger>
         </div>
-      )}
-
-      {expanded && (
-        <div className={s.detail}>
-          <NoteSections note={note} onChange={onChange} onRemoveNote={() => onChange(undefined)} />
-        </div>
-      )}
     </div>
+    <DrawerContent data-pop overlayProps={{ 'data-pop': true }} aria-modal="true" side="right" className={s.noteDrawer}
+      title={`附注 ${String(index).padStart(2, '0')} · ${node.title}`}
+      description="附注／邮件模板 · 编辑沿用原有自动保存，关闭不会撤销已输入内容。"
+      onKeyDown={event => event.stopPropagation()}
+      onPaste={event => event.stopPropagation()}>
+      <NoteSections note={note} onChange={onChange} onRemoveNote={() => onChange(undefined)} collapsible />
+      <div className={s.drawerFoot}>
+        <DrawerClose asChild><button type="button" className={s.drawerClose}>收起，返回预览</button></DrawerClose>
+      </div>
+    </DrawerContent>
+    </Drawer>
   );
 }

@@ -21,10 +21,16 @@
 /* 折起来的那四样，平时只占一行灰字 */
 .summary {
   padding: 9px 14px; border-top: 1px solid var(--rf-rule-light);
-  display: flex; align-items: center; gap: 10px;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
   font-family: var(--rf-mono); font-size: 9.5px; letter-spacing: 0.4px; color: var(--rf-ink-4);
 }
 .summary b { color: var(--rf-gold); font-weight: 500; }
-.more { margin-left: auto; color: var(--rf-ink-3); border-bottom: 1px solid var(--rf-rule-mid); }
+.summary > span { white-space: nowrap; }
+.more { flex-shrink: 0; white-space: nowrap; margin-left: auto; color: var(--rf-ink-3); border-bottom: 1px solid var(--rf-rule-mid); }
 .more:hover { color: var(--rf-ink); border-bottom-color: var(--rf-ink); }
-.detail { border-top: 1px solid var(--rf-rule-light); overflow-y: auto; }
+.more:focus-visible { outline: 2px solid var(--rf-gold); outline-offset: 3px; }
+.noteDrawer { font-family: var(--rf-font); }
+.noteDrawer textarea { min-height: clamp(220px, 38dvh, 420px); }
+.drawerFoot { display: flex; justify-content: flex-end; padding: 16px 20px; }
+.drawerClose { min-height: 40px; padding: 9px 14px; border: 1px solid var(--rf-rule-mid); color: var(--rf-ink); background: var(--rf-surface); font: inherit; }
+.drawerClose:hover { border-color: var(--rf-ink); }

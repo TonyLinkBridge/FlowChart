@@ -1,6 +1,8 @@
 'use client';
 
 import { Fragment } from 'react';
+import { Accordion } from '@/components/arc/accordion/accordion';
+import { NoteRichTextEditor } from './NoteRichTextEditor';
 import {
   addField, addLink, addStep, emptyNote, isEmptyNote,
   removeField, removeLink, removeStep, setFieldAt, setLinkAt, setStep,
@@ -27,10 +29,12 @@ function SecHead({ label, tools }: { label: string; tools?: React.ReactNode }) {
   );
 }
 
-export function NoteSections({ note, onChange, onRemoveNote }: {
+export function NoteSections({ note, onChange, onRemoveNote, collapsible = false }: {
   note?: Note;
   onChange: (n: Note) => void;
   onRemoveNote: () => void;
+  /** Only the expanded note drawer groups its editors; other consumers retain their existing layout. */
+  collapsible?: boolean;
 }) {
   if (!note) {
     return (
@@ -48,8 +52,8 @@ export function NoteSections({ note, onChange, onRemoveNote }: {
   const links = note.links ?? [];
   const doneCount = steps.filter(st => st.done).length;
 
-  return (
-    <>
+  const sections = [
+    { title: '操作步骤', content: (
       <div className={s.sec}>
         <SecHead label="怎么做" tools={
           <button className={s.tool} onClick={() => onChange(addStep(note))}>＋ 加一步</button>} />
@@ -76,7 +80,8 @@ export function NoteSections({ note, onChange, onRemoveNote }: {
         ))}
         {steps.length > 0 && <div className={s.hint}>节点进度由这 {steps.length} 条自动汇总</div>}
       </div>
-
+    ) },
+    { title: '要填的资料', content: (
       <div className={s.sec}>
         <SecHead label="要填的" tools={
           <button className={s.tool} onClick={() => onChange(addField(note))}>＋ 加一格</button>} />
@@ -91,7 +96,8 @@ export function NoteSections({ note, onChange, onRemoveNote }: {
         ))}
         {fields.length > 0 && <div className={s.hint}>填了内容之后，导出时会问你要不要一起带走</div>}
       </div>
-
+    ) },
+    { title: '相关链接', content: (
       <div className={s.sec}>
         <SecHead label="相关" tools={
           <button className={s.tool} onClick={() => onChange(addLink(note))}>＋ 加一条</button>} />
@@ -105,21 +111,32 @@ export function NoteSections({ note, onChange, onRemoveNote }: {
           </div>
         ))}
       </div>
-
+    ) },
+    { title: '联系人', content: (
       <div className={s.sec} style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
         <span className={s.secLabel}>问谁</span>
         <input className={s.rowInput} value={note.contact ?? ''} placeholder="卡住了找谁"
                onChange={e => onChange({ ...note, contact: e.target.value })} />
       </div>
-
+    ) },
+    { title: '附注／邮件模板', content: (
       <div className={s.sec}>
         <SecHead label="说明" />
+        {collapsible ? <NoteRichTextEditor value={note.text ?? ''} onChange={text => onChange({ ...note, text })} /> : <>
         <textarea className={s.area} value={note.text ?? ''}
                   placeholder="补充说明。支持 **粗体** 和 `代码`。"
                   onChange={e => onChange({ ...note, text: e.target.value })} />
         {note.text?.trim() && <div className={s.prose} style={{ marginTop: 10 }}>{inline(note.text)}</div>}
+        </>}
       </div>
+    ) },
+  ];
 
+  return (
+    <>
+      {collapsible ? (
+        <div className={s.accordionEditor}><Accordion items={sections} defaultOpen={4} /></div>
+      ) : sections.map(section => <Fragment key={section.title}>{section.content}</Fragment>)}
       <div className={s.sec} style={{ display: 'flex', justifyContent: 'flex-end' }}>
         <button className={s.danger} onClick={onRemoveNote}>
           {isEmptyNote(note) ? '这条附注是空的 · 删掉' : '删掉整条附注'}

@@ -1,0 +1,38 @@
+.root {
+  --foreground: var(--rf-ink);
+  --text-secondary: var(--rf-ink-2);
+  --text-muted: var(--rf-ink-4);
+  --accent: var(--rf-gold);
+  --accent-strong: var(--rf-gold);
+  --accent-subtle: var(--rf-fill);
+  --accent-foreground: var(--rf-paper);
+  --surface-raised: var(--rf-paper);
+  --surface-muted: var(--rf-fill);
+  --border: var(--rf-rule-mid);
+  --border-subtle: var(--rf-rule-light);
+  --border-strong: var(--rf-ink);
+  --font-body: var(--rf-font);
+  --tracking-body: normal;
+  --text-xs: 10px;
+  --text-sm: 11.5px;
+  --text-base: var(--rf-t-body);
+  --text-lg: 16px;
+  --text-xl: 18px;
+  --text-2xl: 21px;
+  --duration-instant: 0.12s;
+  --duration-fast: 0.16s;
+  --duration-standard: 0.24s;
+  --ease-standard: cubic-bezier(.22, 1, .36, 1);
+  min-width: 0;
+}
+.modes { display: flex; gap: 0; margin: 0 0 14px; }
+/* Reserve the first-line toolbar's space so it cannot intercept the source-mode button. */
+.surface { padding-top: 44px; }
+.modes button { font-size: 11px; padding: 6px 10px; border: 1px solid var(--rf-rule-mid); }
+.modes button + button { border-left: 0; }
+.modes button[aria-pressed='true'] { background: var(--rf-ink); color: var(--rf-paper); }
+.modes button:disabled { cursor: not-allowed; color: var(--rf-ink-4); }
+.modes button:focus-visible, .source:focus-visible { outline: 2px solid var(--rf-gold); outline-offset: 3px; }
+.source { width: 100%; min-height: 200px; resize: vertical; padding: 9px 11px; border: 1px solid var(--rf-rule-mid); background: transparent; color: var(--rf-ink-2); font: inherit; font-size: var(--rf-t-body); line-height: 1.75; }
+.hint { font-size: 10px; line-height: 1.7; color: var(--rf-ink-4); margin: 12px 0 0; }
+@media (prefers-reduced-motion: reduce) { .root { --duration-instant: 0s; --duration-fast: 0s; --duration-standard: 0s; } }

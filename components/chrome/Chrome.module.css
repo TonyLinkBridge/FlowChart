@@ -128,6 +128,8 @@
 
 /* ═══ 方案 B · 沉浸画布：全屏画布，一切皆浮层 ═══ */
 .stage { position: relative; height: 100vh; overflow: hidden; background: var(--rf-paper); }
+.canvasTools { position: absolute; inset: 0; pointer-events: none; }
+.canvasTools > * { pointer-events: auto; }
 
 /* 顶端进度发丝线：整条流程干到哪了，一眼扫到 */
 .hairline { position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--rf-fill); z-index: 45; }
@@ -235,8 +237,7 @@ button.saveErr:hover { text-decoration: underline; }
 .histRestore:hover { color: var(--rf-gold); }
 .histRestore:disabled { opacity: 0.4; cursor: not-allowed; }
 .histNotice { padding: 12px 14px; border-bottom: 1px solid var(--rf-rule-mid); font-size: 12px; background: var(--rf-surface); }
-.histNotice p { margin: 0 0 8px; overflow-wrap: anywhere; }
-.histNotice [role="alert"] { color: #8b2623; }
+.histMessage { margin-bottom: 6px; }
 .histNotice button { min-height: 32px; text-decoration: underline; text-underline-offset: 3px; }
 .histNotice button:focus-visible, .histRestore:focus-visible { outline: 2px solid var(--rf-gold); outline-offset: 3px; }
 .histSection { padding: 12px 14px 5px; font-family: var(--rf-mono); font-size: 9.5px; letter-spacing: 0.14em; color: var(--rf-ink-4); }
@@ -246,3 +247,31 @@ button.saveErr:hover { text-decoration: underline; }
 .histBtn { margin-left: 8px; font-size: 11px; color: var(--rf-ink-3); text-decoration: underline; text-underline-offset: 2px; white-space: nowrap; }
 .histBtn:hover { color: var(--rf-ink); }
 .orgSwitch { display: flex; align-items: center; margin-right: 4px; }
+
+/* Compact screens use separate rows, rather than overlapping fixed-position pills.
+   The main tools remain the same nine actions; menus anchor to the whole tray. */
+@media (max-width: 1000px) {
+  .stage { height: 100dvh; }
+  .canvas, .canvasTools { top: 156px !important; bottom: 156px !important; }
+  .docPill { top: 12px; left: 12px; right: 12px; gap: 8px; padding: 8px 10px; min-height: 38px; }
+  .docPillInput { flex: 1; min-width: 0; width: 0; }
+  .docMeta { flex-shrink: 0; font-size: 8.5px; padding-left: 8px; }
+  .histBtn { flex-shrink: 0; margin-left: 0; min-height: 22px; }
+  .viewPill { top: 60px; left: 12px; right: 12px; transform: none; justify-content: center; }
+  .viewSeg { flex: 1; min-width: 0; padding: 8px 4px; }
+  .acctPill { top: 106px; left: 12px; right: 12px; min-height: 38px; }
+  .orgSwitch { flex: 1; min-width: 0; overflow: hidden; }
+  .acctName { max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .acctOut { flex-shrink: 0; }
+  .libCard, .libToggle, .inspectorFloat, .histFloat { top: 156px; max-height: calc(100% - 320px); }
+  .libCard, .libToggle { left: 12px; }
+  .inspectorFloat, .histFloat { right: 12px; width: min(320px, calc(100% - 24px)); }
+  .histBody { min-height: 0; }
+  .viewPanel { left: 0 !important; padding-top: 156px; padding-bottom: 156px; }
+  .toolbarFloat { left: 12px; right: 12px; bottom: 12px; transform: none; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .toolbarFloat:has(.menu) { z-index: 41; }
+  .toolbarFloat .tbBtn { width: 100%; min-height: 38px; padding: 8px 2px; font-size: 10.5px; }
+  .toolbarFloat .exportWrap { position: static; min-width: 0; }
+  .toolbarFloat .menu { width: min(320px, calc(100vw - 24px)); max-height: calc(100dvh - 250px); overflow-y: auto; }
+  .floatToast { top: auto; bottom: 152px; left: 12px; right: 12px; transform: none; white-space: normal; overflow-wrap: anywhere; }
+}

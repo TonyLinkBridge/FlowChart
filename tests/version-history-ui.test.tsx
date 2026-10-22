@@ -95,7 +95,7 @@ describe('版本预览与恢复', () => {
   it('does not present a failed history request as an empty history', async () => {
     api.fetchHistory.mockRejectedValueOnce(new Error('网络不通'));
     setup();
-    expect(await screen.findByRole('alert')).toHaveProperty('textContent', '历史记录加载失败：网络不通');
+    expect((await screen.findByRole('alert')).textContent).toContain('历史记录加载失败：网络不通');
     expect(screen.queryByText(/还没有存档/)).toBeNull();
   });
 

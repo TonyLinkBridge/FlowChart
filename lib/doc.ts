@@ -1,4 +1,5 @@
 import { autoLayout } from './layout';
+import { nodeH, nodeW } from './edges';
 import type { FlowDoc, FlowEdge, FlowNode, Shape } from './types';
 
 /** 生成一个没被占用的 id */
@@ -40,6 +41,57 @@ export function addNode(doc: FlowDoc, afterId?: string | null): { doc: FlowDoc; 
     edges: afterId ? [...doc.edges, { source: afterId, target: id }] : doc.edges,
   };
   return { doc: autoLayout(next), id };
+}
+
+/** 只拆开用户选中的那条线，不调用整图自动排版。失败时原图完全不变。 */
+export function insertNodeOnEdge(doc: FlowDoc, index: number): { doc: FlowDoc; id: string } | { error: string } {
+  const edge = Number.isInteger(index) ? doc.edges[index] : undefined;
+  const source = doc.nodes.find(n => n.id === edge?.source);
+  const target = doc.nodes.find(n => n.id === edge?.target);
+  if (!edge || !source || !target) return { error: '这条连线已不存在，请重新选择。' };
+  if (doc.nodes.some(n => !Number.isFinite(n.x) || !Number.isFinite(n.y))) {
+    return { error: '节点位置尚未就绪，请稍后再试。' };
+  }
+  if (target.y! <= source.y!) return { error: '这条回连或横向连线暂不支持直接插入，请先调整位置。' };
+
+  const downstream = new Set<string>();
+  const queue = [target.id];
+  const successors = new Map<string, string[]>();
+  for (const e of doc.edges) successors.set(e.source, [...(successors.get(e.source) ?? []), e.target]);
+  for (let i = 0; i < queue.length; i++) {
+    const id = queue[i];
+    if (downstream.has(id)) continue;
+    downstream.add(id);
+    queue.push(...(successors.get(id) ?? []));
+  }
+  if (downstream.has(source.id)) return { error: '这条连线包含循环，直接插入可能影响其他步骤，请先调整连线。' };
+
+  const id = nextId(doc);
+  const node: FlowNode = { id, title: '新步骤', shape: 'process' };
+  const gap = 30;
+  const bottom = source.y! + nodeH(source);
+  const shift = Math.max(0, bottom + gap * 2 + nodeH(node) - target.y!);
+  if (shift && doc.nodes.some(n => downstream.has(n.id) && n.locked)) {
+    return { error: '后续有锁定节点，无法安全腾出位置。请先留出空位或解锁。' };
+  }
+  node.x = target.x! + (nodeW(target) - nodeW(node)) / 2;
+  node.y = shift ? bottom + gap : Math.floor((bottom + target.y! - nodeH(node)) / 2);
+  const nodes = doc.nodes.map(n => shift && downstream.has(n.id) ? { ...n, y: n.y! + shift } : n);
+  const overlaps = (a: FlowNode, b: FlowNode) =>
+    a.x! < b.x! + nodeW(b) + 16 && a.x! + nodeW(a) + 16 > b.x! &&
+    a.y! < b.y! + nodeH(b) + 16 && a.y! + nodeH(a) + 16 > b.y!;
+  const stationary = nodes.filter(n => !downstream.has(n.id));
+  if (nodes.some(n => overlaps(node, n)) || (shift && nodes.some(n =>
+    downstream.has(n.id) && stationary.some(other => overlaps(n, other))))) {
+    return { error: '插入后会挤到其他节点。请先给这条连线留一点空位，再插入。' };
+  }
+  // 插在源节点后面；旧节点的相对顺序和附注编号保持不变。
+  nodes.splice(nodes.findIndex(n => n.id === source.id) + 1, 0, node);
+  const edges = doc.edges.flatMap((e, i) => i === index ? [
+    { ...e, target: id },
+    { source: id, target: e.target, ...(e.dashed === undefined ? {} : { dashed: e.dashed }) },
+  ] : [e]);
+  return { doc: { ...doc, nodes, edges }, id };
 }
 
 /** 删节点。中间那步被删掉时，把它的上下游接起来 —— 不然链子会断成两截。 */

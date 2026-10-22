@@ -4,17 +4,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { fetchHistory, snapshotVersion, previewVersion, type ActivityEntry, type FlowVersion } from '@/lib/store';
 import type { RestorePreview, RestoreRequest, RestoreResult } from '@/lib/version-restore';
 import { RestorePreviewDialog } from './RestorePreviewDialog';
+import { ActivityTimeline } from './ActivityTimeline';
+import { VersionSnapshotList } from './VersionSnapshotList';
+import { Alert } from '@/components/arc/alert/alert';
 import s from './Chrome.module.css';
 
-const when = (time: number) => new Date(time).toLocaleString('zh-CN', {
-  year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit',
-});
 const message = (error: unknown) => error instanceof Error ? error.message : '请稍后重试';
-
-const ACTION_TEXT: Record<string, string> = {
-  create: '创建了流程', update: '更新了流程', delete: '删除了流程',
-  restore: '恢复了版本', snapshot: '保存了存档',
-};
 
 interface Props {
   flowId: string;
@@ -104,38 +99,27 @@ function VersionsPanelBody({ flowId, currentVersion, onClose, onPrepareRestore, 
       </div>
 
       <div className={s.histBody}>
-        {historyError && <div className={s.histNotice}><p role="alert">{historyError}</p><button type="button" onClick={() => void load()}>重新加载历史</button></div>}
+        {historyError && <div className={s.histNotice}>
+          <Alert className={s.histMessage} tone="danger" title="历史记录操作失败">{historyError}</Alert>
+          <button type="button" onClick={() => void load()}>重新加载历史</button>
+        </div>}
         {receipt && <div className={s.histNotice}>
-          <p role="status">已恢复为 V{receipt.version}，恢复前 V{receipt.backup.version} 的完整内容已自动备份。</p>
+          <Alert className={s.histMessage} tone="success" title="恢复完成，已自动备份">
+            {`已恢复为 V${receipt.version}，恢复前 V${receipt.backup.version} 的完整内容已自动备份。`}
+          </Alert>
           <button type="button" onClick={() => void showPreview(receipt.backup.id)} disabled={restoring}>查看并退回恢复前</button>
         </div>}
         {!historyError && versions === null ? (
           <div className={s.histEmpty} role="status">翻档案中…</div>
         ) : !historyError && versions?.length === 0 ? (
           <div className={s.histEmpty}>还没有存档 —— 编辑一会儿会自动落第一版</div>
-        ) : versions?.map(v => (
-          <div key={v.id} className={s.histRow}>
-            <span className={s.histVer}>V{v.version}</span>
-            <span className={s.histMeta}>
-              {v.savedName ?? '同事'} · {when(v.createdAt)}
-              {v.note ? <span className={s.histNoteText}> · {v.note}</span> : null}
-            </span>
-            {v.version === currentVersion && <span className={s.histNow}>当前版本号</span>}
-            <button type="button" className={s.histRestore} onClick={() => void showPreview(v.id)} disabled={restoring}>查看差异</button>
-          </div>
-        ))}
-        {!!versions?.length && <p className={s.histEmpty}>显示最近 {versions.length} 份存档；先查看差异，确认后才会恢复。</p>}
+        ) : <VersionSnapshotList key={versions?.[0]?.id ?? 'empty'} versions={versions ?? []}
+          currentVersion={currentVersion} restoring={restoring} onPreview={id => void showPreview(id)} />}
 
         {activity.length > 0 && (
           <>
             <div className={s.histSection}>动态</div>
-            {activity.map((a, i) => (
-              <div key={i} className={s.histAct}>
-                <span>{a.actorName ?? '有人'} {ACTION_TEXT[a.action] ?? a.action}</span>
-                {a.detail ? <span className={s.histActDetail} title={a.detail}>{a.detail}</span> : null}
-                <span className={s.histActTime}>{when(a.createdAt)}</span>
-              </div>
-            ))}
+            <ActivityTimeline activity={activity} />
           </>
         )}
       </div>

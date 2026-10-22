@@ -1,0 +1,6 @@
+.portal { display: contents; }
+/* Beat Arc's mobile rule; keep existing z-index:30 toolbars/menus above notifications. */
+.portal .viewport[aria-live] { z-index: 29; bottom: 76px; max-height: calc(100dvh - 100px); }
+@media (max-width: 1000px) {
+  .portal .viewport[aria-live] { bottom: 152px; max-height: calc(100dvh - 180px); }
+}

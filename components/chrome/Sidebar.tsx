@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { Folder, StoredDoc, Workspace } from '@/lib/store';
+import { DeleteFlowButton } from './DeleteFlowButton';
 import s from './Sidebar.module.css';
 
 /** 左侧栏：你存过的所有流程图，按你自己建的分堆归类。
@@ -29,7 +30,7 @@ export function Sidebar({
   const inFolder = (fid: string | null) => ws.docs.filter(d => d.folderId === fid);
 
   const Row = (d: StoredDoc) => (
-    <div key={d.id} className={`${s.row} ${d.id === ws.currentId ? s.rowOn : ''}`} onClick={() => onPick(d.id)}>
+    <div key={d.id} data-flow-row className={`${s.row} ${d.id === ws.currentId ? s.rowOn : ''}`} onClick={() => onPick(d.id)}>
       <span className={s.dot} />
       <input
         className={s.name}
@@ -57,7 +58,7 @@ export function Sidebar({
             ))}
           </select>
         )}
-        <button className={s.tool} title="删除" onClick={() => onDelete(d.id)}>×</button>
+        <DeleteFlowButton flowId={d.id} title={d.doc.title} onDelete={onDelete} />
       </span>
     </div>
   );
